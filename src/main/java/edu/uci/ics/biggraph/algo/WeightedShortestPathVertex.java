@@ -17,7 +17,6 @@ import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.io.DoubleWritable;
 import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
-import edu.uci.ics.biggraph.outputformat.InverseOutputFormat;
 import edu.uci.ics.biggraph.outputformat.SimpleOutputFormat;
 
 
