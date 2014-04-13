@@ -77,8 +77,10 @@ class WeightedShortestPathsGraphReader extends
              */
             int neighborNum = Integer.parseInt(fields[1]);
             // Debugging...
+            /*
             System.out.print("Neighbor num: ");
             System.out.println(neighborNum);
+            */
             
             /**
              * set up edges & weights
@@ -96,10 +98,12 @@ class WeightedShortestPathsGraphReader extends
                 vertex.addEdge(destId, weightWritable);   
                 
                 // Debugging...
+                /*
                 System.out.print("dest id: ");
                 System.out.println(dest);
                 System.out.print("weight: ");
                 System.out.println(weight);
+                */
             }          
         }
         // vertex.sortEdges();
