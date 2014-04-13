@@ -1,0 +1,17 @@
+Input Data:
+All input data files are put in a same folder.
+Each node should have 3 files, including:
+1) nodeId.feat : The features for each of the neighbor node.
+2) nodeId.egofeat : The features for the ego user.
+3) nodeId.featnames : The names of each of the feature dimensions. Features are '1' if the user has this property in their profile, and '0' otherwise. This file has been anonymized for facebook users, since the names of the features would reveal private data.
+
+Output Data:
+1) graph.txt
+This file records the graphical information. The format of each line is listed in
+https://docs.google.com/a/uci.edu/document/d/18jaKJT3OCVdKgXPB6JMClRKvsl2IWx8vJYfiTgFjxd0/edit
+2) featureIndex.txt
+This file contains every appearing feature and its corresponding ID.
+
+Run this program:
+1) change the variable "currPath" according to your path of input data files
+2) run twitter_with_tags_parser.py
