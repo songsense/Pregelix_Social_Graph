@@ -7,10 +7,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 
+import edu.uci.ics.pregelix.api.io.WritableSizable;
+
 /**
  * Created by soushimei on 4/13/14.
  */
-public class DoubleArrayListWritable extends ArrayListWritable {
+public class DoubleArrayListWritable extends ArrayListWritable implements WritableSizable {
 
     public void setClass() {
         Class<DoubleWritable> refClass = DoubleWritable.class;
@@ -49,5 +51,10 @@ public class DoubleArrayListWritable extends ArrayListWritable {
             DoubleWritable doubleWritable = new DoubleWritable(value);
             doubleWritable.write(out);
         }
+    }
+
+    @Override
+    public int sizeInBytes() {
+        return 4 + 8 * size();
     }
 }
