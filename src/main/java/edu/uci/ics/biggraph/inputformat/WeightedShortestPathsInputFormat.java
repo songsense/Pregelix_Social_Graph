@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uci.ics.biggraph.io.WeightedPathWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -16,13 +17,13 @@ import edu.uci.ics.pregelix.api.io.VertexReader;
 import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
 import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
 import edu.uci.ics.pregelix.api.util.BspUtils;
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.biggraph.io.DoubleWritable;
 
-public class WeightedShortestPathsInputFormat extends 
-TextVertexInputFormat<VLongWritable, DoubleWritable, FloatWritable, DoubleWritable>{
+import edu.uci.ics.biggraph.io.VLongWritable;
+
+public class WeightedShortestPathsInputFormat extends
+TextVertexInputFormat<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable>{
     @Override
-    public VertexReader<VLongWritable, DoubleWritable, FloatWritable, DoubleWritable> createVertexReader(
+    public VertexReader<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> createVertexReader(
             InputSplit split, TaskAttemptContext context) throws IOException {
         return new WeightedShortestPathsGraphReader(textInputFormat.createRecordReader(split, context));
     }
@@ -30,7 +31,7 @@ TextVertexInputFormat<VLongWritable, DoubleWritable, FloatWritable, DoubleWritab
 
 @SuppressWarnings("rawtypes")
 class WeightedShortestPathsGraphReader extends
-        TextVertexReader<VLongWritable, DoubleWritable, FloatWritable, DoubleWritable> {
+        TextVertexReader<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> {
 
     private final static String separator = " ";
     private Vertex vertex;
@@ -49,7 +50,7 @@ class WeightedShortestPathsGraphReader extends
 
     @SuppressWarnings("unchecked")
     @Override
-    public Vertex<VLongWritable, DoubleWritable, FloatWritable, DoubleWritable> getCurrentVertex() throws IOException,
+    public Vertex<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> getCurrentVertex() throws IOException,
             InterruptedException {
         if (vertex == null)
             vertex = (Vertex) BspUtils.createVertex(getContext().getConfiguration());
@@ -81,7 +82,7 @@ class WeightedShortestPathsGraphReader extends
             System.out.print("Neighbor num: ");
             System.out.println(neighborNum);
             */
-            
+
             /**
              * set up edges & weights
              */
@@ -90,13 +91,13 @@ class WeightedShortestPathsGraphReader extends
             	dest = Long.parseLong(fields[2*i+2]);
             	VLongWritable destId = allocate();
             	destId.set(dest);
-                
+
                 // set up weight
-                float weight = Float.parseFloat(fields[2*i+3]);   
+                float weight = Float.parseFloat(fields[2*i+3]);
                 weight = 1.0f / (weight + 0.001f);			// smaller the weight means more common tags
                 FloatWritable weightWritable = new FloatWritable(weight);
-                vertex.addEdge(destId, weightWritable);   
-                
+                vertex.addEdge(destId, weightWritable);
+
                 // Debugging...
                 /*
                 System.out.print("dest id: ");
@@ -104,12 +105,12 @@ class WeightedShortestPathsGraphReader extends
                 System.out.print("weight: ");
                 System.out.println(weight);
                 */
-            }          
+            }
         }
         // vertex.sortEdges();
         return vertex;
     }
-    
+
     private VLongWritable allocate() {
         if (used >= pool.size()) {
             VLongWritable value = new VLongWritable();

@@ -4,7 +4,10 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import edu.uci.ics.biggraph.io.WeightedPathWritable;
 import org.apache.hadoop.io.FloatWritable;
+import org.apache.hadoop.io.Text;
+
 
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.Edge;
@@ -12,61 +15,92 @@ import edu.uci.ics.pregelix.api.graph.MessageCombiner;
 import edu.uci.ics.pregelix.api.graph.MsgList;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
+import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
+
+
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.biggraph.io.DoubleWritable;
 import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
-import edu.uci.ics.biggraph.outputformat.SimpleOutputFormat;
+import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 
 
-public class WeightedShortestPathVertex extends Vertex<VLongWritable, DoubleWritable, FloatWritable, DoubleWritable> {
+public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> {
     /**
      * Test whether combiner is called by summing up the messages.
      */
-    public static class SimpleMinCombiner extends MessageCombiner<VLongWritable, DoubleWritable, DoubleWritable> {
+    public static class SimpleMinCombiner extends MessageCombiner<VLongWritable, WeightedPathWritable, WeightedPathWritable> {
         private double min = Double.MAX_VALUE;
-        private DoubleWritable agg = new DoubleWritable();
-        private MsgList<DoubleWritable> msgList;
+        private Text path = new Text();
+        private WeightedPathWritable agg = new WeightedPathWritable();
+        private MsgList<WeightedPathWritable> msgList;
+
+        private int metaSlot = 8;
+        private int accumulatedSize = metaSlot;
 
         @Override
-        public void stepPartial(VLongWritable vertexIndex, DoubleWritable msg) throws HyracksDataException {
-            double value = msg.get();
-            if (min > value)
+        public void stepPartial(VLongWritable vertexIndex, WeightedPathWritable msg) throws HyracksDataException {
+            double value = msg.getWeight();
+            if (min > value) {
                 min = value;
+                path.set(msg.getPathWritable());
+            }
+            accumulatedSize += msg.sizeInBytes();
         }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         @Override
         public void init(MsgList msgList) {
             min = Double.MAX_VALUE;
+            path = new Text();
+            agg = new WeightedPathWritable();
             this.msgList = msgList;
+            this.accumulatedSize = metaSlot;
         }
 
         @Override
-        public DoubleWritable finishPartial() {
-            agg.set(min);
+        public WeightedPathWritable finishPartial() {
+            agg.setWeight(min);
+            agg.setPathAlone(path);
             return agg;
         }
 
         @Override
-        public void stepFinal(VLongWritable vertexIndex, DoubleWritable partialAggregate) throws HyracksDataException {
-            double value = partialAggregate.get();
-            if (min > value)
+        public void stepFinal(VLongWritable vertexIndex, WeightedPathWritable partialAggregate) throws HyracksDataException {
+            double value = partialAggregate.getWeight();
+            if (min > value) {
                 min = value;
+                path.set(partialAggregate.getPathWritable());
+            }
+            accumulatedSize += partialAggregate.sizeInBytes();
         }
 
         @Override
-        public MsgList<DoubleWritable> finishFinal() {
-            agg.set(min);
+        public MsgList<WeightedPathWritable> finishFinal() {
+            agg = new WeightedPathWritable();
+            agg.setWeight(min);
+//            agg.setPathAlone("ac");
             msgList.clear();
             msgList.add(agg);
             return msgList;
         }
+
+        @Override
+        public int estimateAccumulatedStateByteSizePartial(VLongWritable vertexIndex, WeightedPathWritable msg) throws HyracksDataException {
+            return accumulatedSize + msg.sizeInBytes();
+        }
+
+        @Override
+        public int estimateAccumulatedStateByteSizeFinal(VLongWritable vertexIndex, WeightedPathWritable partialAggregate)
+                throws HyracksDataException {
+            int size = accumulatedSize;
+            size += (partialAggregate.sizeInBytes());
+            return size;
+        }
     }
 
-    private DoubleWritable outputValue = new DoubleWritable();
-    private DoubleWritable tmpVertexValue = new DoubleWritable();
+    private WeightedPathWritable outputValue = new WeightedPathWritable();
+    private WeightedPathWritable tmpVertexValue = new WeightedPathWritable();
     /** Class logger */
     private static final Logger LOG = Logger.getLogger(WeightedShortestPathVertex.class.getName());
     /** The shortest paths id */
@@ -84,27 +118,50 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, DoubleWrit
     }
 
     @Override
-    public void compute(Iterator<DoubleWritable> msgIterator) {
+    public void compute(Iterator<WeightedPathWritable> msgIterator) {
         if (getSuperstep() == 1) {
-            tmpVertexValue.set(Double.MAX_VALUE);
+            tmpVertexValue.setWeight(Double.MAX_VALUE);
+            // tmpVertexValue.setPathAlone(new Text("s: "));
             setVertexValue(tmpVertexValue);
         }
         double minDist = isSource() ? 0d : Double.MAX_VALUE;
+        Text minPath = new Text();
+        if (isSource() == true) {
+            minPath = new Text();
+            minPath.set(getVertexId().toString().getBytes(), 0, getVertexId().toString().length());
+            // minPath.add(getVertexId().get());
+        } else {
+            minPath.set(getVertexValue().toString().getBytes(), 0, getVertexValue().toString().length());
+        }
+
+        WeightedPathWritable weightPathWritable;
         while (msgIterator.hasNext()) {
-            minDist = Math.min(minDist, msgIterator.next().get());
+            weightPathWritable = msgIterator.next();
+            if (minDist > weightPathWritable.getWeight()) {
+                minDist = weightPathWritable.getWeight();
+                minPath.set(weightPathWritable.getPathWritable());
+            }
         }
         if (LOG.getLevel() == Level.FINE) {
             LOG.fine("Vertex " + getVertexId() + " got minDist = " + minDist + " vertex value = " + getVertexValue());
         }
-        if (minDist < getVertexValue().get()) {
-            tmpVertexValue.set(minDist);
+
+        if (minDist < getVertexValue().getWeight()) {
+            tmpVertexValue.setWeight(minDist);
+            // uncomment here to redisplay the exception
+            // this prevents storing the path info into the vertex value
+//            tmpVertexValue.setPath(minPath, getVertexId().get());
             setVertexValue(tmpVertexValue);
+
+            // uncomment here
+            // this prevents storing the path info into the message
+            // outputValue.setPath(minPath, getVertexId());
             for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
                 if (LOG.getLevel() == Level.FINE) {
                     LOG.fine("Vertex " + getVertexId() + " sent to " + edge.getDestVertexId() + " = "
                             + (minDist + edge.getEdgeValue().get()));
                 }
-                outputValue.set(minDist + edge.getEdgeValue().get());
+                outputValue.setWeight(minDist + (double) edge.getEdgeValue().get());
                 sendMsg(edge.getDestVertexId(), outputValue);
             }
         }
@@ -120,8 +177,9 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, DoubleWrit
         PregelixJob job = new PregelixJob(WeightedShortestPathVertex.class.getSimpleName());
         job.setVertexClass(WeightedShortestPathVertex.class);
         job.setVertexInputFormatClass(WeightedShortestPathsInputFormat.class);
-        job.setVertexOutputFormatClass(SimpleOutputFormat.class);
-        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
+        job.setVertexOutputFormatClass(WeightedOutputFormat.class);
+//        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
+        job.setMessageCombinerClass(DefaultMessageCombiner.class);
         job.setNoramlizedKeyComputerClass(VLongNormalizedKeyComputer.class);
         job.getConfiguration().setLong(SOURCE_ID, 0);
         Client.run(args, job);
