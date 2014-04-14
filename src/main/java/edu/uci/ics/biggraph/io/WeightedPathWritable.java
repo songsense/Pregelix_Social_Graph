@@ -1,11 +1,6 @@
 package edu.uci.ics.biggraph.io;
 
-import java.io.DataOutput;
-import java.io.DataInput;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import org.apache.hadoop.io.Text;
 
 // first is the weight
 // the rest are the path
@@ -14,8 +9,16 @@ public class WeightedPathWritable extends DoubleArrayListWritable {
 	public WeightedPathWritable() {
         super();
         DoubleWritable dw = new DoubleWritable(Double.MAX_VALUE);
-        this.add(dw);
+        this.add(new DoubleWritable(dw.get()));
 	}
+
+    public WeightedPathWritable(WeightedPathWritable weightedPathWritable) {
+        super();
+        for (int i = 0; i < weightedPathWritable.size(); ++i) {
+            DoubleWritable doubleWritable = (DoubleWritable) weightedPathWritable.get(i);
+            this.add(new DoubleWritable(doubleWritable.get()));
+        }
+    }
 
     public double getWeight() {
         DoubleWritable wr = (DoubleWritable) this.get(0);

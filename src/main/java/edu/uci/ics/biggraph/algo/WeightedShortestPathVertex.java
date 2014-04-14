@@ -120,12 +120,16 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
     @Override
     public void compute(Iterator<WeightedPathWritable> msgIterator) {
         ArrayList<Double> minPath = new ArrayList<Double>();
+        tmpVertexValue = new WeightedPathWritable();
+        outputValue = new WeightedPathWritable();
 
+        // in first step, initialize the vertexes' values
         if (getSuperstep() == 1) {
             tmpVertexValue.setWeight(Double.MAX_VALUE);
             tmpVertexValue.setPathAlone(minPath);
             setVertexValue(tmpVertexValue);
         }
+
         double minDist = isSource() ? 0d : Double.MAX_VALUE;
         if (isSource() == true) {
             double id = (double) getVertexId().get();
@@ -150,7 +154,7 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
             tmpVertexValue.setWeight(minDist);
             // uncomment here to redisplay the exception
             // this prevents storing the path info into the vertex value
-//            tmpVertexValue.setPath(minPath, getVertexId().get());
+            tmpVertexValue.setPath(minPath, getVertexId().get());
             setVertexValue(tmpVertexValue);
 
             // uncomment here
