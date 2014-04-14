@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0.062" errors="0" skipped="0" tests="1" name="edu.uci.ics.pregelix.AppTest">
+<testsuite failures="0" time="0.07" errors="0" skipped="0" tests="1" name="edu.uci.ics.pregelix.AppTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/jre/lib"/>
@@ -40,11 +40,11 @@
     <property name="java.specification.version" value="1.7"/>
     <property name="file.encoding" value="UTF-8"/>
     <property name="user.name" value="soushimei"/>
-    <property name="java.class.path" value="/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter823757681419799136.jar"/>
+    <property name="java.class.path" value="/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter5128311023718558582.jar"/>
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter823757681419799136.jar /Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire6466986375652851323tmp /Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire4964576430401245529tmp"/>
+    <property name="sun.java.command" value="/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter5128311023718558582.jar /Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire160670302184619305tmp /Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire4321274912165673505tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
@@ -62,5 +62,5 @@
     <property name="ftp.nonProxyHosts" value="local„ÄÅ169.254/16|*.local„ÄÅ169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.002" classname="edu.uci.ics.pregelix.AppTest" name="testApp"/>
+  <testcase time="0.003" classname="edu.uci.ics.pregelix.AppTest" name="testApp"/>
 </testsuite>
