@@ -4,6 +4,7 @@
 .project
 .classpath
 .settings/*
+.idea/*
 
 # ignore run.sh temporarily
 target/run.sh
