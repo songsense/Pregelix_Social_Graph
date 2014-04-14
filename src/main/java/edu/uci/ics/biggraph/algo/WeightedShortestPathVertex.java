@@ -119,13 +119,14 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
 
     @Override
     public void compute(Iterator<WeightedPathWritable> msgIterator) {
+        ArrayList<Double> minPath = new ArrayList<Double>();
+
         if (getSuperstep() == 1) {
             tmpVertexValue.setWeight(Double.MAX_VALUE);
-            // tmpVertexValue.setPathAlone(new Text("s: "));
+            tmpVertexValue.setPathAlone(minPath);
             setVertexValue(tmpVertexValue);
         }
         double minDist = isSource() ? 0d : Double.MAX_VALUE;
-        ArrayList<Double> minPath = new ArrayList<Double>();
         if (isSource() == true) {
             double id = (double) getVertexId().get();
             minPath.add(id);
