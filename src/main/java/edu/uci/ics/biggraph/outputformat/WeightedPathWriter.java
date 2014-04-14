@@ -23,6 +23,6 @@ public class WeightedPathWriter extends
     public void writeVertex(Vertex<VLongWritable, WeightedPathWritable, FloatWritable, ?> vertex) throws IOException,
             InterruptedException {
         getRecordWriter().write(new Text(vertex.getVertexId().toString()),
-                new Text(vertex.getVertexValue().getWeight() + "\t" + vertex.getVertexValue().getPath()));
+                new Text(vertex.getVertexValue().toString() ));
     }
 }

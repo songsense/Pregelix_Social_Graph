@@ -3,62 +3,69 @@ package edu.uci.ics.biggraph.io;
 import java.io.DataOutput;
 import java.io.DataInput;
 import java.io.IOException;
+import java.util.ArrayList;
 
-import edu.uci.ics.pregelix.api.io.WritableSizable;
 import org.apache.hadoop.io.Text;
 
-
-public class WeightedPathWritable implements WritableSizable {
-	// Weight as a double
-	private DoubleWritable weight;
-	// Path as a String
-	private Text path;
+// first is the weight
+// the rest are the path
+public class WeightedPathWritable extends DoubleArrayListWritable {
 
 	public WeightedPathWritable() {
-		this.weight = new DoubleWritable();
-		this.path = new Text();
+        super();
+        DoubleWritable dw = new DoubleWritable(Double.MAX_VALUE);
+        this.add(dw);
 	}
 
-    @Override
-    public void write(DataOutput dataOutput) throws IOException{
-        weight.write(dataOutput);
-        path.write(dataOutput);
+    public double getWeight() {
+        DoubleWritable wr = (DoubleWritable) this.get(0);
+        double weight = wr.get();
+        return weight;
     }
-    @Override
-    public void readFields(DataInput dataInput) throws IOException {
-        weight.readFields(dataInput);
-        path.readFields(dataInput);
-    }
-
-    public double getWeight() { return weight.get(); }
 
     public String getPath() {
-        return path.toString();
+        StringBuffer sb = new StringBuffer();
+        for (int i = 1; i < this.size(); ++i) {
+            DoubleWritable wr = (DoubleWritable) this.get(i);
+            long id = (long)(wr.get());             // note that the node id is long
+            sb.append(id).append(" ");
+        }
+        return sb.toString();
     }
 
-    public Text getPathWritable() {
+    public ArrayList<Double> getPathArrayList() {
+        ArrayList<Double> path = new ArrayList<Double>();
+        for (int i = 1; i < this.size(); ++i) {
+            DoubleWritable wr = (DoubleWritable) this.get(i);
+            path.add(wr.get());
+        }
         return path;
     }
 
     public void setWeight(double weight) {
-        this.weight.set(weight);
+        DoubleWritable dw = new DoubleWritable(weight);
+        this.set(0, dw);
     }
 
-    public void setPath(Text path, long id) {
-        String pathStr = path.toString() + " " + Long.toString(id);
-        this.path.set(pathStr);
+    public void setPath(ArrayList<Double> path, long id) {
+        this.setPathAlone(path);
+        double newID = (double) id;
+        this.add((new DoubleWritable(newID)));
     }
 
-    public void setPathAlone(Text path) {
-        this.path.set(path.toString());
-    }
-
-    public int sizeInBytes() {
-        return weight.sizeInBytes() + path.getLength() * 8;
+    public void setPathAlone(ArrayList<Double> path) {
+        double weight = getWeight();
+        this.clear();
+        this.add(new DoubleWritable(weight));
+        for (int i = 0; i < path.size(); ++i) {
+            this.add(new DoubleWritable(path.get(i)));
+        }
     }
 
     @Override
     public String toString() {
-        return weight.toString() + "\t" + path.toString();
+        double weight = this.getWeight();
+        String path = this.getPath();
+        return Double.toString(weight) + "\t" + path;
     }
 }
