@@ -80,7 +80,7 @@ class WeightedShortestPathsGraphReader extends
             /**
              * set the vertex value as initialization
              */
-            WeightedPathWritable vertexValue = new WeightedPathWritable();
+            vertexValue = new WeightedPathWritable();
             vertexValue.setWeight(Double.MAX_VALUE);
             vertex.setVertexValue(vertexValue);
             
