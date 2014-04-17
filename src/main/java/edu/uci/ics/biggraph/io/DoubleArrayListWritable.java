@@ -12,8 +12,10 @@ import edu.uci.ics.pregelix.api.io.WritableSizable;
 /**
  * Created by soushimei on 4/13/14.
  */
+@SuppressWarnings({ "serial", "rawtypes" })
 public class DoubleArrayListWritable extends ArrayListWritable implements WritableSizable {
 
+    @SuppressWarnings("unchecked")
     public void setClass() {
         Class<DoubleWritable> refClass = DoubleWritable.class;
         setClass(refClass);
@@ -49,6 +51,8 @@ public class DoubleArrayListWritable extends ArrayListWritable implements Writab
         for (int i = 0; i < numValues; i++) {
             Double value = ((DoubleWritable) get(i)).get();
             DoubleWritable doubleWritable = new DoubleWritable(value);
+            System.out.print("");
+            System.out.println(value);
             doubleWritable.write(out);
         }
     }
