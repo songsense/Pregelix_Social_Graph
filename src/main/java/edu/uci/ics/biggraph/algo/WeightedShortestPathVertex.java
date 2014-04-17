@@ -99,8 +99,8 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
         }
     }
 
-    private WeightedPathWritable outputValue = new WeightedPathWritable();
-    private WeightedPathWritable tmpVertexValue = new WeightedPathWritable();
+    private WeightedPathWritable outputValue = null;
+    private WeightedPathWritable tmpVertexValue = null;
     /** Class logger */
     private static final Logger LOG = Logger.getLogger(WeightedShortestPathVertex.class.getName());
     /** The shortest paths id */
@@ -119,12 +119,11 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
 
     @Override
     public void compute(Iterator<WeightedPathWritable> msgIterator) {
-        ArrayList<Double> minPath = new ArrayList<Double>();
-        tmpVertexValue = new WeightedPathWritable();
-        outputValue = new WeightedPathWritable();
+        ArrayList<Double> minPath = new ArrayList<Double>();        
 
         // in first step, initialize the vertexes' values
         if (getSuperstep() == 1) {
+        	tmpVertexValue = new WeightedPathWritable();
             tmpVertexValue.setWeight(Double.MAX_VALUE);
             tmpVertexValue.setPathAlone(minPath);
             setVertexValue(tmpVertexValue);
@@ -151,21 +150,24 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
         }
 
         if (minDist < getVertexValue().getWeight()) {
+        	tmpVertexValue = new WeightedPathWritable();
             tmpVertexValue.setWeight(minDist);
             // uncomment here to redisplay the exception
             // this prevents storing the path info into the vertex value
             tmpVertexValue.setPath(minPath, getVertexId().get());
+            System.out.println("Size of vertex value to be set: " + tmpVertexValue.size());
             setVertexValue(tmpVertexValue);
 
-            // uncomment here
-            // this prevents storing the path info into the message
-            // outputValue.setPath(minPath, getVertexId());
             for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
                 if (LOG.getLevel() == Level.FINE) {
                     LOG.fine("Vertex " + getVertexId() + " sent to " + edge.getDestVertexId() + " = "
                             + (minDist + edge.getEdgeValue().get()));
                 }
+                outputValue = new WeightedPathWritable();
                 outputValue.setWeight(minDist + (double) edge.getEdgeValue().get());
+                // uncomment here
+                // this prevents storing the path info into the message
+                outputValue.setPath(minPath, getVertexId().get());
                 sendMsg(edge.getDestVertexId(), outputValue);
             }
         }

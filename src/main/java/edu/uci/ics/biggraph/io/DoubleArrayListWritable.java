@@ -34,23 +34,33 @@ public class DoubleArrayListWritable extends ArrayListWritable implements Writab
     public void readFields(DataInput in) throws IOException {
         this.clear();
         int numValues = in.readInt(); // read number of values
+        // for debug
+        System.out.print("======");
+        System.out.print("readFields: " + Integer.toString(numValues));
         for (int i = 0; i < numValues; i++) {
             DoubleWritable value = new DoubleWritable();
             value.readFields(in); // read a value
             add(value); // store it in values
+            // for debug
+            System.out.print(" " + value.toString());
         }
+        System.out.println("======");
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void write(DataOutput out) throws IOException {
         int numValues = size();
+        // for debug
+        System.out.print("======");
+        System.out.print("write: " + Integer.toString(numValues));
         out.writeInt(numValues); // write number of values
         for (int i = 0; i < numValues; i++) {
             Double value = ((DoubleWritable) get(i)).get();
             DoubleWritable doubleWritable = new DoubleWritable(value);
             doubleWritable.write(out);
+            System.out.print(" " + doubleWritable.toString());
         }
+        System.out.println("======");
     }
 
     @Override
