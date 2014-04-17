@@ -78,6 +78,13 @@ class WeightedShortestPathsGraphReader extends
             vertex.setVertexValue(vertexValue);
 
             /**
+             * set the vertex value as initialization
+             */
+            WeightedPathWritable vertexValue = new WeightedPathWritable();
+            vertexValue.setWeight(Double.MAX_VALUE);
+            vertex.setVertexValue(vertexValue);
+            
+            /**
              * get neighbor num
              */
             int neighborNum = Integer.parseInt(fields[1]);

@@ -1,4 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: edu.uci.ics.pregelix.AppTest
 -------------------------------------------------------------------------------
+<<<<<<< HEAD
 Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.05 sec
+=======
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.058 sec
+>>>>>>> 07f3c932a194897a29c6dbf1661604960774c7a0
