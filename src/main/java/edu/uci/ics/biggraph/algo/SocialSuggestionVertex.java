@@ -141,14 +141,17 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             tmpVertexValue.addAllElements(newVertices);
             
             if (curNumResults >= numResults) {
-                voteToHalt();
+//                voteToHalt();
+                terminateJob();
             }
             
             // send the newly received vertex Ids
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 sendMsg(edge.getDestVertexId(), newVertices);
             }
-        } 
+        } else {
+            terminateJob();
+        }
         voteToHalt();
     }
     
