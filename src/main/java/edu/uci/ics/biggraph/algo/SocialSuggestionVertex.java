@@ -14,6 +14,8 @@ import edu.uci.ics.biggraph.io.WeightedPathWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
+import org.apache.hadoop.record.FromCpp;
+import org.omg.CORBA.NVList;
 
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.Edge;
@@ -44,7 +46,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     public static class SocialSuggestionCombiner 
         extends MessageCombiner<VLongWritable, VLongArrayListWritable, VLongArrayListWritable> {
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({ "rawtypes" })
         @Override
         public void init(MsgList providedMsgList) {
             // TODO Auto-generated method stub
@@ -103,7 +105,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             
             msg = new VLongArrayListWritable();
             msg.addAllElements(nb);
-            setVertexValue(msg);
+            setVertexValue(msg);    // set vertex value
             distVertexSizes.set(0, 1);  // distance = 0 -> itself
             distVertexSizes.set(1, nb.size()); // immediate neighbors of current vertex
             
@@ -119,13 +121,35 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             }
         } else if (step >= 2 && step < maxIteration) {
             tmpVertexValue = getVertexValue();
-            int curNumResults = tmpVertexValue.size();
+            VLongArrayListWritable newVertices = new VLongArrayListWritable();
             
-            // TODO: update distVertexSizes and verticesSet
-            // when new messages are received.
-        } else {
-            voteToHalt();
-        }
+            /* 
+             * Update distVertexSizes and verticesSet
+             * when new messages are received. 
+             */
+            while (msgIterator.hasNext()) {
+                VLongArrayListWritable t = msgIterator.next();
+                for (int i = 0; i < t.size(); i++) {
+                    long vid = ((VLongWritable) t.get(i)).get();
+                    if (!verticesSet.contains(vid)) {
+                        verticesSet.add(vid);
+                        newVertices.add(t.get(i));
+                    }
+                }
+            }
+            curNumResults += newVertices.size();
+            tmpVertexValue.addAllElements(newVertices);
+            
+            if (curNumResults >= numResults) {
+                voteToHalt();
+            }
+            
+            // send the newly received vertex Ids
+            for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
+                sendMsg(edge.getDestVertexId(), newVertices);
+            }
+        } 
+        voteToHalt();
     }
     
     private VLongArrayListWritable outputValue = null;
@@ -139,7 +163,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
      */
     private ArrayList<Integer> distVertexSizes = null;
     
-    /** Visited vertice: used for efficiently eliminate duplicates. */
+    /** Visited vertices: used for efficiently eliminate duplicates. */
     private HashSet<Long> verticesSet = null;
     
     /** Maximum iteration */
@@ -149,6 +173,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     /** Result number: how many suggestions desired */
     public static final String NUM_RESULTS = "SocialSuggestionVertex.results";
     private int numResults = -1;
+    private int curNumResults = 0;
     
     /** Class logger */
     private static final Logger LOG = Logger.getLogger(SocialSuggestionVertex.class.getName());
