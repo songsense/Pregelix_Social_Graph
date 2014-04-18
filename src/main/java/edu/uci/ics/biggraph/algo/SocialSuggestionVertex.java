@@ -2,6 +2,7 @@ package edu.uci.ics.biggraph.algo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,12 +88,14 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         
         if (maxIteration < 0) {
             maxIteration = getContext().getConfiguration().getInt(ITERATIONS, 10);
+            distVertexSizes = new ArrayList<Integer>(maxIteration);
         }
         if (numResults < 0) {
             numResults = getContext().getConfiguration().getInt(NUM_RESULTS, 10);
         }
         
-        if (getSuperstep() == 1) {
+        long step = getSuperstep();
+        if (step == 1) {
             nb = new ArrayList<VLongWritable>();
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 nb.add(edge.getDestVertexId());
@@ -100,11 +103,26 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             
             msg = new VLongArrayListWritable();
             msg.addAllElements(nb);
+            setVertexValue(msg);
+            distVertexSizes.set(0, 1);  // distance = 0 -> itself
+            distVertexSizes.set(1, nb.size()); // immediate neighbors of current vertex
+            
+            // create and update vertices set
+            verticesSet = new HashSet<Long>();
+            verticesSet.add(getVertexId().get());
+            
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
+                // update vertices set
+                verticesSet.add(edge.getDestVertexId().get());
+                // broadcast message
                 sendMsg(edge.getDestVertexId(), msg);
             }
-        } else if (getSuperstep() >= 2 && getSuperstep() < maxIteration) {
+        } else if (step >= 2 && step < maxIteration) {
+            tmpVertexValue = getVertexValue();
+            int curNumResults = tmpVertexValue.size();
             
+            // TODO: update distVertexSizes and verticesSet
+            // when new messages are received.
         } else {
             voteToHalt();
         }
@@ -113,6 +131,16 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     private VLongArrayListWritable outputValue = null;
     
     private VLongArrayListWritable tmpVertexValue = null;
+    
+    /** 
+     * Sizes of neighboring vertices with distinct distances
+     * Key = distance, Value = number of vertices with distance of 
+     * Key with the current vertex. 
+     */
+    private ArrayList<Integer> distVertexSizes = null;
+    
+    /** Visited vertice: used for efficiently eliminate duplicates. */
+    private HashSet<Long> verticesSet = null;
     
     /** Maximum iteration */
     public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
