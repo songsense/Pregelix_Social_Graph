@@ -77,19 +77,31 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         }
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void compute(Iterator<VLongArrayListWritable> msgIterator)
             throws Exception {
-        ArrayList<Long> nb;
+        ArrayList<VLongWritable> nb;
+        VLongArrayListWritable msg;
         
         if (maxIteration < 0) {
             maxIteration = getContext().getConfiguration().getInt(ITERATIONS, 10);
         }
+        if (numResults < 0) {
+            numResults = getContext().getConfiguration().getInt(NUM_RESULTS, 10);
+        }
         
-        // Initialize the vertex in the first step
         if (getSuperstep() == 1) {
+            nb = new ArrayList<VLongWritable>();
+            for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
+                nb.add(edge.getDestVertexId());
+            }
             
-            return;
+            msg = new VLongArrayListWritable();
+            msg.addAllElements(nb);
+            for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
+                sendMsg(edge.getDestVertexId(), msg);
+            }
         } else if (getSuperstep() >= 2 && getSuperstep() < maxIteration) {
             
         } else {
@@ -97,25 +109,20 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         }
     }
     
-    /**
-     * Max iteration: this value is specified by executing config
-     * argument.
-     * TODO: specify it
-     */
+    private VLongArrayListWritable outputValue = null;
+    
+    private VLongArrayListWritable tmpVertexValue = null;
+    
+    /** Maximum iteration */
+    public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
     private int maxIteration = -1;
     
-    private WeightedPathWritable outputValue = null;
-    
-    private WeightedPathWritable tmpVertexValue = null;
-    
-    public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
+    /** Result number: how many suggestions desired */
+    public static final String NUM_RESULTS = "SocialSuggestionVertex.results";
+    private int numResults = -1;
     
     /** Class logger */
     private static final Logger LOG = Logger.getLogger(SocialSuggestionVertex.class.getName());
-    /** The shortest paths id */
-    public static final String SOURCE_ID = "SocialSuggestion.sourceId";
-    /** Default shortest paths id */
-    public static final long SOURCE_ID_DEFAULT = 1;
 
     public static void main(String[] args) throws Exception {
         PregelixJob job = new PregelixJob(SocialSuggestionVertex.class.getSimpleName());
@@ -126,7 +133,8 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
 //        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
         job.setMessageCombinerClass(DefaultMessageCombiner.class);
         job.setNoramlizedKeyComputerClass(VLongNormalizedKeyComputer.class);
-        job.getConfiguration().setLong(SOURCE_ID, 0);
+        job.setDynamicVertexValueSize(true);
+        
         Client.run(args, job);
     }
 }

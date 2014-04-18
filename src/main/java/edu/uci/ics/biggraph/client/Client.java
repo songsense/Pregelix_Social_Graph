@@ -28,6 +28,7 @@ import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.core.base.IDriver.Plan;
 import edu.uci.ics.pregelix.core.driver.Driver;
 
+import edu.uci.ics.biggraph.algo.SocialSuggestionVertex;
 import edu.uci.ics.biggraph.algo.WeightedShortestPathVertex;
 
 public class Client {
@@ -59,6 +60,12 @@ public class Client {
 
         @Option(name = "-runtime-profiling", usage = "whether to do runtime profifling", required = false)
         public String profiling = "false";
+        
+        @Option(name = "-iterations", usage = "maximum # of iterations a vertex will compute for", required = false)
+        public int maxIterations;
+        
+        @Option(name = "-results-num", usage = "(maximum) # of suggestions desired", required = false)
+        public int numResults;
     }
 
     public static void run(String[] args, PregelixJob job) throws Exception {
@@ -87,6 +94,10 @@ public class Client {
         job.getConfiguration().setLong(PregelixJob.NUM_VERTICE, options.numVertices);
         job.getConfiguration().setLong(PregelixJob.NUM_EDGES, options.numEdges);
         job.getConfiguration().setLong(WeightedShortestPathVertex.SOURCE_ID, options.sourceId);
+        
+        // specific for task 3: social suggestion
+        job.getConfiguration().setLong(SocialSuggestionVertex.ITERATIONS, options.maxIterations);
+        job.getConfiguration().setLong(SocialSuggestionVertex.NUM_RESULTS, options.numResults);
         return options;
     }
 
