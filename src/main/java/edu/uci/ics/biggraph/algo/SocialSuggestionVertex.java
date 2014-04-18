@@ -26,6 +26,7 @@ import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.io.VLongWritable;
+import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
 import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
 import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 
@@ -128,7 +129,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         PregelixJob job = new PregelixJob(SocialSuggestionVertex.class.getSimpleName());
         job.setVertexClass(SocialSuggestionVertex.class);
         // TODO: create own input format
-        job.setVertexInputFormatClass(WeightedShortestPathsInputFormat.class);
+        job.setVertexInputFormatClass(SocialSuggestionInputFormat.class);
         job.setVertexOutputFormatClass(WeightedOutputFormat.class); // can still use
 //        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
         job.setMessageCombinerClass(DefaultMessageCombiner.class);
