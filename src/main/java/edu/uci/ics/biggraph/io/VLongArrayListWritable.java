@@ -6,13 +6,16 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
 
+import edu.uci.ics.pregelix.api.io.WritableSizable;
 import edu.uci.ics.pregelix.api.util.ArrayListWritable;
 
 /**
  * Created by soushimei on 4/13/14.
  */
-public class VLongArrayListWritable extends ArrayListWritable {
+@SuppressWarnings({ "serial", "rawtypes" })
+public class VLongArrayListWritable extends ArrayListWritable implements WritableSizable {
 
+    @SuppressWarnings("unchecked")
     public void setClass() {
         Class<VLongWritable> refClass = VLongWritable.class;
         setClass(refClass);
@@ -29,6 +32,7 @@ public class VLongArrayListWritable extends ArrayListWritable {
         return sb.toString();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void readFields(DataInput in) throws IOException {
         this.clear();
@@ -40,7 +44,6 @@ public class VLongArrayListWritable extends ArrayListWritable {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void write(DataOutput out) throws IOException {
         int numValues = size();
@@ -50,6 +53,11 @@ public class VLongArrayListWritable extends ArrayListWritable {
             VLongWritable vLongWritable = new VLongWritable(value);
             vLongWritable.write(out);
         }
+    }
+
+    @Override
+    public int sizeInBytes() {
+        return 4 + 8 * size();
     }
 
 }
