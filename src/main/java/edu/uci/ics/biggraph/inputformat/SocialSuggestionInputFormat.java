@@ -65,7 +65,7 @@ class SocialSuggestionGraphReader extends
             long src = Long.parseLong(fields[0]);
             vertexId.set(src);
             vertex.setVertexId(vertexId);
-            long dest = -1L;
+            long dest;
             
             // set vertex value
             @SuppressWarnings("unused")

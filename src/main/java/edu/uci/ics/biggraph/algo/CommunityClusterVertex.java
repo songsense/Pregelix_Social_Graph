@@ -37,20 +37,26 @@ public class CommunityClusterVertex extends Vertex<VLongWritable, VLongIntWritab
         // collect message to find the maximum count of vertex id
 		while (msgIterator.hasNext()) {
 			long msg_VertexId = msgIterator.next().get();
+            int count;
 			// update the vertex id frequency
 			if (vertexFreq.containsKey(msg_VertexId)) {
-				int count = vertexFreq.get(msg_VertexId);
+				count = vertexFreq.get(msg_VertexId);
 				count += 1;
 				vertexFreq.put(msg_VertexId, count);
-				
-				// update the maximum count
-				if (maxCount < count) {
-					maxCount = count;
-					maxVertexId = msg_VertexId;
-				}				
 			} else {
 				vertexFreq.put(msg_VertexId, 1);
+                count = 1;
 			}
+
+            // update the maximum count
+            if (maxCount < count) {
+                maxCount = count;
+                maxVertexId = msg_VertexId;
+            } else if (maxCount == count && maxVertexId > msg_VertexId) {
+                // choose the minimum vertex id if possible
+                maxCount = count;
+                maxVertexId = msg_VertexId;
+            }
 		}
 
         // update the vertex value
