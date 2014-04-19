@@ -19,9 +19,15 @@ public class CommunityClusterVertex extends Vertex<VLongWritable, VLongIntWritab
 	HashMap<Long, Integer> vertexFreq = new HashMap<Long, Integer>();
     VLongWritable msg2Sent = new VLongWritable();
     VLongIntWritable vertexValue2Set = new VLongIntWritable();
+    /** Maximum iteration */
+    public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
+    private int maxIteration = -1;
 	
 	@Override
 	public void compute(Iterator<VLongWritable> msgIterator) throws Exception {
+        // initialize the number of iteration
+        maxIteration = getContext().getConfiguration().getInt(ITERATIONS, 5);
+
 		// initialize vertex id with maximum count
 		long maxVertexId = getVertexValue().getVertexId();
 		int maxCount = getVertexValue().getCount();
@@ -63,16 +69,15 @@ public class CommunityClusterVertex extends Vertex<VLongWritable, VLongIntWritab
         vertexValue2Set.set(maxVertexId, maxCount);
         setVertexValue(vertexValue2Set);
 
-        // send message to others if there is changes in vertex value
-        if (originVertexId != maxVertexId) {
+        if (getSuperstep() > maxIteration) {
+            voteToHalt();
+        } else {
             for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
                 msg2Sent.set(maxVertexId);
                 sendMsg(edge.getDestVertexId(), msg2Sent);
             }
         }
-
         voteToHalt();
-
 	}
 	
     public static void main(String[] args) throws Exception {
