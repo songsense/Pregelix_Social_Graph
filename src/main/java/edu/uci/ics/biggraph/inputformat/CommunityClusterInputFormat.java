@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.uci.ics.biggraph.io.VLongIntWritable;
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -20,9 +21,9 @@ import edu.uci.ics.pregelix.api.util.BspUtils;
 import edu.uci.ics.biggraph.io.VLongWritable;
 
 public class CommunityClusterInputFormat extends
-TextVertexInputFormat<VLongWritable, VLongWritable, FloatWritable, VLongWritable>{
+        TextVertexInputFormat<VLongWritable, VLongIntWritable, FloatWritable, VLongWritable>{
     @Override
-    public VertexReader<VLongWritable, VLongWritable, FloatWritable, VLongWritable> createVertexReader(
+    public VertexReader<VLongWritable, VLongIntWritable, FloatWritable, VLongWritable> createVertexReader(
             InputSplit split, TaskAttemptContext context) throws IOException {
         return new CommunityClusterGraphReader(textInputFormat.createRecordReader(split, context));
     }
@@ -30,7 +31,7 @@ TextVertexInputFormat<VLongWritable, VLongWritable, FloatWritable, VLongWritable
 
 @SuppressWarnings("rawtypes")
 class CommunityClusterGraphReader extends
-        TextVertexReader<VLongWritable, VLongWritable, FloatWritable, VLongWritable> {
+        TextVertexReader<VLongWritable, VLongIntWritable, FloatWritable, VLongWritable> {
 
     private final static String separator = " ";
     private Vertex vertex;
@@ -49,7 +50,7 @@ class CommunityClusterGraphReader extends
 
     @SuppressWarnings("unchecked")
     @Override
-    public Vertex<VLongWritable, VLongWritable, FloatWritable, VLongWritable> getCurrentVertex() throws IOException,
+    public Vertex<VLongWritable, VLongIntWritable, FloatWritable, VLongWritable> getCurrentVertex() throws IOException,
             InterruptedException {
         if (vertex == null)
             vertex = (Vertex) BspUtils.createVertex(getContext().getConfiguration());
@@ -71,46 +72,33 @@ class CommunityClusterGraphReader extends
             vertexId.set(src);
             vertex.setVertexId(vertexId);
             long dest = -1L;
-            
+
             /**
              * set the vertex value as initialization
-             */            
-            VLongWritable vertexValue = new VLongWritable();
-            vertexValue.set(src);
+             */
+            VLongIntWritable vertexValue = new VLongIntWritable();
+            vertexValue.set(src, 1);
             vertex.setVertexValue(vertexValue);
-            
+
             /**
              * get neighbor num
              */
             int neighborNum = Integer.parseInt(fields[1]);
-            // Debugging...
-            /*
-            System.out.print("Neighbor num: ");
-            System.out.println(neighborNum);
-            */
 
             /**
              * set up edges & weights
              */
             for (int i = 0; i < neighborNum; ++i) {
-            	// set up edge
-            	dest = Long.parseLong(fields[2*i+2]);
-            	VLongWritable destId = allocate();
-            	destId.set(dest);
+                // set up edge
+                dest = Long.parseLong(fields[2*i+2]);
+                VLongWritable destId = allocate();
+                destId.set(dest);
 
                 // set up weight
                 float weight = Float.parseFloat(fields[2*i+3]);
                 weight = 1.0f / (weight + 0.001f);			// smaller the weight means more common tags
                 FloatWritable weightWritable = new FloatWritable(weight);
                 vertex.addEdge(destId, weightWritable);
-
-                // Debugging...
-                /*
-                System.out.print("dest id: ");
-                System.out.println(dest);
-                System.out.print("weight: ");
-                System.out.println(weight);
-                */
             }
         }
         // vertex.sortEdges();

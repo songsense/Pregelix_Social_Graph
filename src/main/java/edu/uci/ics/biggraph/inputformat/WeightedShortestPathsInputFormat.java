@@ -72,18 +72,14 @@ class WeightedShortestPathsGraphReader extends
             vertexId.set(src);
             vertex.setVertexId(vertexId);
             long dest = -1L;
-            
-            WeightedPathWritable vertexValue = new WeightedPathWritable();
-            vertexValue.setWeight(Double.MAX_VALUE);
-            vertex.setVertexValue(vertexValue);
 
             /**
              * set the vertex value as initialization
              */
-            vertexValue = new WeightedPathWritable();
+            WeightedPathWritable vertexValue = new WeightedPathWritable();
             vertexValue.setWeight(Double.MAX_VALUE);
             vertex.setVertexValue(vertexValue);
-            
+
             /**
              * get neighbor num
              */
