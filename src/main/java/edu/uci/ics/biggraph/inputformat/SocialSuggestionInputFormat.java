@@ -48,7 +48,7 @@ class SocialSuggestionGraphReader extends
         return getRecordReader().nextKeyValue();
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     @Override
     public Vertex<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> getCurrentVertex()
             throws IOException, InterruptedException {
@@ -68,10 +68,11 @@ class SocialSuggestionGraphReader extends
             long dest = -1L;
             
             // set vertex value
+            @SuppressWarnings("unused")
             VLongArrayListWritable vertex = new VLongArrayListWritable();
             int numNeighbors = Integer.parseInt(fields[1]);
             for (int i = 0; i < numNeighbors; i++) {
-                dest = Long.parseLong(fields[2*i+2]);
+                dest = Long.parseLong(fields[i + 2]);
                 VLongWritable destId = allocate();
                 destId.set(dest);
             }

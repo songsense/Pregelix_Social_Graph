@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<<<<<<< HEAD
-<testsuite failures="0" time="0.05" errors="0" skipped="0" tests="1" name="edu.uci.ics.pregelix.AppTest">
-=======
-<testsuite failures="0" time="0.058" errors="0" skipped="0" tests="1" name="edu.uci.ics.pregelix.AppTest">
->>>>>>> 07f3c932a194897a29c6dbf1661604960774c7a0
+<testsuite failures="0" time="0.051" errors="0" skipped="0" tests="1" name="edu.uci.ics.pregelix.AppTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/jre/lib"/>
@@ -43,21 +39,12 @@
     <property name="java.awt.printerjob" value="sun.lwawt.macosx.CPrinterJob"/>
     <property name="java.specification.version" value="1.7"/>
     <property name="file.encoding" value="UTF-8"/>
-<<<<<<< HEAD
     <property name="user.name" value="liqiangw"/>
-    <property name="java.class.path" value="/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter2632753069433784246.jar"/>
+    <property name="java.class.path" value="/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter7420983548231829997.jar"/>
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="64"/>
     <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter2632753069433784246.jar /Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire1292513100619931167tmp /Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire2907815358569537054tmp"/>
-=======
-    <property name="user.name" value="soushimei"/>
-    <property name="java.class.path" value="/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter5813355807539970142.jar"/>
-    <property name="java.vm.specification.version" value="1.7"/>
-    <property name="sun.arch.data.model" value="64"/>
-    <property name="java.home" value="/Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home/jre"/>
-    <property name="sun.java.command" value="/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter5813355807539970142.jar /Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire8565991084783599928tmp /Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire5106508388140187160tmp"/>
->>>>>>> 07f3c932a194897a29c6dbf1661604960774c7a0
+    <property name="sun.java.command" value="/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefirebooter7420983548231829997.jar /Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire8591001983267808548tmp /Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/surefire/surefire2587936306209806667tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="en"/>
     <property name="awt.toolkit" value="sun.lwawt.macosx.LWCToolkit"/>
@@ -75,5 +62,5 @@
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0.001" classname="edu.uci.ics.pregelix.AppTest" name="testApp"/>
+  <testcase time="0.002" classname="edu.uci.ics.pregelix.AppTest" name="testApp"/>
 </testsuite>

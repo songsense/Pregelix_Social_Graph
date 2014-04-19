@@ -1,28 +1,18 @@
 package edu.uci.ics.biggraph.algo;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.uci.ics.biggraph.io.DoubleArrayListWritable;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongArrayListWritable;
-import edu.uci.ics.biggraph.io.WeightedPathWritable;
-import org.apache.hadoop.io.FloatWritable;
-import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.record.FromCpp;
-import org.omg.CORBA.NVList;
 
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.Edge;
 import edu.uci.ics.pregelix.api.graph.MessageCombiner;
 import edu.uci.ics.pregelix.api.graph.MsgList;
 import edu.uci.ics.pregelix.api.graph.Vertex;
-import edu.uci.ics.pregelix.api.io.WritableSizable;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 
@@ -30,7 +20,6 @@ import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
-import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
 import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 
 public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> {
@@ -90,7 +79,6 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         
         if (maxIteration < 0) {
             maxIteration = getContext().getConfiguration().getInt(ITERATIONS, 10);
-            distVertexSizes = new ArrayList<Integer>(maxIteration);
         }
         if (numResults < 0) {
             numResults = getContext().getConfiguration().getInt(NUM_RESULTS, 10);
@@ -105,9 +93,6 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             
             msg = new VLongArrayListWritable();
             msg.addAllElements(nb);
-            setVertexValue(msg);    // set vertex value
-            distVertexSizes.set(0, 1);  // distance = 0 -> itself
-            distVertexSizes.set(1, nb.size()); // immediate neighbors of current vertex
             
             // create and update vertices set
             verticesSet = new HashSet<Long>();
@@ -121,6 +106,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             }
         } else if (step >= 2 && step < maxIteration) {
             tmpVertexValue = getVertexValue();
+            // get new vertices from incoming message without duplicates
             VLongArrayListWritable newVertices = new VLongArrayListWritable();
             
             /* 
@@ -139,6 +125,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             }
             curNumResults += newVertices.size();
             tmpVertexValue.addAllElements(newVertices);
+            setVertexValue(tmpVertexValue);
             
             if (curNumResults >= numResults) {
 //                voteToHalt();
@@ -155,16 +142,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         voteToHalt();
     }
     
-    private VLongArrayListWritable outputValue = null;
-    
     private VLongArrayListWritable tmpVertexValue = null;
-    
-    /** 
-     * Sizes of neighboring vertices with distinct distances
-     * Key = distance, Value = number of vertices with distance of 
-     * Key with the current vertex. 
-     */
-    private ArrayList<Integer> distVertexSizes = null;
     
     /** Visited vertices: used for efficiently eliminate duplicates. */
     private HashSet<Long> verticesSet = null;
@@ -184,7 +162,6 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     public static void main(String[] args) throws Exception {
         PregelixJob job = new PregelixJob(SocialSuggestionVertex.class.getSimpleName());
         job.setVertexClass(SocialSuggestionVertex.class);
-        // TODO: create own input format
         job.setVertexInputFormatClass(SocialSuggestionInputFormat.class);
         job.setVertexOutputFormatClass(WeightedOutputFormat.class); // can still use
 //        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
