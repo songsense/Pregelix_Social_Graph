@@ -21,7 +21,6 @@ import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
 import edu.uci.ics.biggraph.outputformat.SocialSuggestionOutputFormat;
-import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 
 public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> {
     /**
