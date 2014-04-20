@@ -20,6 +20,7 @@ import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
+import edu.uci.ics.biggraph.outputformat.SocialSuggestionOutputFormat;
 import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 
 public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> {
@@ -85,6 +86,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         }
         
         long step = getSuperstep();
+        System.out.println("### Iteration " + step);
         if (step == 1) {
             nb = new ArrayList<VLongWritable>();
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
@@ -163,12 +165,13 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         PregelixJob job = new PregelixJob(SocialSuggestionVertex.class.getSimpleName());
         job.setVertexClass(SocialSuggestionVertex.class);
         job.setVertexInputFormatClass(SocialSuggestionInputFormat.class);
-        job.setVertexOutputFormatClass(WeightedOutputFormat.class); // can still use
+        job.setVertexOutputFormatClass(SocialSuggestionOutputFormat.class); 
 //        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
         job.setMessageCombinerClass(DefaultMessageCombiner.class);
         job.setNoramlizedKeyComputerClass(VLongNormalizedKeyComputer.class);
         job.setDynamicVertexValueSize(true);
         
+        System.out.println("-----Begin to run-----");
         Client.run(args, job);
     }
 }
