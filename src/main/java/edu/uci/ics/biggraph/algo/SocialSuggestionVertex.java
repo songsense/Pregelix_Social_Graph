@@ -1,6 +1,5 @@
 package edu.uci.ics.biggraph.algo;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -74,7 +73,6 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     @Override
     public void compute(Iterator<VLongArrayListWritable> msgIterator)
             throws Exception {
-        ArrayList<VLongWritable> nb;
         VLongArrayListWritable msg = new VLongArrayListWritable();
         
         if (maxIteration < 0) {
@@ -85,30 +83,12 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         }
         
         long step = getSuperstep();
-        System.out.println("### Iteration " + step + " node # = " + getVertexId().get());
         
         if (step == 1) {
-            nb = new ArrayList<VLongWritable>();
-//            System.out.println("\t(step=" + step + ", node=" 
-//                    + getVertexId().get() + ")Neighbors: ");
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 msg.add(edge.getDestVertexId());
-//                System.out.print(edge.getDestVertexId().get() + " ");
             }
-//            System.out.println();
-            
-//            // update vertices set
-//            verticesSet.add(getVertexId().get());
-//            System.out.println("\tCheckout hashset for node " + getVertexId().get());
-//            Iterator<Long> it = verticesSet.iterator();
-//            while (it.hasNext()) {
-//                System.out.println("\tnode " + getVertexId().get() + " has " 
-//                        + it.next() + " (step " + step + ")");
-//            }
-//            
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
-//                // update vertices set
-//                verticesSet.add(edge.getDestVertexId().get());
                 // broadcast message
                 sendMsg(edge.getDestVertexId(), msg);
             }
@@ -118,13 +98,6 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
             // get new vertices from incoming message without duplicates
             VLongArrayListWritable newVertices = new VLongArrayListWritable();
 
-//            System.out.println("\tCheckout hashset for node " + getVertexId().get());
-//            Iterator<Long> it = verticesSet.iterator();
-//            while (it.hasNext()) {
-//                System.out.println("\tnode " + getVertexId().get() + " has " 
-//                        + it.next() + " (step " + step + ")");
-//            }
-//            System.out.println("\tIncoming message for node" + getVertexId().get());
             while (msgIterator.hasNext()) {
                 VLongArrayListWritable t = msgIterator.next();
                 for (int i = 0; i < t.size(); i++) {
