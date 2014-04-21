@@ -75,7 +75,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     public void compute(Iterator<VLongArrayListWritable> msgIterator)
             throws Exception {
         ArrayList<VLongWritable> nb;
-        VLongArrayListWritable msg;
+        VLongArrayListWritable msg = new VLongArrayListWritable();
         
         if (maxIteration < 0) {
             maxIteration = getContext().getConfiguration().getInt(ITERATIONS, 10);
@@ -85,19 +85,26 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         }
         
         long step = getSuperstep();
-        System.out.println("### Iteration " + step);
+        System.out.println("### Iteration " + step + " node # = " + getVertexId().get());
+        
         if (step == 1) {
             nb = new ArrayList<VLongWritable>();
+            System.out.println("\t(step=" + step + ", node=" 
+                    + getVertexId().get() + ")Neighbors: ");
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
-                nb.add(edge.getDestVertexId());
+                msg.add(edge.getDestVertexId());
+                System.out.print(edge.getDestVertexId().get() + " ");
             }
+            System.out.println();
             
-            msg = new VLongArrayListWritable();
-            msg.addAllElements(nb);
-            
-            // create and update vertices set
-            verticesSet = new HashSet<Long>();
+            // update vertices set
             verticesSet.add(getVertexId().get());
+            System.out.println("\tCheckout hashset for node " + getVertexId().get());
+            Iterator<Long> it = verticesSet.iterator();
+            while (it.hasNext()) {
+                System.out.println("\tnode " + getVertexId().get() + " has " 
+                        + it.next() + " (step " + step + ")");
+            }
             
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 // update vertices set
@@ -114,22 +121,35 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
              * Update distVertexSizes and verticesSet
              * when new messages are received. 
              */
+            System.out.println("\tCheckout hashset for node " + getVertexId().get());
+            Iterator<Long> it = verticesSet.iterator();
+            while (it.hasNext()) {
+                System.out.println("\tnode " + getVertexId().get() + " has " 
+                        + it.next() + " (step " + step + ")");
+            }
+            System.out.println("\tIncoming message for node" + getVertexId().get());
             while (msgIterator.hasNext()) {
                 VLongArrayListWritable t = msgIterator.next();
                 for (int i = 0; i < t.size(); i++) {
                     long vid = ((VLongWritable) t.get(i)).get();
                     if (!verticesSet.contains(vid)) {
+                        System.out.println("\tvid " + vid + ": (accepted)"
+                                + " vertex = " + getVertexId().get());
                         verticesSet.add(vid);
                         newVertices.add(t.get(i));
+                        tmpVertexValue.add(t.get(i));
+                    } else {
+                        System.out.println("\tvid " + vid + ": (contained)"
+                                + " vertex = " + getVertexId().get());
                     }
                 }
             }
-            curNumResults += newVertices.size();
-            tmpVertexValue.addAllElements(newVertices);
+            curNumResults = tmpVertexValue.size();
+//            tmpVertexValue.addAllElements(newVertices);
             setVertexValue(tmpVertexValue);
             
+            // termination predicate
             if (curNumResults >= numResults) {
-//                voteToHalt();
                 terminateJob();
             }
             
@@ -146,7 +166,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     private VLongArrayListWritable tmpVertexValue = null;
     
     /** Visited vertices: used for efficiently eliminate duplicates. */
-    private HashSet<Long> verticesSet = null;
+    private HashSet<Long> verticesSet = new HashSet<Long>();;
     
     /** Maximum iteration */
     public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
