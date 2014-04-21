@@ -103,14 +103,9 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
                 for (int i = 0; i < t.size(); i++) {
                     long vid = ((VLongWritable) t.get(i)).get();
                     if (!verticesSet.contains(vid)) {
-                        System.out.println("\tvid " + vid + ": (accepted)"
-                                + " vertex = " + getVertexId().get());
                         verticesSet.add(vid);
                         newVertices.add(t.get(i));
                         tmpVertexValue.add(t.get(i));
-                    } else {
-                        System.out.println("\tvid " + vid + ": (contained)"
-                                + " vertex = " + getVertexId().get());
                     }
                 }
             }
