@@ -89,45 +89,42 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         
         if (step == 1) {
             nb = new ArrayList<VLongWritable>();
-            System.out.println("\t(step=" + step + ", node=" 
-                    + getVertexId().get() + ")Neighbors: ");
+//            System.out.println("\t(step=" + step + ", node=" 
+//                    + getVertexId().get() + ")Neighbors: ");
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 msg.add(edge.getDestVertexId());
-                System.out.print(edge.getDestVertexId().get() + " ");
+//                System.out.print(edge.getDestVertexId().get() + " ");
             }
-            System.out.println();
+//            System.out.println();
             
-            // update vertices set
-            verticesSet.add(getVertexId().get());
-            System.out.println("\tCheckout hashset for node " + getVertexId().get());
-            Iterator<Long> it = verticesSet.iterator();
-            while (it.hasNext()) {
-                System.out.println("\tnode " + getVertexId().get() + " has " 
-                        + it.next() + " (step " + step + ")");
-            }
-            
+//            // update vertices set
+//            verticesSet.add(getVertexId().get());
+//            System.out.println("\tCheckout hashset for node " + getVertexId().get());
+//            Iterator<Long> it = verticesSet.iterator();
+//            while (it.hasNext()) {
+//                System.out.println("\tnode " + getVertexId().get() + " has " 
+//                        + it.next() + " (step " + step + ")");
+//            }
+//            
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
-                // update vertices set
-                verticesSet.add(edge.getDestVertexId().get());
+//                // update vertices set
+//                verticesSet.add(edge.getDestVertexId().get());
                 // broadcast message
                 sendMsg(edge.getDestVertexId(), msg);
             }
         } else if (step >= 2 && step < maxIteration) {
             tmpVertexValue = getVertexValue();
+            buildSet(tmpVertexValue);
             // get new vertices from incoming message without duplicates
             VLongArrayListWritable newVertices = new VLongArrayListWritable();
-            
-            /* 
-             * Update distVertexSizes and verticesSet
-             * when new messages are received. 
-             */
-            System.out.println("\tCheckout hashset for node " + getVertexId().get());
-            Iterator<Long> it = verticesSet.iterator();
-            while (it.hasNext()) {
-                System.out.println("\tnode " + getVertexId().get() + " has " 
-                        + it.next() + " (step " + step + ")");
-            }
-            System.out.println("\tIncoming message for node" + getVertexId().get());
+
+//            System.out.println("\tCheckout hashset for node " + getVertexId().get());
+//            Iterator<Long> it = verticesSet.iterator();
+//            while (it.hasNext()) {
+//                System.out.println("\tnode " + getVertexId().get() + " has " 
+//                        + it.next() + " (step " + step + ")");
+//            }
+//            System.out.println("\tIncoming message for node" + getVertexId().get());
             while (msgIterator.hasNext()) {
                 VLongArrayListWritable t = msgIterator.next();
                 for (int i = 0; i < t.size(); i++) {
@@ -145,7 +142,6 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
                 }
             }
             curNumResults = tmpVertexValue.size();
-//            tmpVertexValue.addAllElements(newVertices);
             setVertexValue(tmpVertexValue);
             
             // termination predicate
@@ -153,7 +149,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
                 terminateJob();
             }
             
-            // send the newly received vertex Ids
+            // send the newly received vertex IDs
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 sendMsg(edge.getDestVertexId(), newVertices);
             }
@@ -163,10 +159,36 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         voteToHalt();
     }
     
+    /**
+     * Build the hash set for efficient avoiding vertex ID duplicates. 
+     */
+    private void buildSet(VLongArrayListWritable currentVertexValue) {
+        verticesSet.clear();
+        
+        // add vertex ID itself
+        verticesSet.add(getVertexId().get());
+        
+        // add IDs of its neighbors
+        for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
+            verticesSet.add(edge.getDestVertexId().get());
+        }
+        
+        // add current results IDs from the vertex value
+        if (currentVertexValue == null) {
+            return;
+        }
+        for (int i = 0; i < currentVertexValue.size(); i++) {
+            long vid = ((VLongWritable) currentVertexValue.get(i)).get();
+            if (!verticesSet.contains(vid)) {
+                verticesSet.add(vid);
+            }
+        }
+    }
+    
     private VLongArrayListWritable tmpVertexValue = null;
     
     /** Visited vertices: used for efficiently eliminate duplicates. */
-    private HashSet<Long> verticesSet = new HashSet<Long>();;
+    private HashSet<Long> verticesSet = new HashSet<Long>();
     
     /** Maximum iteration */
     public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
