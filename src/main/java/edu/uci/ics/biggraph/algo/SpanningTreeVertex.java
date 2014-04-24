@@ -1,5 +1,6 @@
 package edu.uci.ics.biggraph.algo;
 
+import java.util.HashSet;
 import java.util.Iterator;
 
 import edu.uci.ics.biggraph.client.Client;
@@ -28,6 +29,8 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 	VLongWritable senderIdWritable = new VLongWritable();
 	/** default edge value Writable for deletion */
 	FloatWritable edgeValueByDefault = new FloatWritable(1.0f);
+	/** record the msg sender's id */
+	HashSet<Long> msgSenderIds = new HashSet<Long>(); 
 	
 	// check if the vertex is the root vertex
 	private boolean isRoot() {
@@ -60,7 +63,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 			vertexValue2Set.set(0L);
 			setVertexValue(vertexValue2Set);
 			
-			// send message that it is the root by setting msg 0
+			// send message that it is the root by setting hello counter as 0
 			msg2Sent.setHelloCounterParentId(0L, getRootId());
             for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
                 sendMsg(edge.getDestVertexId(), msg2Sent);
@@ -74,6 +77,8 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 			long vertexValue = getVertexValue().get();
 			if (vertexValue == -1L) {
 				// first time to receive the message
+				// init msgSenderIds
+				msgSenderIds.clear();
 				
 				// Processing the message it got
 				// find the lowest hello counter it receives
@@ -81,6 +86,10 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 				long minCntVertexId = -1L;
 				while (msgIterator.hasNext()) {
 					TwoVLongWritable msg = msgIterator.next();
+					// save the sender's id of message
+					msgSenderIds.add(msg.getParentId());
+					
+					// update the minimum hello counter
 					if (minCnt > msg.getHelloCounter()) {
 						minCnt = msg.getHelloCounter();
 						minCntVertexId = msg.getParentId();
@@ -92,19 +101,33 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 				vertexValue2Set.set(minCnt);
 				setVertexValue(vertexValue2Set);		
 				
-				// send the message to all its neighbors except its parent
+				// send the message to all its neighbors except those who sent it messages
 				msg2Sent.setHelloCounterParentId(minCnt, getVertexId().get());
 	            for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
-	            	if (edge.getDestVertexId().get() != minCntVertexId) { // do not send to its parent
-	            		sendMsg(edge.getDestVertexId(), msg2Sent);
+	            	long destVertexId = edge.getDestVertexId().get();
+	            	if (msgSenderIds.contains(destVertexId) == false) {
+	            		// only send the message to the nodes it did not receive message
+	            		sendMsg(edge.getDestVertexId(), msg2Sent); 
 	            	}
-	            }				 
+	            }
+	            
+	            // now delete the edge that it receives message
+	            // EXCEPT the PARENT it chooses
+	            for (long id : msgSenderIds) {
+	            	if (id != minCntVertexId) { // EXCEPT the PARENT
+	            		// begin deleting
+	            		senderIdWritable.set(id);
+	            		Edge<VLongWritable, FloatWritable> edge = 
+								new Edge<VLongWritable, FloatWritable>(senderIdWritable, edgeValueByDefault);
+	            		removeEdge(edge);
+	            	}
+	            }
 			} else {
 				// just delete any edge if the message was sent through that edge
 				while (msgIterator.hasNext()) {
 					TwoVLongWritable msg = msgIterator.next();
-					senderIdWritable.set(msg.getParentId());
-					 
+					// begin deleting
+					senderIdWritable.set(msg.getParentId());					 
 					Edge<VLongWritable, FloatWritable> edge = 
 							new Edge<VLongWritable, FloatWritable>(senderIdWritable, edgeValueByDefault);
 					removeEdge(edge);
