@@ -1,6 +1,6 @@
 package edu.uci.ics.biggraph.algo;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import edu.uci.ics.biggraph.client.Client;
@@ -30,7 +30,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 	/** default edge value Writable for deletion */
 	FloatWritable edgeValueByDefault = new FloatWritable(1.0f);
 	/** record the msg sender's id */
-	HashSet<Long> msgSenderIds = new HashSet<Long>(); 
+	ArrayList<Long> msgSenderIds = new ArrayList<Long>(); 
 	
 	// check if the vertex is the root vertex
 	private boolean isRoot() {
@@ -101,12 +101,17 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 				vertexValue2Set.set(minCnt);
 				setVertexValue(vertexValue2Set);		
 				
-				// send the message to all its neighbors except those who sent it messages
+				// send the message to all its neighbors except it's parent
+				// NOTE: we did not use the strategy that
+				//  only send the message to the nodes it did not receive message
+				// this is because, we need the destination vertex to receive this obsolete
+				// message such that they can delete their out going edges to the vertex
 				msg2Sent.setHelloCounterParentId(minCnt, getVertexId().get());
 	            for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
 	            	long destVertexId = edge.getDestVertexId().get();
-	            	if (msgSenderIds.contains(destVertexId) == false) {
-	            		// only send the message to the nodes it did not receive message
+	            	if (destVertexId != minCntVertexId) {
+	            		// don't sent message to its parent
+	            		// otherwise, its parent will delete the vertex
 	            		sendMsg(edge.getDestVertexId(), msg2Sent); 
 	            	}
 	            }
@@ -123,6 +128,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 	            	}
 	            }
 			} else {
+				// the vertex has already received the hello message
 				// just delete any edge if the message was sent through that edge
 				while (msgIterator.hasNext()) {
 					TwoVLongWritable msg = msgIterator.next();
