@@ -15,9 +15,9 @@ public class HelloCntParentIdWritable implements WritableSizable {
         parentId.set(-1L);
     }
 
-    public void setHelloCounterParentId(long vv, long vi) {
-    	HelloCounter.set(vv);
-        parentId.set(vv);
+    public void setHelloCounterParentId(long helloCnt, long id) {
+    	HelloCounter.set(helloCnt);
+        parentId.set(id);
     }
 
     public long getHelloCounter() {

@@ -16,7 +16,6 @@ import edu.uci.ics.pregelix.api.io.VertexReader;
 import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
 import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
 import edu.uci.ics.pregelix.api.util.BspUtils;
-import edu.uci.ics.biggraph.algo.SpanningTreeVertex;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.HelloCntParentIdWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
@@ -41,7 +40,8 @@ class SpanningTreeGraphReader extends
     private List<VLongWritable> pool = new ArrayList<VLongWritable>();
     private int used = 0;
     // record the maximum num of out degree
-    private int maxNumOutDegree = 0;
+//    private static int maxNumOutDegree = 0;
+    private static boolean isFirst = true;
 
     public SpanningTreeGraphReader(RecordReader<LongWritable, Text> lineRecordReader) {
         super(lineRecordReader);
@@ -80,21 +80,29 @@ class SpanningTreeGraphReader extends
             /**
              * set the vertex value as initialization
              */
-            vertexValue.set(-1);
-//            vertex.setVertexValue(vertexValue);
+            if (isFirst) {
+            	vertexValue.set(0);
+            	vertex.setVertexValue(vertexValue);
+            	isFirst = false;
+            } else {
+            	vertexValue.set(-1);
+            	vertex.setVertexValue(vertexValue);
+            }
 
             /**
              * get neighbor num
              */
             int neighborNum = Integer.parseInt(fields[1]);
-            if (maxNumOutDegree < neighborNum) {
-            	// update the maxNumOutDegree
-            	maxNumOutDegree = neighborNum;
-            	// set the vertex id with maximum out degree
-            	getContext().getConfiguration().setLong(SpanningTreeVertex.ROOT_ID, src);
-            	System.out.print(src);
-            	System.out.print(" ");
-            }
+//            if (maxNumOutDegree < neighborNum) {
+//            	// update the maxNumOutDegree
+//            	maxNumOutDegree = neighborNum;
+//            	// set the vertex id with maximum out degree
+//            	getContext().getConfiguration().setLong(SpanningTreeVertex.ROOT_ID, src);
+//            	System.out.print(src);
+//            	System.out.print(" ");
+//            	System.out.print(getContext().getConfiguration().getLong(SpanningTreeVertex.ROOT_ID, 0));
+//            	System.out.print(" ");
+//            }
 
             /**
              * set up edges & weights

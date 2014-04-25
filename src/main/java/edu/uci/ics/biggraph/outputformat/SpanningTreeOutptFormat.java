@@ -27,7 +27,7 @@ TextVertexOutputFormat<VLongWritable, IntWritable, FloatWritable> {
 		public void writeVertex(Vertex<VLongWritable, IntWritable, FloatWritable, ?> vertex) throws IOException,
 		        InterruptedException {
 		    getRecordWriter().write(new Text(vertex.getVertexId().toString()),
-		            new Text(vertex.getVertexValue().toString()));
+		            new Text(vertex.toString()));
 		}
 	}
 	
