@@ -3,10 +3,11 @@ package edu.uci.ics.biggraph.algo;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import edu.uci.ics.biggraph.client.Client;
+import edu.uci.ics.biggraph.client.*;
 import edu.uci.ics.biggraph.inputformat.SpanningTreeInputformat;
 import edu.uci.ics.biggraph.io.FloatWritable;
-import edu.uci.ics.biggraph.io.TwoVLongWritable;
+import edu.uci.ics.biggraph.io.IntWritable;
+import edu.uci.ics.biggraph.io.HelloCntParentIdWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.outputformat.SpanningTreeOutptFormat;
 import edu.uci.ics.pregelix.api.graph.Edge;
@@ -15,16 +16,16 @@ import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 
-public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, FloatWritable, TwoVLongWritable>{
+public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable>{
 
 	/** The root vertex id, will be computed/set when read in graph */
 	public static final String ROOT_ID = "SpanningTreeVertex.rootId";
 	/** Default root vertex id */
     public static final long ROOT_ID_DEFAULT = 1;
     /** message to be sent */
-    TwoVLongWritable msg2Sent = new TwoVLongWritable();
+    HelloCntParentIdWritable msg2Sent = new HelloCntParentIdWritable();
     /** vertex value to be set */
-    VLongWritable vertexValue2Set = new VLongWritable();
+    IntWritable vertexValue2Set = new IntWritable();
     /** sender ID Writable for deletion */
 	VLongWritable senderIdWritable = new VLongWritable();
 	/** default edge value Writable for deletion */
@@ -53,45 +54,51 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 	
 	
 	@Override
-	public void compute(Iterator<TwoVLongWritable> msgIterator) throws Exception {
+	public void compute(Iterator<HelloCntParentIdWritable> msgIterator) throws Exception {
 		/** in the first step, 
 		 * the root id sends the message claiming itself as root by
 		 * sending value 0L
 		 */
-		if (getSuperstep() == 1 && isRoot()) {
-			// set itself vertex value as 0L
-			vertexValue2Set.set(0L);
-			setVertexValue(vertexValue2Set);
-			
-			// send message that it is the root by setting hello counter as 0
-			msg2Sent.setHelloCounterParentId(0L, getRootId());
-            for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
-                sendMsg(edge.getDestVertexId(), msg2Sent);
-            }
+		if (getSuperstep() == 1) {
+			if (isRoot()) {
+				// set itself vertex value as 0L
+				vertexValue2Set.set(0);
+				setVertexValue(vertexValue2Set);
+				
+				// send message that it is the root by setting hello counter as 0
+				msg2Sent.setHelloCounterParentId(0L, getRootId());
+	            for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
+	                sendMsg(edge.getDestVertexId(), msg2Sent);
+	            }
+			} else {
+				// set itself vertex value as -1L
+				vertexValue2Set.set(-1);
+				setVertexValue(vertexValue2Set);
+			}
 		} else {
 			/** see if it is the first time to receive the message 
 			 * by checking the vertex value
 			 * First time: -1L
 			 * Otherwise >= 0L
 			 */
-			long vertexValue = getVertexValue().get();
-			if (vertexValue == -1L) {
+			int vertexValue = getVertexValue().get();
+			if (vertexValue == -1) {
 				// first time to receive the message
 				// init msgSenderIds
 				msgSenderIds.clear();
 				
 				// Processing the message it got
 				// find the lowest hello counter it receives
-				long minCnt = Long.MAX_VALUE;
+				int minCnt = Integer.MAX_VALUE;
 				long minCntVertexId = -1L;
 				while (msgIterator.hasNext()) {
-					TwoVLongWritable msg = msgIterator.next();
+					HelloCntParentIdWritable msg = msgIterator.next();
 					// save the sender's id of message
 					msgSenderIds.add(msg.getParentId());
 					
 					// update the minimum hello counter
 					if (minCnt > msg.getHelloCounter()) {
-						minCnt = msg.getHelloCounter();
+						minCnt = (int) msg.getHelloCounter();
 						minCntVertexId = msg.getParentId();
 					}
 				}
@@ -125,18 +132,26 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
 	            		Edge<VLongWritable, FloatWritable> edge = 
 								new Edge<VLongWritable, FloatWritable>(senderIdWritable, edgeValueByDefault);
 	            		removeEdge(edge);
+	            		System.out.print("==== 1. ");
+	            		System.out.print("vertex: " + getVertexId().toString());
+	            		System.out.print(" remove edge to vertex: " + senderIdWritable.toString());
+	            		System.out.println(" ====");
 	            	}
 	            }
 			} else {
 				// the vertex has already received the hello message
 				// just delete any edge if the message was sent through that edge
 				while (msgIterator.hasNext()) {
-					TwoVLongWritable msg = msgIterator.next();
+					HelloCntParentIdWritable msg = msgIterator.next();
 					// begin deleting
 					senderIdWritable.set(msg.getParentId());					 
 					Edge<VLongWritable, FloatWritable> edge = 
 							new Edge<VLongWritable, FloatWritable>(senderIdWritable, edgeValueByDefault);
 					removeEdge(edge);
+            		System.out.print("==== 2. ");
+            		System.out.print("vertex: " + getVertexId().toString());
+            		System.out.print(" remove edge to vertex: " + senderIdWritable.toString());
+            		System.out.println(" ====");
 				}				
 			}
 		} // end of more than one time receives the message
@@ -151,6 +166,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, VLongWritable, Flo
         job.setMessageCombinerClass(DefaultMessageCombiner.class);
         job.setNoramlizedKeyComputerClass(VLongNormalizedKeyComputer.class);
         job.getConfiguration().setLong(ROOT_ID, 0L);
+        job.setDynamicVertexValueSize(true);
         Client.run(args, job);
     }
 

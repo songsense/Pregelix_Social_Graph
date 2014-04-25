@@ -6,13 +6,13 @@ import java.io.IOException;
 
 import edu.uci.ics.pregelix.api.io.WritableSizable;
 
-public class TwoVLongWritable implements WritableSizable {
+public class HelloCntParentIdWritable implements WritableSizable {
 	private VLongWritable HelloCounter = new VLongWritable();
 	private VLongWritable parentId = new VLongWritable();
 
-    public TwoVLongWritable() {
+    public HelloCntParentIdWritable() {
     	HelloCounter.set(-1L);
-        parentId.set(-1);
+        parentId.set(-1L);
     }
 
     public void setHelloCounterParentId(long vv, long vi) {

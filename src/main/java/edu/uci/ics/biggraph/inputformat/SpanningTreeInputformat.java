@@ -17,13 +17,14 @@ import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
 import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
 import edu.uci.ics.pregelix.api.util.BspUtils;
 import edu.uci.ics.biggraph.algo.SpanningTreeVertex;
-import edu.uci.ics.biggraph.io.TwoVLongWritable;
+import edu.uci.ics.biggraph.io.IntWritable;
+import edu.uci.ics.biggraph.io.HelloCntParentIdWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 
 public class SpanningTreeInputformat extends
-        TextVertexInputFormat<VLongWritable, VLongWritable, FloatWritable, TwoVLongWritable>{
+        TextVertexInputFormat<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable>{
     @Override
-    public VertexReader<VLongWritable, VLongWritable, FloatWritable, TwoVLongWritable> createVertexReader(
+    public VertexReader<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable> createVertexReader(
             InputSplit split, TaskAttemptContext context) throws IOException {
         return new SpanningTreeGraphReader(textInputFormat.createRecordReader(split, context));
     }
@@ -31,11 +32,12 @@ public class SpanningTreeInputformat extends
 
 @SuppressWarnings("rawtypes")
 class SpanningTreeGraphReader extends
-        TextVertexReader<VLongWritable, VLongWritable, FloatWritable, TwoVLongWritable> {
+        TextVertexReader<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable> {
 
     private final static String separator = " ";
     private Vertex vertex;
     private VLongWritable vertexId = new VLongWritable();
+    private IntWritable vertexValue = new IntWritable();
     private List<VLongWritable> pool = new ArrayList<VLongWritable>();
     private int used = 0;
     // record the maximum num of out degree
@@ -52,7 +54,7 @@ class SpanningTreeGraphReader extends
 
     @SuppressWarnings("unchecked")
     @Override
-    public Vertex<VLongWritable, VLongWritable, FloatWritable, TwoVLongWritable> getCurrentVertex() throws IOException,
+    public Vertex<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable> getCurrentVertex() throws IOException,
             InterruptedException {
         if (vertex == null)
             vertex = (Vertex) BspUtils.createVertex(getContext().getConfiguration());
@@ -78,9 +80,8 @@ class SpanningTreeGraphReader extends
             /**
              * set the vertex value as initialization
              */
-            VLongWritable vertexValue = new VLongWritable();
-            vertexValue.set(-1L);
-            vertex.setVertexValue(vertexValue);
+            vertexValue.set(-1);
+//            vertex.setVertexValue(vertexValue);
 
             /**
              * get neighbor num
@@ -91,6 +92,8 @@ class SpanningTreeGraphReader extends
             	maxNumOutDegree = neighborNum;
             	// set the vertex id with maximum out degree
             	getContext().getConfiguration().setLong(SpanningTreeVertex.ROOT_ID, src);
+            	System.out.print(src);
+            	System.out.print(" ");
             }
 
             /**

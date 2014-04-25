@@ -9,21 +9,22 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.io.VertexWriter;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat;
+import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.io.FloatWritable;
 /**
  * Simple VertexOutputFormat that supports {@link SimplePageRankVertex}
  */
 public class SpanningTreeOutptFormat extends
-TextVertexOutputFormat<VLongWritable, VLongWritable, FloatWritable> {
+TextVertexOutputFormat<VLongWritable, IntWritable, FloatWritable> {
 	
 	public class SpanningTreeWriter extends
-    TextVertexWriter<VLongWritable, VLongWritable, FloatWritable> {
+    TextVertexWriter<VLongWritable, IntWritable, FloatWritable> {
 		public SpanningTreeWriter(RecordWriter<Text, Text> lineRecordWriter) {
 		    super(lineRecordWriter);
 		}
 		@Override
-		public void writeVertex(Vertex<VLongWritable, VLongWritable, FloatWritable, ?> vertex) throws IOException,
+		public void writeVertex(Vertex<VLongWritable, IntWritable, FloatWritable, ?> vertex) throws IOException,
 		        InterruptedException {
 		    getRecordWriter().write(new Text(vertex.getVertexId().toString()),
 		            new Text(vertex.getVertexValue().toString()));
@@ -31,7 +32,7 @@ TextVertexOutputFormat<VLongWritable, VLongWritable, FloatWritable> {
 	}
 	
 	@Override
-	public VertexWriter<VLongWritable, VLongWritable, FloatWritable> createVertexWriter(TaskAttemptContext context)
+	public VertexWriter<VLongWritable, IntWritable, FloatWritable> createVertexWriter(TaskAttemptContext context)
 	    throws IOException, InterruptedException {
 		RecordWriter<Text, Text> recordWriter = textOutputFormat.getRecordWriter(context);
 		return new SpanningTreeWriter(recordWriter);
