@@ -67,7 +67,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 		 * sending value 0L
 		 */
 		if (getSuperstep() == 1) {
-			System.out.println("ID: " + getVertexId().toString());
+//			System.out.println("ID: " + getVertexId().toString());
 			if (isRoot()) {
 				// set itself vertex value as 0
 				vertexValueToSet.set(0);
@@ -77,10 +77,10 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 				msgToSent.setHelloCounterParentId(0L, getVertexId().get());
 	            for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
 	                sendMsg(edge.getDestVertexId(), msgToSent);
-            		System.out.print("==== 0 message: ");
-            		System.out.print(" send from root: " + getVertexId().toString());
-            		System.out.print(" to " + edge.getDestVertexId().toString());
-            		System.out.println(" ====");
+//            		System.out.print("==== 0 message: ");
+//            		System.out.print(" send from root: " + getVertexId().toString());
+//            		System.out.print(" to " + edge.getDestVertexId().toString());
+//            		System.out.println(" ====");
 	            }
 			} else {
 				// set itself vertex value as -1L
@@ -138,11 +138,11 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 	            		// don't sent message to its parent
 	            		// otherwise, its parent will delete the vertex
 	            		sendMsg(edge.getDestVertexId(), msgToSent); 
-	            		System.out.print("==== 1 message: ");
-	            		System.out.print("Parent id: " + minCntVertexId);
-	            		System.out.print(" send from " + getVertexId().toString());
-	            		System.out.print(" to " + edge.getDestVertexId().toString());
-	            		System.out.println(" ====");
+//	            		System.out.print("==== 1 message: ");
+//	            		System.out.print("Parent id: " + minCntVertexId);
+//	            		System.out.print(" send from " + getVertexId().toString());
+//	            		System.out.print(" to " + edge.getDestVertexId().toString());
+//	            		System.out.println(" ====");
 	            	}
 	            }
 	            
@@ -152,10 +152,10 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 	            	if (id != minCntVertexId) { // EXCEPT the PARENT
 	            		// begin deleting
 	            		setEdgeDeleted(edgeList, id);
-	            		System.out.print("==== 1. ");
-	            		System.out.print("vertex: " + getVertexId().toString());
-	            		System.out.print(" remove edge to vertex: " + id);
-	            		System.out.println(" ====");
+//	            		System.out.print("==== 1. ");
+//	            		System.out.print("vertex: " + getVertexId().toString());
+//	            		System.out.print(" remove edge to vertex: " + id);
+//	            		System.out.println(" ====");
 	            	}
 	            }
 			} else {
@@ -165,10 +165,10 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 					HelloCntParentIdWritable msg = msgIterator.next();
 					// begin deleting
 					setEdgeDeleted(edgeList, msg.getParentId());
-            		System.out.print("==== 2. ");
-            		System.out.print("vertex: " + getVertexId().toString());
-            		System.out.print(" remove edge to vertex: " + msg.getParentId());
-            		System.out.println(" ====");
+//            		System.out.print("==== 2. ");
+//            		System.out.print("vertex: " + getVertexId().toString());
+//            		System.out.print(" remove edge to vertex: " + msg.getParentId());
+//            		System.out.println(" ====");
 				}				
 			}
 		} // end of more than one time receives the message
