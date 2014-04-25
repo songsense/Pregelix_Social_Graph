@@ -85,7 +85,7 @@ class SpanningTreeGraphReader extends
             	vertex.setVertexValue(vertexValue);
             	isFirst = false;
             } else {
-            	vertexValue.set(-1);
+            	vertexValue.set(Integer.MAX_VALUE);
             	vertex.setVertexValue(vertexValue);
             }
 

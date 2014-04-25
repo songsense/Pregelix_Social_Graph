@@ -65,6 +65,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 		 * sending value 0L
 		 */
 		if (getSuperstep() == 1) {
+			System.out.println("ID: " + getVertexId().toString());
 			if (isRoot()) {
 				// set itself vertex value as 0
 				vertexValueToSet.set(0);
@@ -81,7 +82,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 	            }
 			} else {
 				// set itself vertex value as -1L
-				vertexValueToSet.set(-1);
+				vertexValueToSet.set(Integer.MAX_VALUE);
 				setVertexValue(vertexValueToSet);
 			}
 		} else {
@@ -96,7 +97,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 			 * Otherwise >= 0L
 			 */
 			int vertexValue = getVertexValue().get();
-			if (vertexValue == -1) {
+			if (vertexValue == Integer.MAX_VALUE) {
 				// first time to receive the message
 				// init msgSenderIds
 				msgSenderIds.clear();
