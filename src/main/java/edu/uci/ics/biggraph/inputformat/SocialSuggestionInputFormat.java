@@ -72,7 +72,7 @@ class SocialSuggestionGraphReader extends
             VLongArrayListWritable vertexValue = new VLongArrayListWritable();
             int numNeighbors = Integer.parseInt(fields[1]);
             for (int i = 0; i < numNeighbors; i++) {
-                long dest = Long.parseLong(fields[i + 2]);
+                long dest = Long.parseLong(fields[2*i + 2]);
                 VLongWritable destId = allocate();
                 destId.set(dest);
                 
