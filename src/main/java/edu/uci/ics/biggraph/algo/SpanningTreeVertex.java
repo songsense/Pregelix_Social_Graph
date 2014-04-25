@@ -54,6 +54,8 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 				++i;
 			}
 		}
+		// no tag information
+		sb.append(" ").append(0);
 		return Integer.toString(i) + sb.toString();
 	}
 	
