@@ -70,6 +70,17 @@
     height: 40px;
     font-size: 15px;
     }*/
+    
+    .controlBlockTitle{
+    font-size:18px; 
+    font-weight:bold; 
+    }
+
+    .controlBlockContent{
+    margin-top:-15px; 
+    font-weight:bold;
+    color:#000033;
+    }
   </style>
   
   <title>Large Graph Analysis</title>
@@ -77,26 +88,31 @@
 <body>
   <div id="main" style="float:left">
     <div id="header" style="float:left">
-      <p>Twitter Graph Analysis Based On Pregelix</p>
+      <p>Graph Analysis Based On Pregelix</p>
     </div>
     <div id="graphDisplayBlock" style="float:left">
       <p style="color:#55acee; font-size: 20px; margin-left:10px; margin-bottom:5px">Tweeter Graph</p>
       <canvas id="graph" width="800" height="500"></canvas>
     </div>
     <div id="controlBlock" style="float:left">
+      <div id="loadGraph" class="taskBlock">
+	<p class="controlBlockTitle">Load Graph:</p>
+	<p style="margin-bottom:3px">Choose your graph file:</p>
+	<input id="filePath" type="file" name="filePath"/>
+      </div>
       <div id="task1" class="taskBlock">
-	<p style="font-size:18px; font-weight:bold">Task 1:</p>
-	<p style="margin-top:-15px; font-weight:bold">Shortest Distance Over Frequent Communication Paths</p>
+	<p class="controlBlockTitle">Task 1:</p>
+	<p class="controlBlockContent">Shortest Distance Over Frequent Communication Paths</p>
 	<button class="button" id="runTask1" type="submit">Run Task1</button>
       </div>
       <div id="task2" class="taskBlock">
-	<p style="font-size:18px; font-weight:bold">Task 2:</p>
-	<p style="margin-top:-15px; font-weight:bold">Interests with Large Communities</p>
+	<p class="controlBlockTitle">Task 2:</p>
+	<p class="controlBlockContent">Interests with Large Communities</p>
 	<button class="button" id="runTask2" type="submit">Run Task2</button>
       </div>
       <div id="task3" class="taskBlock">
-	<p style="font-size:18px; font-weight:bold">Task 3:</p>
-	<p style="margin-top:-15px; font-weight:bold">Socialization Suggestion</p>
+	<p class="controlBlockTitle">Task 3:</p>
+	<p class="controlBlockContent">Socialization Suggestion</p>
 	<button class="button" id="runTask3" type="submit">Run Task3</button>
       </div>
     </div>
