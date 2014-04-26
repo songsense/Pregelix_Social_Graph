@@ -28,8 +28,8 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
     /** vertex value to be set */
     IntWritable vertexValueToSet = new IntWritable();
 	/** deleted edge */
-	float edgeDeleted = 2.0f;
-	FloatWritable edgeDeletedWritable = new FloatWritable(2.0f);
+	float edgeDeleted = -1.0f;
+	FloatWritable edgeDeletedWritable = new FloatWritable(-1.0f);
 	/** record the msg sender's id */
 	ArrayList<Long> msgSenderIds = new ArrayList<Long>(); 
 	List<Edge<VLongWritable, FloatWritable> > edgeList;
@@ -57,6 +57,10 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 		// no tag information
 		sb.append(" ").append(0);
 		return Integer.toString(i) + sb.toString();
+//		if (i > 1)
+//			return "0";
+//		else
+//			return "";
 	}
 	
 	

@@ -205,6 +205,7 @@ var Renderer = function(canvas){
 
 
 function addResult(dom, res) {
+    //alert("add result");
     for (i in res) {
         $(dom).append(res[i] + "<br/>");
     }
@@ -227,7 +228,49 @@ function drawGraph(dom, res){
     }
 }
 
+function loadGraph(){
+    var fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
+    var query = 'use dataverse Task1; delete $tuple from dataset Graph; load dataset Graph using localfs(("path"="localhost:///home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/'+fileName+'"),("format"="adm"));';
+    //alert(query);
+    var xmlhttp;
+    if(window.XMLHttpRequest){
+	xmlhttp = new XMLHttpRequest();
+    }
+    else{
+	xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.onreadystatechange=function(){
+	//alert("OK");
+	//if(xmlhttp.readyState==4 && xmlhttp.status==200){
+	    //alert("start");
+	    var A = new AsterixDBConnection().dataverse("Task1");
+	    var expression0a = new FLWOGRExpression()
+		.ForClause("$node", new AExpression("dataset Graph"))
+		.ReturnClause({
+		    "source_node":"$node.source_node",
+		    "target_node":"$node.target_node"});
+	    
+	    var success = function(res){
+		//alert(res["results"]);
+		//addResult('#graph', res["results"]);
+		drawGraph('#graph', res["results"]);
+	    };
+	    A.query(expression0a.val(),  success);
+	//}
+    }
+
+    xmlhttp.open("GET", "http://localhost:19002/update?statements="+query, true);
+    xmlhttp.send();
+    
+    
+}
+
+
 $(document).ready(function(){
+
+    $("#filePath").change(loadGraph);
+
     var A = new AsterixDBConnection().dataverse("Task1");
     
     
@@ -239,9 +282,9 @@ $(document).ready(function(){
     
     var success = function(res){
 	//addResult('#graphDisplayBlock', res["results"]);
+	//alert(res["results"]);
 	drawGraph('#graph', res["results"]);
     };
     A.query(expression0a.val(),  success);
-    
     
 });
