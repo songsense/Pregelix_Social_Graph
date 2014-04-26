@@ -20,7 +20,9 @@ public class URLGenerator {
     
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        System.out.println(generate("localhost", 19001, RestAPI.DDL, ""));
+        String test = "use dataverse company;" + 
+                      "for $l in dataset('Employee') return $l;";
+        System.out.println(generate("localhost", 19001, RestAPI.QUERY, test));
     }
 
 }
