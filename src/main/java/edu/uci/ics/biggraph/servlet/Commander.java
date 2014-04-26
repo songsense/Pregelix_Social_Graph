@@ -49,6 +49,6 @@ public class Commander {
      */
     public static void main(String[] args) throws IOException {
         // TODO Auto-generated method stub
-        System.out.println(sendGet("http://localhost:19002/query?query=use%20dataverse%20company;for%20$l%20in%20dataset(%27Employee%27)%20return%20$l;"));
+        System.out.println(sendGet("http://localhost:19002/query?query=use%20dataverse%20company;for%20$l%20in%20dataset('Employee')%20return%20$l;"));
     }
 }
