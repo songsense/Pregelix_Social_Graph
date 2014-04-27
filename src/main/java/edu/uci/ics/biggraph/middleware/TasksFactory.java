@@ -10,6 +10,9 @@ public class TasksFactory {
             case LOAD_GRAPH:
                 task = new LoadGraph();
                 break;
+            case TASK_1:
+                task = new TaskOne();
+                break;
             default:
                 System.err.println("Unknown task type.");
                 break;

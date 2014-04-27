@@ -1,6 +1,5 @@
 package edu.uci.ics.biggraph.middleware;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,9 +7,9 @@ import java.io.IOException;
 /**
  * Created by soushimei on 4/27/14.
  */
-public class LoadGraph extends Task {
-    public LoadGraph() {
-        super(TaskType.LOAD_GRAPH);
+public class TaskOne extends Task {
+    public TaskOne() {
+        super(TaskType.TASK_1);
     }
 
     @Override
@@ -39,12 +38,13 @@ public class LoadGraph extends Task {
         this.port = port;
 
         // set by default
-        this.taskClass = "edu.uci.ics.biggraph.algo.SpanningTreeVertex";
+        this.taskClass = "edu.uci.ics.biggraph.algo.WeightedShortestPathVertex";
         this.outputPath = "/tmp/pregelix_result";
         this.ip = "`bin/getip.sh`";
 
         // set by querying the database
         inputGraphPath = getInputGraphPath();
+        sourceId = getSourceId();
     }
 
     @Override
@@ -64,10 +64,13 @@ public class LoadGraph extends Task {
         // append ip configuration
         stringBuffer.append("-ip ").append(ip).append(" ");
         // append port configuration
-        stringBuffer.append("-port ").append(port);
+        stringBuffer.append("-port ").append(port).append(" ");
+        // append source id
+        stringBuffer.append("-source-vertex ").append(sourceId);
 
         return stringBuffer.toString();
     }
+
 
     private String getInputGraphPath() {
         // TODO querying the database
@@ -75,21 +78,26 @@ public class LoadGraph extends Task {
         return inputGraphPath;
     }
 
+    private String getSourceId() {
+        sourceId = "1";
+        return sourceId;
+    }
+
     private void runCommand() throws IOException, InterruptedException {
         System.out.println("Executing " + command);
         // writing scripts to the pregelix path
-        File file = new File(pregelixPath + "load_path.sh");
+        File file = new File(pregelixPath + "task1.sh");
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.write(command);
         fileWriter.close();
 
         // change mode to the executive
-        Process changeMode = Runtime.getRuntime().exec("chmod a+x " + pregelixPath + "load_path.sh");
+        Process changeMode = Runtime.getRuntime().exec("chmod a+x " + pregelixPath + "task1.sh");
         changeMode.waitFor();
 
         // run the command
         System.setProperty("user.dir", pregelixPath);
-        Process p = Runtime.getRuntime().exec(pregelixPath + "load_path.sh", null, new File(pregelixPath));
+        Process p = Runtime.getRuntime().exec(pregelixPath + "task1.sh", null, new File(pregelixPath));
         p.waitFor();
     }
 
@@ -102,4 +110,5 @@ public class LoadGraph extends Task {
     private String outputPath = null;
     private String ip = null;
     private String port = null;
+    private String sourceId = null;
 }

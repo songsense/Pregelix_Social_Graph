@@ -40,7 +40,11 @@ public class MiddlewareClient {
     private static void runJob() throws InterruptedException {
         Task task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
         task.runTask(options.pregelixPath, options.projectPath, options.port);
-        System.out.println("Finish");
+        System.out.println("Finish Load Graph");
+
+        task = TasksFactory.createTask(TaskType.TASK_1);
+        task.runTask(options.pregelixPath, options.projectPath, options.port);
+        System.out.println("Finish Task 1");
 //        while(true) {
 //            Thread.sleep(sleepTime);
 //        }
