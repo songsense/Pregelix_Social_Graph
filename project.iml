@@ -85,6 +85,30 @@
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: edu.uci.ics.hyracks:pregelix-example:0.2.9" level="project" />
     <orderEntry type="library" name="Maven: com.google.collections:google-collections:1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-client:1.12" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.jersey:jersey-core:1.1.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.ws.rs:jsr311-api:1.1.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.jersey:jersey-json:1.1.5" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.jettison:jettison:1.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: stax:stax-api:1.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.xml.bind:jaxb-impl:2.1.12" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.xml.bind:jaxb-api:2.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.xml.stream:stax-api:1.0-2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.jackson:jackson-core-asl:1.1.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.jersey:jersey-test-framework:1.1.5.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.jersey:jersey-server:1.1.5.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: asm:asm:3.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-servlet-webserver:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-http:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-framework:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-utils:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-rcm:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-portunif:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.sun.grizzly:grizzly-http-servlet:1.9.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.embedded:glassfish-embedded-all:3.0-Prelude-Embedded-b14" level="project" />
+    <orderEntry type="library" name="Maven: javax:javaee-api:6.0" level="project" />
   </component>
 </module>
 
