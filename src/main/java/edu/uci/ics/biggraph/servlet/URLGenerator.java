@@ -7,8 +7,11 @@ import java.net.URISyntaxException;
  * Translate AQL into valid URL. 
  */
 public class URLGenerator {
-    static String generate(String host, int port, RestAPI type, String revisedCmd) {
-        return "http://" + host + ":" + new Integer(port).toString() + type.getQuery() 
+    /**
+     * Generate the final URL for HTTP request.
+     */
+    public static String generate(String host, int port, RestAPI type, String revisedCmd) {
+        return "http://" + host + ":" + Integer.toString(port) + type.getQuery()
                 + "?" + type.getFrag() + revisedCmd;
     }
     
@@ -22,8 +25,11 @@ public class URLGenerator {
 //        }
 //        return uri != null ? uri.toASCIIString() : null;
 //    }
-    
-    static String cmdParser(String cmd) {
+
+    /**
+     * Parse the AQL by removing/translating necessary notations.
+     */
+    public static String cmdParser(String cmd) {
         StringBuilder sb = new StringBuilder();
         int strlen = cmd.length();
         
@@ -51,13 +57,52 @@ public class URLGenerator {
         
         return sb.toString();
     }
+
+    /**
+     * Generate UPDATE command.
+     * @param dataverse - the dataverse the required entry belongs to.
+     * @param dataset - the dataset the required entry belongs to.
+     * @param payload - items in this entry represented as strings.
+     *                e.g.: "\"id\":123", "\"name\":\"John Doe\"".
+     * @return the assembled command.
+     */
+    public static String update(String dataverse, String dataset, String[] payload) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("use dataverse " + dataverse + ";\n")
+          .append("insert into dataset " + dataset + "({");
+        for (int i = 0; i < payload.length; i++) {
+            sb.append(payload[i]);
+            if (i != payload.length - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("});");
+
+        return sb.toString();
+    }
+
+    /**
+     * Generate QUERY command.
+     * @param dataverse - the dataverse the required entry belongs to.
+     * @param dataset - the dataset the required entry belongs to.
+     * @return the assembled command.
+     */
+    public static String query(String dataverse, String dataset) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("use dataverse " + dataverse + ";\n")
+          .append("for $l in dataset('" + dataset + "') return $l");
+
+        return sb.toString();
+    }
     
     public static void main(String[] args) {
         // TODO Auto-generated method stub
-        String test = "use dataverse company;" + 
+        String test = "use dataverse company;" +
                       "for $l in dataset('Employee') return $l;";
         String test2 = "use dataverse company;" +
-                       "insert into dataset Employee({ \"id\":123,\"name\":\"John Doe\"});";  
+                       "insert into dataset Employee({ \"id\":123,\"name\":\"John Doe\"});";
         String revised = cmdParser(test2);
         System.out.println(generate("localhost", 19002, RestAPI.UPDATE, revised));
     }
