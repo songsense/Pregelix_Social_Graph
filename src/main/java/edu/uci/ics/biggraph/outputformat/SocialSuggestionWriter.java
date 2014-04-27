@@ -31,10 +31,24 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
 
         getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
 
-        // Assemble vertex payload as part of AQL UPDATE command.
+        /*
+         * Assemble vertex payload as part of AQL UPDATE command.
+         * Find out the fields format:
+         * @see https://docs.google.com/document/d/1HvSHJrj2qdY6Zr8wCQRlMVbTfrFzz7qnOhqEed3J4DQ/edit
+         */
         String[] items = new String[2];
+        StringBuilder vals = new StringBuilder();
         items[0] = "\"node_id\":" + nodeID;
-        items[1] = "\"suggested_friends\":" + nodeVal; // XXX: NOT SURE!
+        vals.append("\"suggested_friends\":" + "{{");
+        String[] ss = nodeVal.split(" ");
+        for (int i = 0; i < ss.length; i++) {
+            vals.append(ss[i]);
+            if (i != ss.length - 1) {
+                vals.append(",");
+            }
+        } // XXX: should we put "null" afterwards?
+        vals.append("}}");
+        items[1] = vals.toString();
 
         String aql = URLGenerator.update("Tasks", "TaskThreeType", items);
         aql = URLGenerator.cmdParser(aql);
