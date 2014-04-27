@@ -30,7 +30,11 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         String nodeVal = val.toString();
 
         getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
+        toDatabase(nodeID, nodeVal);
+    }
 
+    private void toDatabase(String nodeID, String nodeVal)
+                                        throws IOException {
         /*
          * Assemble vertex payload as part of AQL UPDATE command.
          * Find out the fields format:
@@ -56,6 +60,13 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         aql = URLGenerator.cmdParser(aql);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
         Commander.sendGet(url); // no payload to get
+
+        // test result
+        String result = URLGenerator.query("Tasks", "TaskThree");
+        result = URLGenerator.cmdParser(result);
+        result = URLGenerator.generate("localhost", 19002, RestAPI.QUERY, result);
+        result = Commander.sendGet(result);
+        System.out.println(result);
     }
 
 }
