@@ -13,6 +13,9 @@ public class TasksFactory {
             case TASK_1:
                 task = new TaskOne();
                 break;
+            case TASK_2:
+                task = new TaskTwo();
+                break;
             default:
                 System.err.println("Unknown task type.");
                 break;

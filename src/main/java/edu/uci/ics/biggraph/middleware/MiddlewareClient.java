@@ -45,6 +45,10 @@ public class MiddlewareClient {
         task = TasksFactory.createTask(TaskType.TASK_1);
         task.runTask(options.pregelixPath, options.projectPath, options.port);
         System.out.println("Finish Task 1");
+
+        task = TasksFactory.createTask(TaskType.TASK_2);
+        task.runTask(options.pregelixPath, options.projectPath, options.port);
+        System.out.println("Finish Task 2");
 //        while(true) {
 //            Thread.sleep(sleepTime);
 //        }
