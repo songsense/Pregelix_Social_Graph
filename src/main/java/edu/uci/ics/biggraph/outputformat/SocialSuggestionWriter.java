@@ -47,7 +47,7 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
             if (i != ss.length - 1) {
                 vals.append(",");
             }
-        } // XXX: should we put "null" afterwards?
+        } // for unordered list, we don't need a tailing "null".
         vals.append("}}");
         items[1] = vals.toString();
         System.out.println(items[1]);
