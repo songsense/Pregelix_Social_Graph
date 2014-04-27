@@ -71,10 +71,13 @@ public class URLGenerator {
 
         sb.append("use dataverse " + dataverse + ";\n")
           .append("insert into dataset " + dataset + "({");
-        for (String s : payload) {
-            sb.append(s + ",");
+        for (int i = 0; i < payload.length; i++) {
+            sb.append(payload[i]);
+            if (i != payload.length - 1) {
+                sb.append(",");
+            }
         }
-        sb.append("})");
+        sb.append("});");
 
         return sb.toString();
     }

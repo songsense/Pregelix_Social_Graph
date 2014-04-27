@@ -36,6 +36,7 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
          * Find out the fields format:
          * @see https://docs.google.com/document/d/1HvSHJrj2qdY6Zr8wCQRlMVbTfrFzz7qnOhqEed3J4DQ/edit
          */
+        System.out.println("[OUTPUT] ID: " + nodeID + ", Val = " + nodeVal);
         String[] items = new String[2];
         StringBuilder vals = new StringBuilder();
         items[0] = "\"node_id\":" + nodeID;
@@ -49,8 +50,9 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         } // XXX: should we put "null" afterwards?
         vals.append("}}");
         items[1] = vals.toString();
+        System.out.println(items[1]);
 
-        String aql = URLGenerator.update("Tasks", "TaskThreeType", items);
+        String aql = URLGenerator.update("Tasks", "TaskThree", items);
         aql = URLGenerator.cmdParser(aql);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
         Commander.sendGet(url); // no payload to get
