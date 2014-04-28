@@ -1,5 +1,6 @@
 package edu.uci.ics.biggraph.middleware;
 
+import edu.uci.ics.biggraph.servlet.DatabaseInitializer;
 import edu.uci.ics.biggraph.servlet.ProtocolTypeAccessor;
 import org.kohsuke.args4j.CmdLineException;
 
@@ -40,6 +41,8 @@ public class MiddlewareClient {
 
     private static void runJob() throws InterruptedException, IOException {
         Task task;
+
+        DatabaseInitializer.initializeAll();
 
         ProtocolTypeAccessor.getInstance().loadEntry();
 
