@@ -52,7 +52,7 @@ public class GraphTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-//        removeEntry();
+        removeEntry();
 
         String cmds = assembleFields();
         String aql;
@@ -63,7 +63,7 @@ public class GraphTypeAccessor extends DataTypeAccessor {
         }
         aql = URLGenerator.cmdParser(aql);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
-//        Commander.sendGet(url);
+        Commander.sendGet(url);
         System.out.println(url);
     }
 
