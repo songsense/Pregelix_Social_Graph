@@ -1,18 +1,28 @@
 package edu.uci.ics.biggraph.servlet;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObjectBuilder;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
+ * Graph Type Accessor - This class is shared by two graph types:
+ * 1. GraphType (for OriginalGraph)
+ * 2. BackBoneNodeType (for BackBoneGraph)
+ *
  * Created by liqiangw on 4/27/14.
  */
 public class GraphTypeAccessor extends DataTypeAccesor {
-    private static GraphTypeAccessor ourInstance = new GraphTypeAccessor();
+    private static GraphTypeAccessor origin = new GraphTypeAccessor(GType.ORIGIN);
+    private static GraphTypeAccessor backbone = new GraphTypeAccessor(GType.BACKBONE);
 
-    public static GraphTypeAccessor getInstance() {
-        return ourInstance;
-    }
+    public static final GraphTypeAccessor ORIGIN = origin;
+    public static final GraphTypeAccessor BACKBONE = backbone;
+
+    private enum GType {ORIGIN, BACKBONE};
+    private GType type;
 
     /* Fields specification */
     /** source_node : int32 (primary key) */
@@ -22,7 +32,8 @@ public class GraphTypeAccessor extends DataTypeAccesor {
     /** weight: {{double}} */
     private LinkedList<Double> weight = null;
 
-    private GraphTypeAccessor() {
+    private GraphTypeAccessor(GType type) {
+        this.type = type;
     }
 
     /**
@@ -43,8 +54,13 @@ public class GraphTypeAccessor extends DataTypeAccesor {
     public void storeEntry() throws IOException {
         removeEntry();
 
-        String[] cmds = assembleFields();
-        String aql = URLGenerator.update("OriginalGraph", "Graph", cmds);
+        String cmds = assembleFields();
+        String aql;
+        if (type == GType.ORIGIN) {
+            aql = URLGenerator.update("OriginalGraph", "Graph", cmds);
+        } else {
+            aql = URLGenerator.update("BackBoneGraph", "BackBoneNode", cmds);
+        }
         aql = URLGenerator.cmdParser(aql);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
         Commander.sendGet(url);
@@ -61,9 +77,15 @@ public class GraphTypeAccessor extends DataTypeAccesor {
     private void removeEntry() throws IOException {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("use dataverse OriginalGraph;");
-        sb.append("delete $e from dataset Graph where $e.source_node = "
+        if (type == GType.ORIGIN) {
+            sb.append("use dataverse OriginalGraph;");
+            sb.append("delete $e from dataset Graph where $e.source_node = "
                     + source_node + ";");
+        } else {
+            sb.append("use dataverse BackBoneGraph;");
+            sb.append("delete $e from dataset BackBoneNode where $e.source_node = "
+                    + source_node + ";");
+        }
 
         String cmd = sb.toString();
         cmd = URLGenerator.cmdParser(cmd);
@@ -71,38 +93,52 @@ public class GraphTypeAccessor extends DataTypeAccesor {
         Commander.sendGet(cmd);
     }
 
-    private String[] assembleFields() {
-        String[] cmds = new String[3];
-        StringBuilder sb = new StringBuilder();
+    private String assembleFields() {
+//        String[] cmds = new String[3];
+//        StringBuilder sb = new StringBuilder();
+//
+//        cmds[0] = "\"source_node:\"" + getSourceNode();
+//
+//        sb.append("\"target_nodes:\"[");
+//        int listLen = target_nodes.size();
+//        Iterator<Integer> it = target_nodes.iterator();
+//        while (it.hasNext()) {
+//            sb.append(it.next() + ",");
+//        }
+//        sb.append("null]");
+//        cmds[1] = sb.toString();
+//
+//        sb = new StringBuilder();
+//        sb.append("\"weight:\"[");
+//        int wLen = weight.size();
+//        Iterator<Double> dt = weight.iterator();
+//        while (dt.hasNext()) {
+//            sb.append(dt.next() + ",");
+//        }
+//        sb.append("null]");
+//        cmds[2] = sb.toString();
+//
+//        return cmds;
+        JsonObjectBuilder model = Json.createObjectBuilder()
+                .add("source_node", getSourceNode());
 
-        cmds[0] = "\"source_node:\"" + getSourceNode();
-
-        sb.append("\"target_nodes:\"{{");
-        int listLen = target_nodes.size();
         Iterator<Integer> it = target_nodes.iterator();
+        JsonArrayBuilder targets = Json.createArrayBuilder();
         while (it.hasNext()) {
-            sb.append(it.next());
-            if (--listLen > 0) {
-                sb.append(",");
-            }
+            targets.add(it.next());
         }
-        sb.append("}}");
-        cmds[1] = sb.toString();
+        targets.addNull(); // requirement for ordered list
+        model.add("target_nodes", targets);
 
-        sb = new StringBuilder();
-        sb.append("\"weight:\"{{");
-        int wLen = weight.size();
         Iterator<Double> dt = weight.iterator();
+        JsonArrayBuilder w = Json.createArrayBuilder();
         while (dt.hasNext()) {
-            sb.append(dt.next());
-            if (--wLen > 0) {
-                sb.append(",");
-            }
+            w.add(dt.next());
         }
-        sb.append("}}");
-        cmds[2] = sb.toString();
+        w.addNull();
+        model.add("weight", w);
 
-        return cmds;
+        return model.build().toString();
     }
 
     public int getSourceNode() {
