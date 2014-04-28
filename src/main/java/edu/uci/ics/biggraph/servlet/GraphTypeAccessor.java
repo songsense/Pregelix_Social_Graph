@@ -14,7 +14,7 @@ import java.util.LinkedList;
  *
  * Created by liqiangw on 4/27/14.
  */
-public class GraphTypeAccessor extends DataTypeAccesor {
+public class GraphTypeAccessor extends DataTypeAccessor {
     private static GraphTypeAccessor origin = new GraphTypeAccessor(GType.ORIGIN);
     private static GraphTypeAccessor backbone = new GraphTypeAccessor(GType.BACKBONE);
 
@@ -52,7 +52,7 @@ public class GraphTypeAccessor extends DataTypeAccesor {
      */
     @Override
     public void storeEntry() throws IOException {
-        removeEntry();
+//        removeEntry();
 
         String cmds = assembleFields();
         String aql;
@@ -63,7 +63,8 @@ public class GraphTypeAccessor extends DataTypeAccesor {
         }
         aql = URLGenerator.cmdParser(aql);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
-        Commander.sendGet(url);
+//        Commander.sendGet(url);
+        System.out.println(url);
     }
 
     /**
@@ -165,7 +166,19 @@ public class GraphTypeAccessor extends DataTypeAccesor {
         this.weight = weight;
     }
 
-    public static void main(String[] args) {
-        LinkedList<Integer> targets;
+    public static void main(String[] args) throws IOException {
+        LinkedList<Integer> targets = new LinkedList<Integer>();
+        LinkedList<Double> weights = new LinkedList<Double>();
+
+        targets.add(1);
+        targets.add(2);
+        weights.add(0.4);
+        weights.add(0.5);
+
+        GraphTypeAccessor origin = GraphTypeAccessor.ORIGIN;
+        origin.setSourceNode(0);
+        origin.setTargetNodes(targets);
+        origin.setWeight(weights);
+        origin.storeEntry();
     }
 }

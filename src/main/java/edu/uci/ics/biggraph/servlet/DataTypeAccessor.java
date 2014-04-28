@@ -14,7 +14,7 @@ import java.io.IOException;
  *
  * Created by liqiangw on 4/27/14.
  */
-public abstract class DataTypeAccesor {
+public abstract class DataTypeAccessor {
     /**
      * Load the data entry from database.
      */

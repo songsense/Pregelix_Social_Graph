@@ -8,7 +8,7 @@ import java.util.LinkedList;
  * @deprecated Logic has been merged into GraphTypeAccessor.
  * Created by liqiangw on 4/27/14.
  */
-public class BackBoneNodeTypeAccessor extends DataTypeAccesor {
+public class BackBoneNodeTypeAccessor extends DataTypeAccessor {
     private static BackBoneNodeTypeAccessor ourInstance = new BackBoneNodeTypeAccessor();
 
     public static BackBoneNodeTypeAccessor getInstance() {
