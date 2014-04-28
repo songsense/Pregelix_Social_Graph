@@ -92,7 +92,7 @@ public class URLGenerator {
         StringBuilder sb = new StringBuilder();
 
         sb.append("use dataverse " + dataverse + ";\n")
-          .append("for $l in dataset('" + dataset + "') return $l");
+          .append("for $l in dataset('" + dataset + "') return $l;");
 
         return sb.toString();
     }

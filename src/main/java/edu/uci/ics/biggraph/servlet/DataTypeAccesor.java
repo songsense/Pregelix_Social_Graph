@@ -1,7 +1,9 @@
 package edu.uci.ics.biggraph.servlet;
 
+import java.io.IOException;
+
 /**
- * Utilities for accessing to metadata stored in database.
+ * Utilities for accessing to data stored in database.
  *
  * Note that this class only support dealing with ONLY ONE
  * instance of one data type. Accessing to more than one
@@ -12,14 +14,14 @@ package edu.uci.ics.biggraph.servlet;
  *
  * Created by liqiangw on 4/27/14.
  */
-public abstract class MetadataTypeAccesor {
+public abstract class DataTypeAccesor {
     /**
      * Load the data entry from database.
      */
-    public abstract void loadEntry();
+    public abstract void loadEntry() throws IOException;
 
     /**
      * Write back the entry to database.
      */
-    public abstract void storeEntry();
+    public abstract void storeEntry() throws IOException;
 }
