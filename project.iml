@@ -109,6 +109,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.embedded:glassfish-embedded-all:3.0-Prelude-Embedded-b14" level="project" />
     <orderEntry type="library" name="Maven: javax:javaee-api:6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.3" level="project" />
   </component>
 </module>
 

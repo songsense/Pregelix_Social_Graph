@@ -164,4 +164,8 @@ public class GraphTypeAccessor extends DataTypeAccesor {
     public void setWeight(LinkedList<Double> weight) {
         this.weight = weight;
     }
+
+    public static void main(String[] args) {
+        LinkedList<Integer>
+    }
 }

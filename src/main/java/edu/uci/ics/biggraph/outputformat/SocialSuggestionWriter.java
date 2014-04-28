@@ -1,18 +1,17 @@
 package edu.uci.ics.biggraph.outputformat;
 
-import java.io.IOException;
-
-import edu.uci.ics.biggraph.servlet.URLGenerator;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.RecordWriter;
-
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongArrayListWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
+import edu.uci.ics.biggraph.servlet.Commander;
+import edu.uci.ics.biggraph.servlet.RestAPI;
+import edu.uci.ics.biggraph.servlet.URLGenerator;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat.TextVertexWriter;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.RecordWriter;
 
-import edu.uci.ics.biggraph.servlet.*;
+import java.io.IOException;
 
 public class SocialSuggestionWriter extends 
 TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
@@ -44,15 +43,13 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         String[] items = new String[2];
         StringBuilder vals = new StringBuilder();
         items[0] = "\"node_id\":" + nodeID;
-        vals.append("\"suggested_friends\":" + "{{");
+        vals.append("\"suggested_friends\":" + "[");
         String[] ss = nodeVal.split(" ");
         for (int i = 0; i < ss.length; i++) {
-            vals.append(ss[i]);
-            if (i != ss.length - 1) {
-                vals.append(",");
-            }
-        } // for unordered list, we don't need a tailing "null".
-        vals.append("}}");
+            vals.append(ss[i] + ",");
+        }
+        // for ordered list, we need a tailing "null".
+        vals.append("null]");
         items[1] = vals.toString();
         System.out.println(items[1]);
 
