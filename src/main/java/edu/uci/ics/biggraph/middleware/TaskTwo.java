@@ -70,15 +70,13 @@ public class TaskTwo extends Task {
         return stringBuffer.toString();
     }
 
-    private String getInputGraphPath() {
-        // TODO querying the database
-        inputGraphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/data/CDS/graph_1/";
-        return inputGraphPath;
-    }
-
     private String getIterations() {
-        // TODO querying the database
-        iterations = "10";
+        try {
+            iterations = ProtocolOperation.getIterations();
+        } catch (IOException e) {
+            e.printStackTrace();
+            iterations = "10";
+        }
         return iterations;
     }
 
@@ -105,7 +103,6 @@ public class TaskTwo extends Task {
     private String pregelixPath = null;
     private String projectPath = null;
     private String taskClass = null;
-    private String inputGraphPath = null;
     private String outputPath = null;
     private String ip = null;
     private String port = null;

@@ -38,7 +38,9 @@ public class MiddlewareClient {
     }
 
     private static void runJob() throws InterruptedException {
-        Task task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
+        Task task;
+
+        task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
         task.runTask(options.pregelixPath, options.projectPath, options.port);
         System.out.println("Finish Load Graph");
 
