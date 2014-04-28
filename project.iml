@@ -10,6 +10,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.glassfish:javax.json:1.0.3" level="project" />
     <orderEntry type="library" name="Maven: edu.uci.ics.hyracks:pregelix-core:0.2.9" level="project" />
     <orderEntry type="library" name="Maven: edu.uci.ics.hyracks:pregelix-api:0.2.9" level="project" />
     <orderEntry type="library" name="Maven: edu.uci.ics.hyracks:hyracks-dataflow-common:0.2.9" level="project" />
