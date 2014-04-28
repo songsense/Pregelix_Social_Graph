@@ -1,11 +1,10 @@
 package edu.uci.ics.biggraph.servlet;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
+import javax.json.*;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by liqiangw on 4/27/14.
@@ -18,16 +17,16 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
     }
 
     private static class Protocol {
-        int id = 0;
-        int load_graph = 0;
-        int task1_status = 0;
-        int task2_status = 0;
-        int task3_status = 0;
+        String id = "";
+        String load_graph = "";
+        String task1_status = "";
+        String task2_status = "";
+        String task3_status = "";
         String graph_file_path = "";
-        int number_of_iterations = 0;
-        int source_id = Integer.MIN_VALUE;
-        int target_id = Integer.MAX_VALUE;
-        int number_of_results = 0;
+        String number_of_iterations = "";
+        String source_id = "";
+        String target_id = "";
+        String number_of_results = "";
     }
 
     private Protocol protocol = new Protocol();
@@ -49,28 +48,37 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
             JsonReader jsonReader = Json.createReader(new StringReader(payload));
             JsonObject jsonObject = jsonReader.readObject();
 
+            payload = jsonObject.get("results").toString();
+            jsonReader = Json.createReader(new StringReader(payload));
+            JsonArray jsonArray = jsonReader.readArray();
+            payload = jsonArray.getString(0);
+
+            jsonReader = Json.createReader(new StringReader(payload));
+            Map map = (Map) jsonReader.readObject();
+            String a = map.get("id").toString();
+
             // read fields;
-            protocol.id = jsonObject.getJsonNumber("id").intValue();
-            protocol.load_graph = jsonObject.getJsonNumber("load_graph").intValue();
-            protocol.task1_status = jsonObject.getJsonNumber("task1_status").intValue();
-            protocol.task2_status = jsonObject.getJsonNumber("task2_status").intValue();
-            protocol.task3_status = jsonObject.getJsonNumber("task3_status").intValue();
-            protocol.graph_file_path = jsonObject.getString("graph_file_path");
-            protocol.number_of_iterations = jsonObject.getJsonNumber("number_of_iterations").intValue();
-            protocol.source_id = jsonObject.getJsonNumber("source_id").intValue();
-            protocol.target_id = jsonObject.getJsonNumber("target_id").intValue();
-            protocol.number_of_results = jsonObject.getJsonNumber("number_of_results").intValue();
+            protocol.id = map.get("id").toString();
+            protocol.load_graph = map.get("load_graph").toString();
+            protocol.task1_status = map.get("task1_status").toString();
+            protocol.task2_status = map.get("task2_status").toString();
+            protocol.task3_status = map.get("task3_status").toString();
+            protocol.graph_file_path = map.get("graph_file_path").toString();
+            protocol.number_of_iterations = map.get("number_of_iterations").toString();
+            protocol.source_id = map.get("source_id").toString();
+            protocol.target_id = map.get("target_id").toString();
+            protocol.number_of_results = map.get("number_of_results").toString();
 
             jsonReader.close();
         }
     }
 
-    public int getID() {
+    public String getID() {
         // always return 0
         return protocol.id;
     }
 
-    public int getLoadGraphStatus() {
+    public String getLoadGraphStatus() {
         return protocol.load_graph;
     }
 
@@ -78,11 +86,11 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         if (status < 0 || status > 2) {
             System.out.println("setLoadGraphStatus(" + status + "): Invalid argument");
         } else {
-            protocol.load_graph = status;
+            protocol.load_graph = Integer.toString(status);
         }
     }
 
-    public int getTaskStatus(int taskNum) {
+    public String getTaskStatus(int taskNum) {
         switch (taskNum) {
         case 1:
             return protocol.task1_status;
@@ -91,7 +99,7 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         case 3:
             return protocol.task3_status;
         default:
-            return -1;
+            return "-1";
         }
     }
 
@@ -102,13 +110,13 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         } else {
             switch (taskNum) {
             case 1:
-                protocol.task1_status = status;
+                protocol.task1_status = Integer.toString(status);
                 break;
             case 2:
-                protocol.task2_status = status;
+                protocol.task2_status = Integer.toString(status);
                 break;
             case 3:
-                protocol.task3_status = status;
+                protocol.task3_status = Integer.toString(status);
                 break;
             default:
                 break;
@@ -124,43 +132,43 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         protocol.graph_file_path = path;
     }
 
-    public int getMaxIterations() {
+    public String getMaxIterations() {
         return protocol.number_of_iterations;
     }
 
     public void setMaxIterations(int iterations) {
         if (iterations >= 0) {
-            protocol.number_of_iterations = iterations;
+            protocol.number_of_iterations = Integer.toString(iterations);
         }
     }
 
-    public int getSourceID() {
+    public String getSourceID() {
         return protocol.source_id;
     }
 
     public void setSourceID(int id) {
         if (id >= 0) {
-            protocol.source_id = id;
+            protocol.source_id = Integer.toString(id);
         }
     }
 
-    public int getTargetID() {
+    public String getTargetID() {
         return protocol.target_id;
     }
 
     public void setTargetID(int id) {
         if (id >= 0) {
-            protocol.target_id = id;
+            protocol.target_id = Integer.toString(id);
         }
     }
 
-    public int getMaxResults() {
+    public String getMaxResults() {
         return protocol.number_of_results;
     }
 
     public void setMaxResults(int results) {
         if (results >= 0) {
-            protocol.number_of_results = results;
+            protocol.number_of_results = Integer.toString(results);
         }
     }
 

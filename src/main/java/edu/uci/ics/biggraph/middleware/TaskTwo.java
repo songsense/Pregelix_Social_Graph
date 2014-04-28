@@ -1,5 +1,7 @@
 package edu.uci.ics.biggraph.middleware;
 
+import edu.uci.ics.biggraph.servlet.ProtocolTypeAccessor;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -42,8 +44,8 @@ public class TaskTwo extends Task {
         this.ip = "`bin/getip.sh`";
 
         // set by querying the database
-        inputGraphPath = getInputGraphPath();
-        iterations = getIterations();
+        inputGraphPath = ProtocolTypeAccessor.getInstance().getGraphFilePath();
+        iterations = ProtocolTypeAccessor.getInstance().getMaxIterations();
     }
 
     @Override
@@ -70,16 +72,6 @@ public class TaskTwo extends Task {
         return stringBuffer.toString();
     }
 
-    private String getIterations() {
-        try {
-            iterations = ProtocolOperation.getIterations();
-        } catch (IOException e) {
-            e.printStackTrace();
-            iterations = "10";
-        }
-        return iterations;
-    }
-
     private void runCommand() throws IOException, InterruptedException {
         System.out.println("Executing " + command);
         // writing scripts to the pregelix path
@@ -99,12 +91,5 @@ public class TaskTwo extends Task {
     }
 
     private String command = null;
-
-    private String pregelixPath = null;
-    private String projectPath = null;
-    private String taskClass = null;
-    private String outputPath = null;
-    private String ip = null;
-    private String port = null;
     private String iterations = null;
 }

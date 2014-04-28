@@ -1,5 +1,6 @@
 package edu.uci.ics.biggraph.middleware;
 
+import edu.uci.ics.biggraph.servlet.ProtocolTypeAccessor;
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.IOException;
@@ -37,17 +38,19 @@ public class MiddlewareClient {
         return options;
     }
 
-    private static void runJob() throws InterruptedException {
+    private static void runJob() throws InterruptedException, IOException {
         Task task;
 
-        task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
-        task.runTask(options.pregelixPath, options.projectPath, options.port);
-        System.out.println("Finish Load Graph");
+        ProtocolTypeAccessor.getInstance().loadEntry();
 
-        task = TasksFactory.createTask(TaskType.TASK_1);
-        task.runTask(options.pregelixPath, options.projectPath, options.port);
-        System.out.println("Finish Task 1");
+//        task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
+//        task.runTask(options.pregelixPath, options.projectPath, options.port);
+//        System.out.println("Finish Load Graph");
 
+//        task = TasksFactory.createTask(TaskType.TASK_1);
+//        task.runTask(options.pregelixPath, options.projectPath, options.port);
+//        System.out.println("Finish Task 1");
+//
         task = TasksFactory.createTask(TaskType.TASK_2);
         task.runTask(options.pregelixPath, options.projectPath, options.port);
         System.out.println("Finish Task 2");

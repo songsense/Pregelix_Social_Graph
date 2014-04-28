@@ -24,16 +24,11 @@ public abstract class Task {
         this.taskType = taskType;
     }
 
-
+    protected String pregelixPath = null;
+    protected String projectPath = null;
+    protected String taskClass = null;
     protected String inputGraphPath = null;
-    protected String getInputGraphPath() {
-        try {
-            inputGraphPath = ProtocolOperation.getInputGraphPath();
-        } catch (IOException e) {
-            e.printStackTrace();
-            inputGraphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/data/CDS/graph_1/";
-        }
-//        inputGraphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/data/CDS/graph_1/";
-        return inputGraphPath;
-    }
+    protected String outputPath = null;
+    protected String ip = null;
+    protected String port = null;
 }
