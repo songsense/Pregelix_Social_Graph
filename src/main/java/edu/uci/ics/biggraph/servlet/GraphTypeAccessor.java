@@ -27,9 +27,9 @@ public class GraphTypeAccessor extends DataTypeAccessor {
     /* Fields specification */
     /** source_node : int32 (primary key) */
     private int source_node;
-    /** target_node : {{int32}} */
+    /** target_node : [int32] */
     private LinkedList<Integer> target_nodes = null;
-    /** weight: {{double}} */
+    /** weight: [double] */
     private LinkedList<Double> weight = null;
 
     private GraphTypeAccessor(GType type) {
@@ -95,31 +95,6 @@ public class GraphTypeAccessor extends DataTypeAccessor {
     }
 
     private String assembleFields() {
-//        String[] cmds = new String[3];
-//        StringBuilder sb = new StringBuilder();
-//
-//        cmds[0] = "\"source_node:\"" + getSourceNode();
-//
-//        sb.append("\"target_nodes:\"[");
-//        int listLen = target_nodes.size();
-//        Iterator<Integer> it = target_nodes.iterator();
-//        while (it.hasNext()) {
-//            sb.append(it.next() + ",");
-//        }
-//        sb.append("null]");
-//        cmds[1] = sb.toString();
-//
-//        sb = new StringBuilder();
-//        sb.append("\"weight:\"[");
-//        int wLen = weight.size();
-//        Iterator<Double> dt = weight.iterator();
-//        while (dt.hasNext()) {
-//            sb.append(dt.next() + ",");
-//        }
-//        sb.append("null]");
-//        cmds[2] = sb.toString();
-//
-//        return cmds;
         JsonObjectBuilder model = Json.createObjectBuilder()
                 .add("source_node", getSourceNode());
 
