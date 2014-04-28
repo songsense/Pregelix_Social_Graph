@@ -166,6 +166,6 @@ public class GraphTypeAccessor extends DataTypeAccesor {
     }
 
     public static void main(String[] args) {
-        LinkedList<Integer>
+        LinkedList<Integer> targets;
     }
 }
