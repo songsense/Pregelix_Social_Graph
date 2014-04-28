@@ -42,7 +42,7 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
     public void loadEntry() throws IOException {
         String queryURL = URLGenerator.query("Communication", "Protocol");
         queryURL = URLGenerator.cmdParser(queryURL);
-        queryURL = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, queryURL);
+        queryURL = URLGenerator.generate("localhost", 19002, RestAPI.QUERY, queryURL);
         String payload = Commander.sendGet(queryURL);
 
         if (payload != null) {
