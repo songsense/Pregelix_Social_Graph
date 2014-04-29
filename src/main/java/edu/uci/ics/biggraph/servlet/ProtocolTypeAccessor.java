@@ -49,10 +49,16 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
             JsonObject jsonObject = jsonReader.readObject();
 
             payload = jsonObject.get("results").toString();
+            jsonReader.close();
             jsonReader = Json.createReader(new StringReader(payload));
             JsonArray jsonArray = jsonReader.readArray();
+            if (jsonArray.isEmpty()) {
+                jsonReader.close();
+                return;
+            }
             payload = jsonArray.getString(0);
 
+            jsonReader.close();
             jsonReader = Json.createReader(new StringReader(payload));
             Map map = (Map) jsonReader.readObject();
             String a = map.get("id").toString();
@@ -78,8 +84,8 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         return protocol.id;
     }
 
-    public String getLoadGraphStatus() {
-        return protocol.load_graph;
+    public int getLoadGraphStatus() {
+        return Integer.parseInt(protocol.load_graph);
     }
 
     public void setLoadGraphStatus(int status) {
@@ -90,16 +96,16 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         }
     }
 
-    public String getTaskStatus(int taskNum) {
+    public int getTaskStatus(int taskNum) {
         switch (taskNum) {
         case 1:
-            return protocol.task1_status;
+            return Integer.parseInt(protocol.task1_status);
         case 2:
-            return protocol.task2_status;
+            return Integer.parseInt(protocol.task2_status);
         case 3:
-            return protocol.task3_status;
+            return Integer.parseInt(protocol.task3_status);
         default:
-            return "-1";
+            return -1;
         }
     }
 
@@ -200,15 +206,15 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
     private String assembleFields() {
         JsonObjectBuilder model = Json.createObjectBuilder()
                 .add("id", 0)
-                .add("load_graph", protocol.load_graph)
-                .add("task1_status", protocol.task1_status)
-                .add("task2_status", protocol.task2_status)
-                .add("task3_status", protocol.task3_status)
+                .add("load_graph", Integer.parseInt(protocol.load_graph))
+                .add("task1_status", Integer.parseInt(protocol.task1_status))
+                .add("task2_status", Integer.parseInt(protocol.task2_status))
+                .add("task3_status", Integer.parseInt(protocol.task3_status))
                 .add("graph_file_path", protocol.graph_file_path)
-                .add("number_of_iterations", protocol.number_of_iterations)
-                .add("source_id", protocol.source_id)
-                .add("target_id", protocol.target_id)
-                .add("number_of_results", protocol.number_of_results);
+                .add("number_of_iterations", Integer.parseInt(protocol.number_of_iterations))
+                .add("source_id", Integer.parseInt(protocol.source_id))
+                .add("target_id", Integer.parseInt(protocol.target_id))
+                .add("number_of_results", Integer.parseInt(protocol.number_of_results));
 
         return model.build().toString();
     }
