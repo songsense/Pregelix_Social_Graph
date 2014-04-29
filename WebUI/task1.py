@@ -15,19 +15,18 @@ def bootstrap():
 
     # First, we bootstrap our request query
     print "Loading TinySocial Dataset..."
-    query_statement = open("task1/taskOneQuery.txt").read().split("load")
-    for i in range(1,3):
-        query_statement[i] = "load" + query_statement[i].replace("FULL_PATH",base + "/task1")
+    query_statement = open("task1/createDataBase.txt").read().split("####");
     
-    for i in range(0,3):
+    for i in range(0,2):
         print query_statement[i]+'\n';
     
     ddl = {
         'ddl': query_statement[0]
     }
 
-    load = {
-        "statements" : "use dataverse Task1; " + "\n".join(query_statement[1:3])
+    insert = {
+        #"statements" : "use dataverse Task1; " + "\n".join(query_statement[1:3])
+        "statements": query_statement[1]
     }
 
     http_header = {
@@ -41,7 +40,7 @@ def bootstrap():
     update_url = "http://" + asterix_host + ":" + str(asterix_port) + "/update"
     try:
         requests.get(ddl_url, params=ddl)
-        response = requests.get(update_url, params=load, headers=http_header)
+        response = requests.get(update_url, params=insert, headers=http_header)
     except (ConnectionError, HTTPError):
         print "Encountered connection error; stopping execution"
         sys.exit(1)

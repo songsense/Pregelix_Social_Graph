@@ -81,6 +81,10 @@
     font-weight:bold;
     color:#000033;
     }
+
+    .task1Text{
+    width: 60px;
+    }
   </style>
   
   <title>Large Graph Analysis</title>
@@ -103,6 +107,12 @@
       <div id="task1" class="taskBlock">
 	<p class="controlBlockTitle">Task 1:</p>
 	<p class="controlBlockContent">Shortest Distance Over Frequent Communication Paths</p>
+	<span style="margin-left:5px">Source Node:</span>
+	<input id="source_id" class="task1Text" name="source_id" type="text"/>
+	</br>
+	<span style="margin-left:5px">Target Node:</span>
+	<input id="target_id" class="task1Text" name="target_id" type="text"/>
+	</br>
 	<button class="button" id="runTask1" type="submit">Run Task1</button>
       </div>
       <div id="task2" class="taskBlock">
