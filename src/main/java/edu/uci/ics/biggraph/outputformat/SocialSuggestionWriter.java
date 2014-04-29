@@ -30,14 +30,14 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
 
         synchronized(this) {
-            System.out.print("[TaskThree]: " + nodeID + "->");
+//            System.out.print("[TaskThree]: " + nodeID + "->");
             String[] friends = nodeVal.split(" ");
             LinkedList<Integer> list = new LinkedList<Integer>();
             for (String f : friends) {
                 list.add(Integer.parseInt(f));
-                System.out.print(Integer.parseInt(f) + " ");
+//                System.out.print(Integer.parseInt(f) + " ");
             }
-            System.out.println();
+//            System.out.println();
             TaskThreeTypeAccessor p = TaskThreeTypeAccessor.getInstance();
             p.setVertex(Integer.parseInt(nodeID), list);
             p.storeEntry();
