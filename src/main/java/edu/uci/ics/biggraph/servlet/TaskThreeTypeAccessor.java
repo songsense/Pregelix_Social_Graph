@@ -49,7 +49,7 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-        removeEntry();
+//        removeEntry();
 
         String url = makeURL();
         Commander.sendGet(url);
@@ -64,7 +64,7 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
         while (it.hasNext()) {
             t.add(it.next());
         }
-        t.addNull(); // requirement for ordered list
+//        t.addNull(); // requirement for ordered list
         model.add("suggested_friends", t);
 
         return model.build().toString();

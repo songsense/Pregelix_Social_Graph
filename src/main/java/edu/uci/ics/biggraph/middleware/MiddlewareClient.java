@@ -105,21 +105,25 @@ public class MiddlewareClient {
             // run the task
             switch (taskType) {
                 case TASK_1:
+                    DatabaseInitializer.initializeTasks();
                     task = TasksFactory.createTask(TaskType.TASK_1);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Task 1");
                     break;
                 case TASK_2:
+                    DatabaseInitializer.initializeTasks();
                     task = TasksFactory.createTask(TaskType.TASK_2);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Task 2");
                     break;
                 case TASK_3:
+                    DatabaseInitializer.initializeTasks();
                     task = TasksFactory.createTask(TaskType.TASK_3);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Task 3");
                     break;
                 case LOAD_GRAPH:
+                    DatabaseInitializer.initializeBackBoneGraph();
                     task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Load Graph");
