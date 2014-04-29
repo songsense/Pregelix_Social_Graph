@@ -68,7 +68,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
         while (it.hasNext()) {
             t.add(it.next());
         }
-        t.addNull(); // requirement for ordered list
+//        t.addNull(); // requirement for ordered list
         model.add("path", t);
 
         return model.build().toString();

@@ -3,10 +3,10 @@ package edu.uci.ics.biggraph.middleware;
 import edu.uci.ics.biggraph.servlet.DatabaseInitializer;
 import edu.uci.ics.biggraph.servlet.ProtocolTypeAccessor;
 import org.kohsuke.args4j.CmdLineException;
-
-import java.io.IOException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+
+import java.io.IOException;
 /**
  * Created by soushimei on 4/27/14.
  */
@@ -17,7 +17,7 @@ public class MiddlewareClient {
 
 
     private static class Options {
-        @Option(name = "-preglix_path", usage = "pregelix path", required = true)
+        @Option(name = "-pregelix_path", usage = "pregelix path", required = true)
         public String pregelixPath;
         @Option(name = "-project_path", usage = "project path", required = true)
         public String projectPath;

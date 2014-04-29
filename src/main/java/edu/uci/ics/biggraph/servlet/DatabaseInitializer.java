@@ -14,7 +14,7 @@ public class DatabaseInitializer {
                 "source_node: int32," +
                 "target_nodes: [int32]," +
             "weight: [double]" +
-            "}" +
+            "};" +
             "create dataset Graph(GraphType) primary key source_node;";
     private static final String INIT_BACKBONE_STATEMENT =
             "drop dataverse BackBoneGraph if exists;" +
@@ -24,7 +24,7 @@ public class DatabaseInitializer {
                 "source_node: int32," +
                 "target_nodes: [int32]," +
                 "weight: [double]" +
-            "}" +
+            "};" +
             "create dataset BackBoneNode(BackBoneNodeType) primary key source_node";
     private static final String INIT_COMMUNICATION_STATEMENT =
             "drop dataverse Communication if exists;" +
@@ -41,7 +41,7 @@ public class DatabaseInitializer {
                 "source_id: int32," +
                 "target_id: int32," +
                 "number_of_results: int32" +
-            "}" +
+            "};" +
             "create dataset Protocol(ProtocolType) primary key id;";
     private static final String INSERT_COMMUNICATION_STATEMENT =
             "use dataverse Communication;" +
