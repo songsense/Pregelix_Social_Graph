@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
+ * @deprecated Logic has been merged into GraphTypeAccessor.
  * Created by soushimei on 4/27/14.
  */
 public class ProtocolOperation {

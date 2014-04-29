@@ -3,6 +3,7 @@ package edu.uci.ics.biggraph.outputformat;
 import edu.uci.ics.biggraph.io.FloatWritable;
 import edu.uci.ics.biggraph.io.VLongIntWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
+import edu.uci.ics.biggraph.servlet.TaskTwoTypeAccessor;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat;
 import org.apache.hadoop.io.Text;
@@ -24,5 +25,7 @@ public class CommunityClusterWriter extends
             InterruptedException {
         getRecordWriter().write(new Text(vertex.getVertexId().toString()),
                 new Text(vertex.getVertexValue().toString()));
+        TaskTwoTypeAccessor.getInstance().setVertex((int)vertex.getVertexId().get(), (int) vertex.getVertexValue().getVertexId());
+        TaskTwoTypeAccessor.getInstance().storeEntry();
     }
 }

@@ -1,5 +1,7 @@
 package edu.uci.ics.biggraph.middleware;
 
+import edu.uci.ics.biggraph.servlet.ProtocolTypeAccessor;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -44,7 +46,8 @@ public class LoadGraph extends Task {
         this.ip = "`bin/getip.sh`";
 
         // set by querying the database
-        inputGraphPath = getInputGraphPath();
+//        inputGraphPath = getInputGraphPath();
+        inputGraphPath = ProtocolTypeAccessor.getInstance().getGraphFilePath();
     }
 
     @Override
@@ -88,11 +91,4 @@ public class LoadGraph extends Task {
     }
 
     private String command = null;
-
-    private String pregelixPath = null;
-    private String projectPath = null;
-    private String taskClass = null;
-    private String outputPath = null;
-    private String ip = null;
-    private String port = null;
 }

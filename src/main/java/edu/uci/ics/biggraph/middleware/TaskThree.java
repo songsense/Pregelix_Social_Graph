@@ -7,12 +7,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Created by soushimei on 4/27/14.
+ * Created by soushimei on 4/28/14.
  */
-public class TaskTwo extends Task {
-    public TaskTwo() {
-        super(TaskType.TASK_2);
+public class TaskThree extends Task {
+    public TaskThree() {
+        super(TaskType.TASK_3);
     }
+
     @Override
     public void runTask(String pregelixPath, String projectPath, String port) {
         // get the configuration
@@ -39,13 +40,14 @@ public class TaskTwo extends Task {
         this.port = port;
 
         // set by default
-        this.taskClass = "edu.uci.ics.biggraph.algo.CommunityClusterVertex";
+        this.taskClass = "edu.uci.ics.biggraph.algo.SocialSuggestionVertex";
         this.outputPath = "/tmp/pregelix_result";
         this.ip = "`bin/getip.sh`";
 
         // set by querying the database
         inputGraphPath = ProtocolTypeAccessor.getInstance().getGraphFilePath();
         iterations = ProtocolTypeAccessor.getInstance().getMaxIterations();
+        maxResults = ProtocolTypeAccessor.getInstance().getMaxResults();
     }
 
     @Override
@@ -67,7 +69,8 @@ public class TaskTwo extends Task {
         // append port configuration
         stringBuffer.append("-port ").append(port).append(" ");
         // append source id
-        stringBuffer.append("-iterations ").append(iterations);
+        stringBuffer.append("-iterations ").append(iterations).append(" ");
+        stringBuffer.append("-results-num ").append(maxResults);
 
         return stringBuffer.toString();
     }
@@ -75,21 +78,22 @@ public class TaskTwo extends Task {
     private void runCommand() throws IOException, InterruptedException {
         System.out.println("Executing " + command);
         // writing scripts to the pregelix path
-        File file = new File(pregelixPath + "task2.sh");
+        File file = new File(pregelixPath + "task3.sh");
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.write(command);
         fileWriter.close();
 
         // change mode to the executive
-        Process changeMode = Runtime.getRuntime().exec("chmod a+x " + pregelixPath + "task2.sh");
+        Process changeMode = Runtime.getRuntime().exec("chmod a+x " + pregelixPath + "task3.sh");
         changeMode.waitFor();
 
         // run the command
         System.setProperty("user.dir", pregelixPath);
-        Process p = Runtime.getRuntime().exec(pregelixPath + "task2.sh", null, new File(pregelixPath));
+        Process p = Runtime.getRuntime().exec(pregelixPath + "task3.sh", null, new File(pregelixPath));
         p.waitFor();
     }
 
     private String command = null;
     private String iterations = null;
+    private String maxResults = null;
 }

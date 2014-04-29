@@ -43,6 +43,14 @@ public class URLGenerator {
                 }
                 i--;
                 break;
+            case '\"':
+            case '\\':
+                sb.append("%22");
+                while (i < strlen &&
+                        (cmd.charAt(i) == '\"' || cmd.charAt(i) == '\\')) {
+                    i++;
+                }
+                i--;
             case '\n':
             case '\r':
                 break;
