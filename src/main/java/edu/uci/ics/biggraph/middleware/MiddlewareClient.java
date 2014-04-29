@@ -3,10 +3,10 @@ package edu.uci.ics.biggraph.middleware;
 import edu.uci.ics.biggraph.servlet.DatabaseInitializer;
 import edu.uci.ics.biggraph.servlet.ProtocolTypeAccessor;
 import org.kohsuke.args4j.CmdLineException;
-
-import java.io.IOException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+
+import java.io.IOException;
 /**
  * Created by soushimei on 4/27/14.
  */
@@ -17,7 +17,7 @@ public class MiddlewareClient {
 
 
     private static class Options {
-        @Option(name = "-preglix_path", usage = "pregelix path", required = true)
+        @Option(name = "-pregelix_path", usage = "pregelix path", required = true)
         public String pregelixPath;
         @Option(name = "-project_path", usage = "project path", required = true)
         public String projectPath;
@@ -105,21 +105,25 @@ public class MiddlewareClient {
             // run the task
             switch (taskType) {
                 case TASK_1:
+                    DatabaseInitializer.initializeTasks();
                     task = TasksFactory.createTask(TaskType.TASK_1);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Task 1");
                     break;
                 case TASK_2:
+                    DatabaseInitializer.initializeTasks();
                     task = TasksFactory.createTask(TaskType.TASK_2);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Task 2");
                     break;
                 case TASK_3:
+                    DatabaseInitializer.initializeTasks();
                     task = TasksFactory.createTask(TaskType.TASK_3);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Task 3");
                     break;
                 case LOAD_GRAPH:
+                    DatabaseInitializer.initializeBackBoneGraph();
                     task = TasksFactory.createTask(TaskType.LOAD_GRAPH);
                     task.runTask(options.pregelixPath, options.projectPath, options.port);
                     System.out.println("Finish Load Graph");

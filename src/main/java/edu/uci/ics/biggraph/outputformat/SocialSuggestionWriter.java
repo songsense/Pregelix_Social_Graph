@@ -3,15 +3,14 @@ package edu.uci.ics.biggraph.outputformat;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongArrayListWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.biggraph.servlet.Commander;
-import edu.uci.ics.biggraph.servlet.RestAPI;
-import edu.uci.ics.biggraph.servlet.URLGenerator;
+import edu.uci.ics.biggraph.servlet.TaskThreeTypeAccessor;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat.TextVertexWriter;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.RecordWriter;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class SocialSuggestionWriter extends 
 TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
@@ -29,41 +28,21 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         String nodeVal = val.toString();
 
         getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
-        toDatabase(nodeID, nodeVal);
-    }
 
-    private void toDatabase(String nodeID, String nodeVal)
-                                        throws IOException {
-        /*
-         * Assemble vertex payload as part of AQL UPDATE command.
-         * Find out the fields format:
-         * @see https://docs.google.com/document/d/1HvSHJrj2qdY6Zr8wCQRlMVbTfrFzz7qnOhqEed3J4DQ/edit
-         */
-        System.out.println("[OUTPUT] ID: " + nodeID + ", Val = " + nodeVal);
-        String[] items = new String[2];
-        StringBuilder vals = new StringBuilder();
-        items[0] = "\"node_id\":" + nodeID;
-        vals.append("\"suggested_friends\":" + "[");
-        String[] ss = nodeVal.split(" ");
-        for (int i = 0; i < ss.length; i++) {
-            vals.append(ss[i] + ",");
+        synchronized(this) {
+            System.out.print("[TaskThree]: " + nodeID + "->");
+            String[] friends = nodeVal.split(" ");
+            LinkedList<Integer> list = new LinkedList<Integer>();
+            for (String f : friends) {
+                list.add(Integer.parseInt(f));
+                System.out.print(Integer.parseInt(f) + " ");
+            }
+            System.out.println();
+            TaskThreeTypeAccessor p = TaskThreeTypeAccessor.getInstance();
+            p.setVertex(Integer.parseInt(nodeID), list);
+            p.storeEntry();
         }
-        // for ordered list, we need a tailing "null".
-        vals.append("null]");
-        items[1] = vals.toString();
-        System.out.println(items[1]);
-
-        String aql = URLGenerator.update("Tasks", "TaskThree", items);
-        aql = URLGenerator.cmdParser(aql);
-        String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
-        Commander.sendGet(url); // no payload to get
-
-        // test result
-        String result = URLGenerator.query("Tasks", "TaskThree");
-        result = URLGenerator.cmdParser(result);
-        result = URLGenerator.generate("localhost", 19002, RestAPI.QUERY, result);
-        result = Commander.sendGet(result);
-        System.out.println(result);
     }
+
 
 }

@@ -12,9 +12,10 @@ import java.util.LinkedList;
  */
 public class TaskOneTypeAccessor extends DataTypeAccessor {
     private static TaskOneTypeAccessor ourInstance = new TaskOneTypeAccessor();
-
+    // FIXME: Should we eliminate singleton pattern?
     public static TaskOneTypeAccessor getInstance() {
-        return ourInstance;
+        return new TaskOneTypeAccessor();
+//        return ourInstance;
     }
 
     /* Fields specification */
@@ -52,7 +53,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-        removeEntry();
+//        removeEntry();
 
         String url = makeURL();
         Commander.sendGet(url);
@@ -68,7 +69,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
         while (it.hasNext()) {
             t.add(it.next());
         }
-        t.addNull(); // requirement for ordered list
+//        t.addNull(); // requirement for ordered list
         model.add("path", t);
 
         return model.build().toString();
