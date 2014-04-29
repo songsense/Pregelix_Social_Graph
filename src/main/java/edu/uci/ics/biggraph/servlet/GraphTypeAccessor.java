@@ -32,7 +32,8 @@ public class GraphTypeAccessor extends DataTypeAccessor {
     /** weight: [double] */
     private LinkedList<Double> weight = null;
 
-    private GraphTypeAccessor(GType type) {
+    // FIXME: Should we eliminate singleton pattern?
+    public GraphTypeAccessor(GType type) {
         this.type = type;
     }
 

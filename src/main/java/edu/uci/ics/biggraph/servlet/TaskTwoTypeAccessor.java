@@ -10,8 +10,10 @@ import java.io.IOException;
 public class TaskTwoTypeAccessor extends DataTypeAccessor {
     private static TaskTwoTypeAccessor ourInstance = new TaskTwoTypeAccessor();
 
+    // FIXME: Should we eliminate singleton pattern?
     public static TaskTwoTypeAccessor getInstance() {
-        return ourInstance;
+//        return ourInstance;
+        return new TaskTwoTypeAccessor();
     }
 
     /* Fields specification */

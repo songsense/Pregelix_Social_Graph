@@ -3,7 +3,6 @@ package edu.uci.ics.biggraph.servlet;
 import javax.json.*;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -12,8 +11,10 @@ import java.util.Map;
 public class ProtocolTypeAccessor extends DataTypeAccessor {
     private static ProtocolTypeAccessor ourInstance = new ProtocolTypeAccessor();
 
+    // FIXME: Should we eliminate singleton pattern?
     public static ProtocolTypeAccessor getInstance() {
-        return ourInstance;
+//        return ourInstance;
+        return new ProtocolTypeAccessor();
     }
 
     private static class Protocol {

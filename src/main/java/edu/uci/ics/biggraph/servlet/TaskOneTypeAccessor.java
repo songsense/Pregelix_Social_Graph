@@ -12,9 +12,10 @@ import java.util.LinkedList;
  */
 public class TaskOneTypeAccessor extends DataTypeAccessor {
     private static TaskOneTypeAccessor ourInstance = new TaskOneTypeAccessor();
-
+    // FIXME: Should we eliminate singleton pattern?
     public static TaskOneTypeAccessor getInstance() {
-        return ourInstance;
+        return new TaskOneTypeAccessor();
+//        return ourInstance;
     }
 
     /* Fields specification */
