@@ -115,6 +115,9 @@ public class MiddlewareClient {
                     System.out.println("Finish Task 2");
                     break;
                 case TASK_3:
+                    task = TasksFactory.createTask(TaskType.TASK_3);
+                    task.runTask(options.pregelixPath, options.projectPath, options.port);
+                    System.out.println("Finish Task 3");
                     break;
                 case LOAD_GRAPH:
                     task = TasksFactory.createTask(TaskType.LOAD_GRAPH);

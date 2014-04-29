@@ -110,7 +110,7 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
     }
 
     public void setTaskStatus(int taskNum, int status) {
-        if (status < 0 || status > 2 || taskNum < 0 || taskNum > 2) {
+        if (status < 0 || status > 2 || taskNum < 1 || taskNum > 3) {
             System.out.println("setTaskStatus(" + taskNum + ","
                     + status + "): Invalid argument");
         } else {
