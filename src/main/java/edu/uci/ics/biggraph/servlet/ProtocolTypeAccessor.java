@@ -214,9 +214,13 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         return url;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ProtocolTypeAccessor p = getInstance();
         System.out.println(p.assembleFields());
         System.out.println(p.makeURL());
+
+        System.out.println("-----Json Reader Test-----");
+        p.loadEntry();
     }
+
 }
