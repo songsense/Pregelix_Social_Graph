@@ -26,6 +26,7 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
     }
 
     synchronized public void setVertex(int node_id, int community_id) {
+        System.out.println("[TaskTwo: setVertex]:" + node_id + " " + community_id);
         assert node_id >= 0;
 
         this.node_id = node_id;
@@ -49,6 +50,7 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
     @Override
     public void storeEntry() throws IOException {
         synchronized (this) {
+            System.out.println("[Task2 storeEntry():" + node_id);
             removeEntry();
 
             String url = makeURL();

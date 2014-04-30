@@ -28,19 +28,18 @@ public class WeightedPathWriter extends
         getRecordWriter().write(new Text(vertex.getVertexId().toString()),
                 new Text(vertex.getVertexValue().toString() ));
 
-        synchronized (this) {
-            int targetId = (int) vertex.getVertexId().get();
-            double weight = (int) vertex.getVertexValue().getWeight();
-            ArrayList<Double> pathInDouble = vertex.getVertexValue().getPathArrayList();
-            LinkedList<Integer> path = new LinkedList<Integer>();
+        int targetId = (int) vertex.getVertexId().get();
+        double weight = (int) vertex.getVertexValue().getWeight();
+        ArrayList<Double> pathInDouble = vertex.getVertexValue().getPathArrayList();
+        LinkedList<Integer> path = new LinkedList<Integer>();
 
-            for (double node : pathInDouble) {
-                int n = (int) node;
-                path.add(n);
-            }
-
-            TaskOneTypeAccessor.getInstance().setVertex(targetId, weight, path);
-            TaskOneTypeAccessor.getInstance().storeEntry();
+        for (double node : pathInDouble) {
+            int n = (int) node;
+            path.add(n);
         }
+
+        TaskOneTypeAccessor t = TaskOneTypeAccessor.getInstance();
+        t.setVertex(targetId, weight, path);
+        t.storeEntry();
     }
 }

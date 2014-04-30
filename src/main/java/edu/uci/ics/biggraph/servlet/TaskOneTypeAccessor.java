@@ -53,7 +53,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-//        removeEntry();
+        removeEntry();
 
         String url = makeURL();
         Commander.sendGet(url);
