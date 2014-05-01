@@ -38,7 +38,8 @@ public class WeightedPathWriter extends
             path.add(n);
         }
 
-        TaskOneTypeAccessor.getInstance().setVertex(targetId, weight, path);
-        TaskOneTypeAccessor.getInstance().storeEntry();
+        TaskOneTypeAccessor t = TaskOneTypeAccessor.getInstance();
+        t.setVertex(targetId, weight, path);
+        t.storeEntry();
     }
 }

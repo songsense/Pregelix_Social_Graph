@@ -26,7 +26,8 @@ public class CommunityClusterWriter extends
         getRecordWriter().write(new Text(vertex.getVertexId().toString()),
                 new Text(vertex.getVertexValue().toString()));
 
-        TaskTwoTypeAccessor.getInstance().setVertex((int)vertex.getVertexId().get(), (int) vertex.getVertexValue().getVertexId());
-        TaskTwoTypeAccessor.getInstance().storeEntry();
+        TaskTwoTypeAccessor t = TaskTwoTypeAccessor.getInstance();
+        t.setVertex((int) vertex.getVertexId().get(), (int) vertex.getVertexValue().getVertexId());
+        t.storeEntry();
     }
 }

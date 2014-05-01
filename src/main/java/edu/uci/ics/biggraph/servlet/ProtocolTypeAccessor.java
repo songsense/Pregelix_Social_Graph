@@ -13,8 +13,8 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
 
     // FIXME: Should we eliminate singleton pattern?
     public static ProtocolTypeAccessor getInstance() {
-//        return ourInstance;
-        return new ProtocolTypeAccessor();
+        return ourInstance;
+//        return new ProtocolTypeAccessor();
     }
 
     private static class Protocol {
@@ -40,56 +40,60 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void loadEntry() throws IOException {
-        String queryURL = URLGenerator.query("Communication", "Protocol");
-        queryURL = URLGenerator.cmdParser(queryURL);
-        queryURL = URLGenerator.generate("localhost", 19002, RestAPI.QUERY, queryURL);
-        String payload = Commander.sendGet(queryURL);
+        synchronized (this) {
+            String queryURL = URLGenerator.query("Communication", "Protocol");
+            queryURL = URLGenerator.cmdParser(queryURL);
+            queryURL = URLGenerator.generate("localhost", 19002, RestAPI.QUERY, queryURL);
+            String payload = Commander.sendGet(queryURL);
 
-        if (payload != null) {
-            JsonReader jsonReader = Json.createReader(new StringReader(payload));
-            JsonObject jsonObject = jsonReader.readObject();
+            if (payload != null) {
+                System.out.println(payload);
 
-            payload = jsonObject.get("results").toString();
-            jsonReader.close();
-            jsonReader = Json.createReader(new StringReader(payload));
-            JsonArray jsonArray = jsonReader.readArray();
-            if (jsonArray.isEmpty()) {
+                JsonReader jsonReader = Json.createReader(new StringReader(payload));
+                JsonObject jsonObject = jsonReader.readObject();
+
+                payload = jsonObject.get("results").toString();
                 jsonReader.close();
-                return;
+                jsonReader = Json.createReader(new StringReader(payload));
+                JsonArray jsonArray = jsonReader.readArray();
+                if (jsonArray.isEmpty()) {
+                    jsonReader.close();
+                    return;
+                }
+                payload = jsonArray.getString(0);
+
+                jsonReader.close();
+                jsonReader = Json.createReader(new StringReader(payload));
+                Map map = (Map) jsonReader.readObject();
+                String a = map.get("id").toString();
+
+                // read fields;
+                protocol.id = map.get("id").toString();
+                protocol.load_graph = map.get("load_graph").toString();
+                protocol.task1_status = map.get("task1_status").toString();
+                protocol.task2_status = map.get("task2_status").toString();
+                protocol.task3_status = map.get("task3_status").toString();
+                protocol.graph_file_path = map.get("graph_file_path").toString();
+                protocol.number_of_iterations = map.get("number_of_iterations").toString();
+                protocol.source_id = map.get("source_id").toString();
+                protocol.target_id = map.get("target_id").toString();
+                protocol.number_of_results = map.get("number_of_results").toString();
+
+                jsonReader.close();
             }
-            payload = jsonArray.getString(0);
-
-            jsonReader.close();
-            jsonReader = Json.createReader(new StringReader(payload));
-            Map map = (Map) jsonReader.readObject();
-            String a = map.get("id").toString();
-
-            // read fields;
-            protocol.id = map.get("id").toString();
-            protocol.load_graph = map.get("load_graph").toString();
-            protocol.task1_status = map.get("task1_status").toString();
-            protocol.task2_status = map.get("task2_status").toString();
-            protocol.task3_status = map.get("task3_status").toString();
-            protocol.graph_file_path = map.get("graph_file_path").toString();
-            protocol.number_of_iterations = map.get("number_of_iterations").toString();
-            protocol.source_id = map.get("source_id").toString();
-            protocol.target_id = map.get("target_id").toString();
-            protocol.number_of_results = map.get("number_of_results").toString();
-
-            jsonReader.close();
         }
     }
 
-    public String getID() {
+    synchronized public String getID() {
         // always return 0
         return protocol.id;
     }
 
-    public int getLoadGraphStatus() {
+    synchronized public int getLoadGraphStatus() {
         return Integer.parseInt(protocol.load_graph);
     }
 
-    public void setLoadGraphStatus(int status) {
+    synchronized public void setLoadGraphStatus(int status) {
         if (status < 0 || status > 2) {
             System.out.println("setLoadGraphStatus(" + status + "): Invalid argument");
         } else {
@@ -97,7 +101,7 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         }
     }
 
-    public int getTaskStatus(int taskNum) {
+    synchronized public int getTaskStatus(int taskNum) {
         switch (taskNum) {
         case 1:
             return Integer.parseInt(protocol.task1_status);
@@ -110,7 +114,7 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         }
     }
 
-    public void setTaskStatus(int taskNum, int status) {
+    synchronized public void setTaskStatus(int taskNum, int status) {
         if (status < 0 || status > 2 || taskNum < 1 || taskNum > 3) {
             System.out.println("setTaskStatus(" + taskNum + ","
                     + status + "): Invalid argument");
@@ -131,49 +135,49 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
         }
     }
 
-    public String getGraphFilePath() {
+    synchronized public String getGraphFilePath() {
         return protocol.graph_file_path;
     }
 
-    public void setGraphFilePath(String path) {
+    synchronized public void setGraphFilePath(String path) {
         protocol.graph_file_path = path;
     }
 
-    public String getMaxIterations() {
+    synchronized public String getMaxIterations() {
         return protocol.number_of_iterations;
     }
 
-    public void setMaxIterations(int iterations) {
+    synchronized public void setMaxIterations(int iterations) {
         if (iterations >= 0) {
             protocol.number_of_iterations = Integer.toString(iterations);
         }
     }
 
-    public String getSourceID() {
+    synchronized public String getSourceID() {
         return protocol.source_id;
     }
 
-    public void setSourceID(int id) {
+    synchronized public void setSourceID(int id) {
         if (id >= 0) {
             protocol.source_id = Integer.toString(id);
         }
     }
 
-    public String getTargetID() {
+    synchronized public String getTargetID() {
         return protocol.target_id;
     }
 
-    public void setTargetID(int id) {
+    synchronized public void setTargetID(int id) {
         if (id >= 0) {
             protocol.target_id = Integer.toString(id);
         }
     }
 
-    public String getMaxResults() {
+    synchronized public String getMaxResults() {
         return protocol.number_of_results;
     }
 
-    public void setMaxResults(int results) {
+    synchronized public void setMaxResults(int results) {
         if (results >= 0) {
             protocol.number_of_results = Integer.toString(results);
         }
@@ -186,10 +190,12 @@ public class ProtocolTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-        removeEntry();
+        synchronized (this) {
+            removeEntry();
 
-        String url = makeURL();
-        Commander.sendGet(url);
+            String url = makeURL();
+            Commander.sendGet(url);
+        }
     }
 
     private void removeEntry() throws IOException {
