@@ -218,6 +218,11 @@ var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-displ
 var sys;
 var fileName;
 
+//red, yellow, purple, green, blue, dark red, dark green
+var colorArray=["#FF0000", "#FFFF00", "#8B008B", "#00FF00", "#0000CD", "#8B0000", "#006400 "];
+
+var numColor = colorArray.length;
+
 
 //var nodeIDStr = "";
 
@@ -276,7 +281,8 @@ function loadGraph(){
 	var expressionGetProtocol = new FLWOGRExpression()
 	    .ForClause("$node", new AExpression("dataset Protocol"))
 	    .ReturnClause("$node");
-	var successGetProtocol = function(res){
+	var successGetProtocol = function(tempres){
+	    var res=tempres["results"];
 	    for(i in res){
 		var resJson = eval('('+res[i]+')');
 		var task1_status = resJson.task1_status.int32.toString();
@@ -356,7 +362,9 @@ function runTask1(){
     var expressionGetProtocol = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset Protocol"))
 	.ReturnClause("$node");
-    var successGetProtocol = function(res){
+    //get and set flag
+    var successGetProtocol = function(tempres){
+	var res = tempres["results"];
 	for(i in res){
 	    var resJson = eval('('+res[i]+')');
 	    var load_graph = resJson.load_graph.int32.toString();
@@ -389,7 +397,8 @@ function runTask1(){
 		var e = new FLWOGRExpression()
 		    .ForClause("$node", new AExpression("dataset Protocol"))
 		    .ReturnClause("$node");
-		var s = function(res){
+		var s = function(tempres){
+		    var res=tempres["results"];
 		    for(i in res){
 			var resJson = eval('('+res[i]+')');
 			alert(resJson.task1_status.int32);
@@ -405,7 +414,8 @@ function runTask1(){
 				.WhereClause(new AExpression(whereClauseStr))
 				//.WhereClause(new AExpression("$node.target_node = 3"))
 				.ReturnClause("$node");
-			    var succTask1 = function(res){				    
+			    var succTask1 = function(tempres){
+				var res = tempres["results"];
 				for(i in res){
 				    var resJson = eval('('+res[i]+')');
 				    var path = resJson.path.orderedlist;
@@ -447,8 +457,111 @@ function initialize(){
 }
 
 function runTask2(){
-    var nodeID = $("#task2_node").val();
-    
+
+    //set flag
+    //alert("run task2");
+    var connector = new AsterixDBConnection().dataverse("Communication");
+    var expressionGetProtocol = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset Protocol"))
+	.ReturnClause("$node");
+    var successGetProtocol = function(resProtocolTemp){
+	//alert("OK");
+	var resProtocol = resProtocolTemp["results"];
+	for(k in resProtocol){
+	    //get value of Protocol
+	    var resJson = eval('('+resProtocol[k]+')');
+	    var load_graph = resJson.load_graph.int32.toString();
+	    var task1_status = resJson.task1_status.int32.toString();
+	    var task2_status = "1"
+	    var task3_status = resJson.task3_status.int32.toString();
+	    var number_of_iterations = resJson.number_of_iterations.int32.toString();
+	    var graph_file_path = resJson.graph_file_path;
+	    var source_id = resJson.source_id.int32.toString();
+	    var target_id = resJson.target_id.int32.toString();
+	    var number_of_results = resJson.number_of_results.int32.toString();
+
+	    var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0, "load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
+	    
+	    var xmlhttp3;
+	    if(window.XMLHttpRequest){
+		xmlhttp3 = new XMLHttpRequest();
+	    }
+	    else{
+		xmlhttp3 = new ActiveXObject("Microsoft.XMLHTTP");
+	    }
+	    xmlhttp3.open("GET", "http://localhost:19002/update?statements="+querySetFlag);
+	    xmlhttp3.send();
+
+	    xmlhttp3.onreadystatechange=function(){
+		//alert("change");
+		var c = new AsterixDBConnection().dataverse("Communication");
+		var e = new FLWOGRExpression()
+		    .ForClause("$node", new AExpression("dataset Protocol"))
+		    .ReturnClause("$node");
+		var s = function(resTemp){
+		    var res=resTemp["results"];
+		    for(i in res){
+			var resJson = eval('('+res[i]+')');
+			alert(resJson.task2_status.int32);
+			if(resJson.task2_status.int32!=2){
+			    setTimeout(function(){ c.query(e.val(), s);}, 10000);
+			}
+			else{
+			    var nodeID = $("#task2_node").val();
+			    //get the commit_id
+			    var whereClauseStr = "$node.node_id="+nodeID;
+			    alert(whereClauseStr);
+			    var connectorGetCommID = new AsterixDBConnection().dataverse("Tasks");
+			    var expressionGetCommID = new FLWOGRExpression()
+				.ForClause("$node", new AExpression("dataset TaskTwo"))
+				.WhereClause(new AExpression(whereClauseStr))
+				.ReturnClause("$node");
+			    var successGetCommID = function(resCommIDTemp){
+				var resCommID = resCommIDTemp["results"];
+				for(j in resCommID){
+				    var resJson = eval('('+resCommID[j]+')');
+				    var commID = resJson.community_id.int32.toString();
+				    var commIDNum = resJson.community_id.int32;
+				    var whereClauseStr = "$node.community_id="+commID;
+				    var connectorGetNode = new AsterixDBConnection().dataverse("Tasks");
+				    var expressionGetNode = new FLWOGRExpression()
+					.ForClause("$node", new AExpression("dataset TaskTwo"))
+					.WhereClause(new AExpression(whereClauseStr))
+					.ReturnClause("$node");
+				    var successGetNode = function(resNodeTemp){
+					var resNode = resNodeTemp["results"];
+					//draw graph
+					sys.addNode("-1", {label:"-1", color:"#FFFFFF"});
+					sys.addNode("-2", {label:"-2", color:"#FFFFFF"});
+					for(m in resNode){
+					    var resJson = eval('('+resNode[m]+')');
+					    var nodeStr = resJson.node_id.int32.toString();
+					    //alert(nodeStr);
+					    sys.getNode(nodeStr).data.color=colorArray[commIDNum%numColor];
+					    // renew graph
+					    sys.addEdge("-1", "-2", {directed:false, color:"#FFFFFF"})
+					    var edgeArray = sys.getEdges("-1","-2");
+					    sys.pruneEdge(edgeArray[0]);
+					}
+					//delete temp node
+					var tempNode = sys.getNode("-1");
+					sys.pruneNode(tempNode);
+					tempNode = sys.getNode("-2");
+					sys.pruneNode(tempNode);
+				    }
+				    connectorGetNode.query(expressionGetNode.val(), successGetNode);
+				}
+			    }
+			    connectorGetCommID.query(expressionGetCommID.val(), successGetCommID);
+			}
+		    }
+		}
+		c.query(e.val(), s);
+			    
+	    }
+	}
+    }
+    connector.query(expressionGetProtocol.val(), successGetProtocol);
 }
 
 $(document).ready(function(){
