@@ -213,8 +213,10 @@ function addResult(dom, res) {
 }
 
 
+/*---- global variable ----*/
 var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/";
 var sys;
+var fileName;
 
 
 //var nodeIDStr = "";
@@ -261,7 +263,56 @@ function drawGraph(dom, res){
 }
 
 function loadGraph(){
-    var fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
+    var A = new AsterixDBConnection().dataverse("OriginalGraph");
+    var expression0a = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset Graph"))
+	.ReturnClause({
+	    "source_node":"$node.source_node",
+	    "target_node":"$node.target_node"});
+    
+    var success = function(res){
+	drawGraph('#graph', res["results"]);
+	var connector = new AsterixDBConnection().dataverse("Communication");
+	var expressionGetProtocol = new FLWOGRExpression()
+	    .ForClause("$node", new AExpression("dataset Protocol"))
+	    .ReturnClause("$node");
+	var successGetProtocol = function(res){
+	    for(i in res){
+		var resJson = eval('('+res[i]+')');
+		var task1_status = resJson.task1_status.int32.toString();
+		var task2_status = resJson.task2_status.int32.toString();
+		var task3_status = resJson.task3_status.int32.toString();
+		var number_of_iterations = resJson.number_of_iterations.int32.toString();
+		var source_id = resJson.source_id.int32.toString();
+		var target_id = resJson.target_id.int32.toString();
+		var number_of_results = resJson.number_of_results.int32.toString();
+		var load_graph = "1";
+		var graph_file_path = pathGraph+fileName;
+		
+		var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
+		//alert(querySetFlag);
+		
+		var xmlhttp2;
+		if(window.XMLHttpRequest){
+		    xmlhttp2 = new XMLHttpRequest();
+		}
+		else{
+		    xmlhttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		xmlhttp2.open("GET", "http://localhost:19002/update?statements="+querySetFlag);
+		xmlhttp2.send();
+	    }
+	}
+	connector.query(expressionGetProtocol.val(), successGetProtocol);
+    }
+    A.query(expression0a.val(),  success);
+}
+
+
+
+function loadGraphFirstTime(){
+    fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
 
     var queryCreate = 'drop dataverse OriginalGraph if exists; create dataverse OriginalGraph; use dataverse OriginalGraph; create type GraphType as open{source_node: int32, target_node:{{int32}}, weight:{{double}}} \n create dataset Graph(GraphType) primary key source_node;';
 
@@ -291,58 +342,13 @@ function loadGraph(){
 	xmlhttp1.open("GET", "http://localhost:19002/update?statements="+queryUpdate);
 	xmlhttp1.send();
 	xmlhttp1.onreadystatechange=function(){
-	    var A = new AsterixDBConnection().dataverse("OriginalGraph");
-	    var expression0a = new FLWOGRExpression()
-		.ForClause("$node", new AExpression("dataset Graph"))
-		.ReturnClause({
-		    "source_node":"$node.source_node",
-		    "target_node":"$node.target_node"});
-	    
-	    var success = function(res){
-		drawGraph('#graph', res["results"]);
-		var connector = new AsterixDBConnection().dataverse("Communication");
-		var expressionGetProtocol = new FLWOGRExpression()
-		    .ForClause("$node", new AExpression("dataset Protocol"))
-		    .ReturnClause("$node");
-		var successGetProtocol = function(res){
-		    for(i in res){
-			var resJson = eval('('+res[i]+')');
-			var task1_status = resJson.task1_status.int32.toString();
-			var task2_status = resJson.task2_status.int32.toString();
-			var task3_status = resJson.task3_status.int32.toString();
-			var number_of_iterations = resJson.number_of_iterations.int32.toString();
-			var source_id = resJson.source_id.int32.toString();
-			var target_id = resJson.target_id.int32.toString();
-			var number_of_results = resJson.number_of_results.int32.toString();
-			var load_graph = "1";
-			var graph_file_path = pathGraph+fileName;
-			
-			var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
-			//alert(querySetFlag);
-			
-			var xmlhttp2;
-			if(window.XMLHttpRequest){
-			    xmlhttp2 = new XMLHttpRequest();
-			}
-			else{
-			    xmlhttp2 = new ActiveXObject("Microsoft.XMLHTTP");
-			}
-   
-			xmlhttp2.open("GET", "http://localhost:19002/update?statements="+querySetFlag);
-			xmlhttp2.send();
-		    }
-		}
-		connector.query(expressionGetProtocol.val(), successGetProtocol);
-	    };
-	    A.query(expression0a.val(),  success);
-	    
-	    
-	    
+	    loadGraph();
 	}
     }
 }
 
 function runTask1(){
+
     var source_node = $('#source_id').val().toString();
     var target_node = $('#target_id').val().toString();
     
@@ -392,13 +398,14 @@ function runTask1(){
 			}
 			else{
 			    var connTask1 = new AsterixDBConnection().dataverse("Tasks");
-			    var whereClauseStr = "$node.target_node="+target_id;
-			    //alert(whereClauseStr);
+			    var whereClauseStr = '$node.target_node='+target_id;
+			    alert(whereClauseStr);
 			    var expTask1 = new FLWOGRExpression()
 				.ForClause("$node", new AExpression("dataset TaskOne"))
+				.WhereClause(new AExpression(whereClauseStr))
+				//.WhereClause(new AExpression("$node.target_node = 3"))
 				.ReturnClause("$node");
-			    var succTask1 = function(res){
-				//alert("success");
+			    var succTask1 = function(res){				    
 				for(i in res){
 				    var resJson = eval('('+res[i]+')');
 				    var path = resJson.path.orderedlist;
@@ -414,7 +421,7 @@ function runTask1(){
 				    }
 				}
 			    }
-			    connTask1.query(expTask1.val(), succTask1);
+			    connTask1.query(expTask1.val(), succTask1);	
 			}
 		    }
 		}
@@ -440,6 +447,7 @@ function initialize(){
 }
 
 function runTask2(){
+    var nodeID = $("#task2_node").val();
     
 }
 
@@ -447,11 +455,13 @@ $(document).ready(function(){
 
     initialize();
 
-    $("#filePath").change(loadGraph);
+    $("#filePath").change(loadGraphFirstTime);
 
     $("#runTask1").click(runTask1);
 
     $("#runTask2").click(runTask2);
+
+    $('.reloadButton').click(loadGraph);
 
     /*
     var A = new AsterixDBConnection().dataverse("Task1");
