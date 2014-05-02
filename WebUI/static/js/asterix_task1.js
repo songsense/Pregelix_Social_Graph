@@ -293,7 +293,7 @@ function loadGraph(){
 		var target_id = "-1";
 		var number_of_results = "-1";
 		var load_graph = "1";
-		var graph_file_path = pathGraph+fileName;
+		var graph_file_path = pathGraph+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 		
 		var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
 		//alert(querySetFlag);
@@ -461,6 +461,7 @@ function runTask2(){
 
     //set flag
     //alert("run task2");
+    var numIterStr = $('#task2_num_iteration').val().toString();
     var connector = new AsterixDBConnection().dataverse("Communication");
     var expressionGetProtocol = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset Protocol"))
@@ -475,7 +476,7 @@ function runTask2(){
 	    var task1_status = resJson.task1_status.int32.toString();
 	    var task2_status = "1"
 	    var task3_status = resJson.task3_status.int32.toString();
-	    var number_of_iterations = resJson.number_of_iterations.int32.toString();
+	    var number_of_iterations = numIterStr;
 	    var graph_file_path = resJson.graph_file_path;
 	    var source_id = resJson.source_id.int32.toString();
 	    var target_id = resJson.target_id.int32.toString();
@@ -569,6 +570,7 @@ function runTask3(){
 
     var nodeID = $('#task3_node').val().toString();
     var numFriendsStr = $('#task3_num_friends').val().toString();
+    var numIterStr = $('#task3_num_iteration').val().toString();
     var connector = new AsterixDBConnection().dataverse("Communication");
     var expressionGetProtocol = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset Protocol"))
@@ -582,7 +584,7 @@ function runTask3(){
 	    var task1_status = resJson.task1_status.int32.toString();
 	    var task2_status = resJson.task2_status.int32.toString();
 	    var task3_status = "1";
-	    var number_of_iterations = resJson.number_of_iterations.int32.toString();
+	    var number_of_iterations = numIterStr;
 	    var graph_file_path = resJson.graph_file_path;
 	    var source_id = resJson.source_id.int32.toString();
 	    var target_id = resJson.target_id.int32.toString();

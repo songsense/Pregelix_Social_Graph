@@ -114,16 +114,34 @@
 	<input id="target_id" class="task1Text" name="target_id" type="text"/>
 	</br>
 	<button class="button" id="runTask1" type="submit">Run Task1</button>
+	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
       <div id="task2" class="taskBlock">
 	<p class="controlBlockTitle">Task 2:</p>
 	<p class="controlBlockContent">Interests with Large Communities</p>
+	<span style="margin-left:5px">Node ID:</span>
+	<input id="task2_node" class="task1Text" name="task2_node" type="text"/>
+	</br>
+	<span style="margin-left:5px">Number Of Iteration:</span>
+	<input id="task2_num_iteration" class="task1Text" name="task2_num_iteration" type="text"/>
+	</br>
 	<button class="button" id="runTask2" type="submit">Run Task2</button>
+	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
       <div id="task3" class="taskBlock">
 	<p class="controlBlockTitle">Task 3:</p>
 	<p class="controlBlockContent">Socialization Suggestion</p>
+	<span style="margin-left:5px">Node ID:</span>
+	<input id="task3_node" class="task1Text" name="task3_node" type="text"/>
+	</br>
+	<span style="margin-left:5px">Number Of Friends:</span>
+	<input id="task3_num_friends" class="task1Text" name="task3_num_friends" type="text"/>
+	</br>
+	<span style="margin-left:5px">Number Of Iteration:</span>
+	<input id="task3_num_iteration" class="task1Text" name="task3_num_iteration" type="text"/>
+	</br>
 	<button class="button" id="runTask3" type="submit">Run Task3</button>
+	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
     </div>
   </div>
