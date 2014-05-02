@@ -3,7 +3,7 @@ create dataverse Communication;
 use dataverse Communication;
 
 create type ProtocolType as open{
-       id: int32;
+       id: int32,
        load_graph: int32,
        task1_status: int32,
        task2_status: int32,
@@ -17,6 +17,7 @@ create type ProtocolType as open{
 
 create dataset Protocol(ProtocolType)
 primary key id;
+
 
 drop dataverse Tasks if exists;
 create dataverse Tasks;
@@ -35,7 +36,7 @@ create type TaskTwoType as open{
 
 create type TaskThreeType as open{
        node_id: int32,
-       suggested_friends: {{int32}}
+       suggested_friends: [int32]
 }
 
 create dataset TaskOne(TaskOneType)
