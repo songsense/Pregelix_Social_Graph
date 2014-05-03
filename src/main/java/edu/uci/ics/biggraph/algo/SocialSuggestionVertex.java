@@ -1,12 +1,11 @@
 package edu.uci.ics.biggraph.algo;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.logging.Logger;
-
+import edu.uci.ics.biggraph.client.Client;
+import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongArrayListWritable;
-
+import edu.uci.ics.biggraph.io.VLongWritable;
+import edu.uci.ics.biggraph.outputformat.SocialSuggestionOutputFormat;
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.Edge;
 import edu.uci.ics.pregelix.api.graph.MessageCombiner;
@@ -14,12 +13,13 @@ import edu.uci.ics.pregelix.api.graph.MsgList;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
-
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
-import edu.uci.ics.biggraph.client.Client;
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
-import edu.uci.ics.biggraph.outputformat.SocialSuggestionOutputFormat;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.logging.Logger;
 
 public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> {
     /**
@@ -93,8 +93,9 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
                 sendMsg(edge.getDestVertexId(), msg);
             }
         } else if (step >= 2 && step < maxIteration) {
-            tmpVertexValue = getVertexValue();
-            buildSet(tmpVertexValue);
+            tmpVertexValue = getVertexValue(); // get values from last iterations
+
+            buildMap(tmpVertexValue);
             // get new vertices from incoming message without duplicates
             VLongArrayListWritable newVertices = new VLongArrayListWritable();
 
@@ -102,13 +103,30 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
                 VLongArrayListWritable t = msgIterator.next();
                 for (int i = 0; i < t.size(); i++) {
                     long vid = ((VLongWritable) t.get(i)).get();
-                    if (!verticesSet.contains(vid)) {
-                        verticesSet.add(vid);
+                    if (!verticesMap.containsKey(vid)) {
+                        verticesMap.put(vid, 1l);
                         newVertices.add(t.get(i));
-                        tmpVertexValue.add(t.get(i));
+//                        tmpVertexValue.add(t.get(i));
+                    } else {
+                        long cur = verticesMap.get(vid);
+                        verticesMap.put(vid, cur + 1);
                     }
                 }
             }
+
+            // prioritize incoming vertices by its appearing frequency.
+            ArrayList<VertexFrequency> vf = new ArrayList<VertexFrequency>();
+            for (int i = 0; i < newVertices.size(); i++) {
+                VLongWritable vl = (VLongWritable) newVertices.get(i);
+                long vid = vl.get();
+                long freq = verticesMap.get(vid);
+                vf.add(new VertexFrequency(vl, freq));
+            }
+            Collections.sort(vf);
+            for (int i = 0; i < vf.size(); i++) {
+                tmpVertexValue.add(vf.get(i).vlong);
+            }
+
             curNumResults = tmpVertexValue.size();
             setVertexValue(tmpVertexValue);
             
@@ -130,15 +148,15 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     /**
      * Build the hash set for efficient avoiding vertex ID duplicates. 
      */
-    private void buildSet(VLongArrayListWritable currentVertexValue) {
-        verticesSet.clear();
+    private void buildMap(VLongArrayListWritable currentVertexValue) {
+        verticesMap.clear();
         
         // add vertex ID itself
-        verticesSet.add(getVertexId().get());
+        verticesMap.put(getVertexId().get(), 1l);
         
         // add IDs of its neighbors
         for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
-            verticesSet.add(edge.getDestVertexId().get());
+            verticesMap.put(edge.getDestVertexId().get(), 1l);
         }
         
         // add current results IDs from the vertex value
@@ -147,8 +165,29 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
         }
         for (int i = 0; i < currentVertexValue.size(); i++) {
             long vid = ((VLongWritable) currentVertexValue.get(i)).get();
-            if (!verticesSet.contains(vid)) {
-                verticesSet.add(vid);
+            if (!verticesMap.containsKey(vid)) {
+                verticesMap.put(vid, 1l);
+            }
+        }
+    }
+
+    private class VertexFrequency implements Comparable<VertexFrequency> {
+        VLongWritable vlong;
+        long freq = 0;
+
+        public VertexFrequency(VLongWritable vlong, long freq) {
+            this.vlong = vlong;
+            this.freq = freq;
+        }
+
+        @Override
+        public int compareTo(VertexFrequency that) {
+            if (this.freq > that.freq) {
+                return -1;
+            } else if (this.freq == that.freq) {
+                return 0;
+            } else {
+                return 1;
             }
         }
     }
@@ -156,7 +195,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
     private VLongArrayListWritable tmpVertexValue = null;
     
     /** Visited vertices: used for efficiently eliminate duplicates. */
-    private HashSet<Long> verticesSet = new HashSet<Long>();
+    private HashMap<Long, Long> verticesMap = new HashMap<Long, Long>();
     
     /** Maximum iteration */
     public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
