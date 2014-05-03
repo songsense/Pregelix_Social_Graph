@@ -34,6 +34,7 @@ var intersect_line_box = function(p1, p2, boxTuple)
 var Renderer = function(canvas){
     var canvas = $(canvas).get(0)
     var ctx = canvas.getContext("2d");
+    //var gfx = arbor.Graphics(canvas);
     var particleSystem
 
     var that = {
@@ -76,23 +77,23 @@ var Renderer = function(canvas){
 		// pt:   {x:#, y:#}  node position in screen coords
 
 		// draw a rectangle centered at pt
-		var w = 10
+		var w = 35
 		//ctx.fillStyle = (node.data.alone) ? "orange" : "black"
 		ctx.fillStyle = node.data.color;
 		ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w);
+        //gfx.oval(pt.x-w/2, pt.y-w/2, w, w, {fill:node.data.color});
 		nodeBoxes[node.name] = [pt.x-w/2, pt.y-11, w, 22]
 		// zhimin add: add number in each node
 		/*-- start --*/
-		/*
+	
 		var w = ctx.measureText(node.data.label||"").width + 6;
 		var label = node.data.label;
-	
 		ctx.font = "bold 11px Arial"
 		ctx.textAlign = "center"
 		    
-		ctx.fillStyle = "#888888"
+		ctx.fillStyle = "#FFFFFF"
 		ctx.fillText(label, pt.x, pt.y+4)
-		*/
+		
 		/*--end--*/
             }) 
 
@@ -249,10 +250,16 @@ function drawGraph(dom, res){
     var count = 0;
     */
     for(i in res){
+    //alert(res[i]);
 	var resJson = eval('('+res[i]+')');
 	var sourceNode = resJson.source_node.int32.toString();
 	var targetNodeArray = resJson.target_node.unorderedlist;
-	sys.addNode(sourceNode, {label:sourceNode, color:"#000000"});
+    
+    
+    //alert("sourceNode:"+sourceNode);
+    var label=resJson.label;
+	//alert(label);
+    sys.addNode(sourceNode, {label:label, color:"rgb(175,95,60)"});
 	/*if(count==0){
 	    count=1;
 	    nodeIDStr=nodeIDStr+sourceNode;
@@ -271,9 +278,7 @@ function loadGraph(){
     var A = new AsterixDBConnection().dataverse("OriginalGraph");
     var expression0a = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset Graph"))
-	.ReturnClause({
-	    "source_node":"$node.source_node",
-	    "target_node":"$node.target_node"});
+	.ReturnClause("$node");
     
     var success = function(res){
 	drawGraph('#graph', res["results"]);
@@ -292,7 +297,7 @@ function loadGraph(){
 		var source_id = "-1";
 		var target_id = "-1";
 		var number_of_results = "-1";
-		var load_graph = "1";
+		var load_graph = "2";
 		var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 		alert(graph_file_path);
 		var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
@@ -320,10 +325,12 @@ function loadGraph(){
 function loadGraphFirstTime(){
     fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
 
-    var queryCreate = 'drop dataverse OriginalGraph if exists; create dataverse OriginalGraph; use dataverse OriginalGraph; create type GraphType as open{source_node: int32, target_node:{{int32}}, weight:{{double}}} \n create dataset Graph(GraphType) primary key source_node;';
+    var queryCreate = 'drop dataverse OriginalGraph if exists; create dataverse OriginalGraph; use dataverse OriginalGraph; create type GraphType as open{source_node: int32, label: string, target_node:{{int32}}, weight:{{double}}} \n create dataset Graph(GraphType) primary key source_node;';
 
     var queryUpdate = 'use dataverse OriginalGraph; load dataset Graph using localfs(("path"="localhost://'+pathGraph+fileName+'"),("format"="adm"));';
     
+    //alert(queryCreate);
+    //alert(queryUpdate);
     var xmlhttp;
     if(window.XMLHttpRequest){
 	xmlhttp = new XMLHttpRequest();
