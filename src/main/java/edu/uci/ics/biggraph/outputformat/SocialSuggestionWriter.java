@@ -39,5 +39,4 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         p.storeEntry();
     }
 
-
 }
