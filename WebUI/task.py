@@ -15,6 +15,7 @@ def bootstrap():
 
     # First, we bootstrap our request query
     print "Loading TinySocial Dataset..."
+
     query_statement = open("task1/createDataBase.txt").read().split("####");
     
     for i in range(0,2):

@@ -26,11 +26,13 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
     }
 
     synchronized public void setVertex(int node_id, int community_id) {
-        System.out.println("[TaskTwo: setVertex]:" + node_id + " " + community_id);
-        assert node_id >= 0;
+        synchronized (this) {
+            System.out.println("[TaskTwo: setVertex]:" + node_id + " " + community_id);
+            assert node_id >= 0;
 
-        this.node_id = node_id;
-        this.community_id = community_id;
+            this.node_id = node_id;
+            this.community_id = community_id;
+        }
     }
 
     /**

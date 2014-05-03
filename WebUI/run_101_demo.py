@@ -1,4 +1,4 @@
-import task1
+import task
 import requests
 from bottle import route, run, template, get, debug, static_file, request, response
 
@@ -47,5 +47,5 @@ def run_asterix_ddl():
 def run_asterix_update():
     return (build_response("update", dict(request.query)))
     
-res = task1.bootstrap()
+res = task.bootstrap()
 run(host='localhost', port=8081, debug=True)

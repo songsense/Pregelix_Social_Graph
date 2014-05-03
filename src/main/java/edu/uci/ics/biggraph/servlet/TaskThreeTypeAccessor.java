@@ -29,10 +29,12 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
     }
 
     public void setVertex(int node_id, LinkedList<Integer> suggested_friends) {
-        assert node_id >= 0;
+        synchronized (this) {
+            assert node_id >= 0;
 
-        this.node_id = node_id;
-        this.suggested_friends = suggested_friends;
+            this.node_id = node_id;
+            this.suggested_friends = suggested_friends;
+        }
     }
 
     /**
@@ -51,10 +53,12 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-        removeEntry();
+        synchronized (this) {
+            removeEntry();
 
-        String url = makeURL();
-        Commander.sendGet(url);
+            String url = makeURL();
+            Commander.sendGet(url);
+        }
     }
 
     private String assembleFields() {

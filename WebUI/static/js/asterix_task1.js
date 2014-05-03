@@ -214,7 +214,7 @@ function addResult(dom, res) {
 
 
 /*---- global variable ----*/
-var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/";
+var pathGraph = "/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/";
 var sys;
 var fileName;
 
@@ -293,8 +293,8 @@ function loadGraph(){
 		var target_id = "-1";
 		var number_of_results = "-1";
 		var load_graph = "1";
-		var graph_file_path = pathGraph+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
-		
+		var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
+		alert(graph_file_path);
 		var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
 		//alert(querySetFlag);
 		
@@ -371,7 +371,8 @@ function runTask1(){
 	    var task2_status = resJson.task2_status.int32.toString();
 	    var task3_status = resJson.task3_status.int32.toString();
 	    var number_of_iterations = resJson.number_of_iterations.int32.toString();
-	    var graph_file_path = resJson.graph_file_path;
+	    //var graph_file_path = resJson.graph_file_path;
+        var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 	    //alert(graph_file_path);
 	    //var source_id = resJson.source_id.int32.toString();
 	    //var target_id = resJson.target_id.int32.toString();
@@ -381,7 +382,7 @@ function runTask1(){
 	    var source_id = source_node;
 	    var target_id = target_node;
 	    var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0, "load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
-	    
+	    alert(querySetFlag);
 	    var xmlhttp3;
 	    if(window.XMLHttpRequest){
 		xmlhttp3 = new XMLHttpRequest();
@@ -389,10 +390,13 @@ function runTask1(){
 	    else{
 		xmlhttp3 = new ActiveXObject("Microsoft.XMLHTTP");
 	    }
-   
+        
+        alert("http://localhost:19002/update?statements="+querySetFlag);
 	    xmlhttp3.open("GET", "http://localhost:19002/update?statements="+querySetFlag);
 	    xmlhttp3.send();
 	    xmlhttp3.onreadystatechange=function(){
+		alert("status:"+xmlhttp3.status);
+        alert("ready status:"+xmlhttp3.readyStatus);
 		var c = new AsterixDBConnection().dataverse("Communication");
 		var e = new FLWOGRExpression()
 		    .ForClause("$node", new AExpression("dataset Protocol"))
@@ -423,7 +427,7 @@ function runTask1(){
 				    alert("start:"+path[0].int32.toString());
 				    sys.getNode(path[0].int32.toString()).data.color="#FF0000";
 				    sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
-				    for(var j=0; j<path.length-1; ++j){
+				    for(var j=1; j<path.length-1; ++j){
 					var sourceNodeObj = sys.getNode(path[j].int32.toString());
 					var targetNodeObj = sys.getNode(path[j+1].int32.toString());
 					var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
@@ -477,7 +481,8 @@ function runTask2(){
 	    var task2_status = "1"
 	    var task3_status = resJson.task3_status.int32.toString();
 	    var number_of_iterations = numIterStr;
-	    var graph_file_path = resJson.graph_file_path;
+	    //var graph_file_path = resJson.graph_file_path;
+        var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 	    var source_id = resJson.source_id.int32.toString();
 	    var target_id = resJson.target_id.int32.toString();
 	    var number_of_results = resJson.number_of_results.int32.toString();
@@ -585,7 +590,8 @@ function runTask3(){
 	    var task2_status = resJson.task2_status.int32.toString();
 	    var task3_status = "1";
 	    var number_of_iterations = numIterStr;
-	    var graph_file_path = resJson.graph_file_path;
+	    //var graph_file_path = resJson.graph_file_path;
+        var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 	    var source_id = resJson.source_id.int32.toString();
 	    var target_id = resJson.target_id.int32.toString();
 	    var number_of_results = numFriendsStr;

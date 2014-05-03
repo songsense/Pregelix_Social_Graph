@@ -30,11 +30,13 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
     }
 
     public void setVertex(int target, double weight, LinkedList<Integer> path) {
-        assert target >= 0;
+        synchronized (this) {
+            assert target >= 0;
 
-        this.target_node = target;
-        this.weight = weight;
-        this.path = (path == null) ? new LinkedList<Integer>() : path;
+            this.target_node = target;
+            this.weight = weight;
+            this.path = (path == null) ? new LinkedList<Integer>() : path;
+        }
     }
 
     /**
@@ -53,10 +55,12 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-        removeEntry();
+        synchronized (this) {
+            removeEntry();
 
-        String url = makeURL();
-        Commander.sendGet(url);
+            String url = makeURL();
+            Commander.sendGet(url);
+        }
     }
 
     private String assembleFields() {

@@ -1,0 +1,4 @@
+{"source_node":0,"target_node":{{1,2}},"weight":{{0.1,0.1}}}
+{"source_node":1,"target_node":{{3}},"weight":{{0.1}}}
+{"source_node":2,"target_node":{{3}},"weight":{{0.1}}}
+{"source_node":3,"target_node":{{1}},"weight":{{0.1}}}

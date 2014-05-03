@@ -31,9 +31,13 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
 
         String[] friends = nodeVal.split(" ");
         LinkedList<Integer> list = new LinkedList<Integer>();
+
         for (String f : friends) {
-            list.add(Integer.parseInt(f));
+            if (f != null && !f.isEmpty()) {
+                list.add(Integer.parseInt(f));
+            }
         }
+
         TaskThreeTypeAccessor p = TaskThreeTypeAccessor.getInstance();
         p.setVertex(Integer.parseInt(nodeID), list);
         p.storeEntry();
