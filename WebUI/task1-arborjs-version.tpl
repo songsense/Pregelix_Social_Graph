@@ -6,6 +6,8 @@
   <script type="text/javascript" src="static/js/asterix-sdk-stable.js"></script>
   <script type="text/javascript" src="static/js/asterix_task1.js"></script>
   <script type="text/javascript" src="static/js/arbor.js"></script>
+  <script type="text/javascript" src="static/js/arbor-graphics.js"></script>
+  <script type="text/javascript" src="static/js/arbor-tween.js"></script>
   <style>
     #main{
    // border-style:solid;
@@ -95,8 +97,10 @@
       <p>Graph Analysis Based On Pregelix</p>
     </div>
     <div id="graphDisplayBlock" style="float:left">
-      <p style="color:#55acee; font-size: 20px; margin-left:10px; margin-bottom:5px">Tweeter Graph</p>
-      <canvas id="graph" width="800" height="500"></canvas>
+      <p style="color:#55acee; font-size: 20px; margin-left:10px; margin-bottom:5px">Graph Display</p>
+      <canvas id="graph" width="800" height="655"></canvas>
+      <div id="tips">
+      </div>
     </div>
     <div id="controlBlock" style="float:left">
       <div id="loadGraph" class="taskBlock">

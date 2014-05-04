@@ -11,7 +11,7 @@ import java.io.IOException;
  * Created by soushimei on 4/27/14.
  */
 public class MiddlewareClient {
-    private static final int sleepTime = 3000;
+    private static final int sleepTime = 1000;
     private static Options options = new Options();
     private static TaskType taskType = TaskType.NOP;
 
