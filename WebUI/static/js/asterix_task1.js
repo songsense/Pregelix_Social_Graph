@@ -230,6 +230,8 @@ var numColor = colorArray.length;
 
 var timeOut = 1300;
 
+var tableName = {};
+
 //var nodeIDStr = "";
 
 function drawGraph(dom, res){
@@ -263,6 +265,7 @@ function drawGraph(dom, res){
     
     //alert("sourceNode:"+sourceNode);
     var label=resJson.label;
+	tableName[label]=sourceNode;
 	//alert(label);
     sys.addNode(sourceNode, {label:label, color:"#4F726C"});
 	/*if(count==0){
@@ -403,8 +406,14 @@ function drawGraphTask1(target_id){
 
 function runTask1(){
 
-    var source_node = $('#source_id').val().toString();
-    var target_node = $('#target_id').val().toString();
+	var source_label = $('#source_id').val().toString();
+	var target_label = $('#target_id').val().toString();
+    if(!(source_label in tableName && target_label in tableName)){
+    	alert("No such source or target node!");
+    	return;
+    }
+    var source_node = tableName[source_label];
+    var target_node = tableName[target_label];
     
     $('#tips').html("");
     
@@ -544,7 +553,12 @@ function runTask2(){
     //set flag
     //alert("run task2");
     
-    var nodeID = $("#task2_node").val().toString();
+	var nodeLabel = $('#task2_node').val().toString();
+    if(!(nodeLabel in tableName)){
+    	alert("No such node!");
+    	return;
+    }
+    var nodeID = tableName[nodeLabel];
     var numIterStr = $('#task2_num_iteration').val().toString();
     $('#tips').html("");
     
@@ -658,7 +672,12 @@ function drawGraphTask3(nodeID){
 
 function runTask3(){
 
-    var nodeID = $('#task3_node').val().toString();
+  	var nodeLabel = $('#task3_node').val().toString();
+    if(!(nodeLabel in tableName)){
+    	alert("No such node!");
+    	return;
+    }
+    var nodeID = tableName[nodeLabel];
     var numFriendsStr = $('#task3_num_friends').val().toString();
     var numIterStr = $('#task3_num_iteration').val().toString();
     $('#tips').html("");
