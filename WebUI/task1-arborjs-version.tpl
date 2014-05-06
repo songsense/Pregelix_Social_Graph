@@ -94,11 +94,11 @@
 <body>
   <div id="main" style="float:left">
     <div id="header" style="float:left">
-      <p>Graph Analysis Based On Pregelix</p>
+      <p>Graph Analysis and Visualization Based on Pregelix and AsterixDB</p>
     </div>
     <div id="graphDisplayBlock" style="float:left">
-      <p style="color:#55acee; font-size: 20px; margin-left:10px; margin-bottom:5px">Graph Display</p>
-      <canvas id="graph" width="800" height="655"></canvas>
+      <p id="graphDiplayStatus" style="color:#55acee; font-size: 20px; margin-left:10px; margin-bottom:5px">Graph Display</p>
+      <canvas id="graph" width="800" height="640"></canvas>
       <div id="tips">
       </div>
     </div>
@@ -109,21 +109,21 @@
 	<input id="filePath" type="file" name="filePath"/>
       </div>
       <div id="task1" class="taskBlock">
-	<p class="controlBlockTitle">Task 1:</p>
-	<p class="controlBlockContent">Shortest Distance Over Frequent Communication Paths</p>
-	<span style="margin-left:5px">Source Node:</span>
+	<p class="controlBlockTitle">Task 1: Connection Strength</p>
+	<p class="controlBlockContent">Shortest Distance Over Weighted Paths</p>
+	<span style="margin-left:5px">Source Name:</span>
 	<input id="source_id" class="task1Text" name="source_id" type="text"/>
 	</br>
-	<span style="margin-left:5px">Target Node:</span>
+	<span style="margin-left:5px">Target Name:</span>
 	<input id="target_id" class="task1Text" name="target_id" type="text"/>
 	</br>
 	<button class="button" id="runTask1" type="submit">Run Task1</button>
 	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
       <div id="task2" class="taskBlock">
-	<p class="controlBlockTitle">Task 2:</p>
-	<p class="controlBlockContent">Interests with Large Communities</p>
-	<span style="margin-left:5px">Node ID:</span>
+	<p class="controlBlockTitle">Task 2: Group Recommendation</p>
+	<p class="controlBlockContent">Different Communities in Graph</p>
+	<span style="margin-left:5px">Name:</span>
 	<input id="task2_node" class="task1Text" name="task2_node" type="text"/>
 	</br>
 	<span style="margin-left:5px">Number Of Iteration:</span>
@@ -133,12 +133,12 @@
 	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
       <div id="task3" class="taskBlock">
-	<p class="controlBlockTitle">Task 3:</p>
+	<p class="controlBlockTitle">Task 3: Friend Recommendation</p>
 	<p class="controlBlockContent">Socialization Suggestion</p>
-	<span style="margin-left:5px">Node ID:</span>
+	<span style="margin-left:5px">Name:</span>
 	<input id="task3_node" class="task1Text" name="task3_node" type="text"/>
 	</br>
-	<span style="margin-left:5px">Number Of Friends:</span>
+	<span style="margin-left:5px">Number Of Recommended Friends:</span>
 	<input id="task3_num_friends" class="task1Text" name="task3_num_friends" type="text"/>
 	</br>
 	<span style="margin-left:5px">Number Of Iteration:</span>

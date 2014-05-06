@@ -12,9 +12,9 @@ public class WeightedPathWritable extends DoubleArrayListWritable {
         super();
         DoubleWritable dw = new DoubleWritable(Double.MAX_VALUE);
         this.add(new DoubleWritable(dw.get()));
-    	// here we assume the length of the array list is only 10
+    	// here we assume the length of the array list is only 100
         // @see setPathAlone()
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 100; ++i) {
         	this.add(new DoubleWritable(Double.MAX_VALUE));
         }
 	}
@@ -92,8 +92,8 @@ public class WeightedPathWritable extends DoubleArrayListWritable {
         for (int i = 0; i < path.size(); ++i) {
         	this.set(i + 1, new DoubleWritable(path.get(i)));
         }
-        for (int i = path.size() + 1; i < 11; ++i) {
-        	// here we assume the length of the array list is only 10
+        for (int i = path.size() + 1; i < 101; ++i) {
+        	// here we assume the length of the array list is only 100
         	// @see constructor for details
         	this.set(i, new DoubleWritable(Double.MAX_VALUE));
         }

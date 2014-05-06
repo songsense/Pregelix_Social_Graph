@@ -232,6 +232,10 @@ var timeOut = 1300;
 
 var tableName = {};
 
+var preSourceNode = "0";
+
+var preIterNum = "0";
+
 //var nodeIDStr = "";
 
 function drawGraph(dom, res){
@@ -440,8 +444,9 @@ function runTask1(){
 	    var task1_status = resJson.task1_status.int32.toString();
 	    var source_id = source_node;
 	    var target_id = target_node;
-        if(task1_status=="0"){
+        if(task1_status=="0" || preSourceNode!=source_id){
             task1_status="1";
+            preSourceNode = source_id;
 	        var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0, "load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
 	        var xmlhttp3;
 	        if(window.XMLHttpRequest){
@@ -467,9 +472,12 @@ function runTask1(){
 			            var resJson = eval('('+res[i]+')');
 			            //alert(resJson.task1_status.int32);
 			            if(resJson.task1_status.int32!=2){
+			            	if(resJson.task1_status.int32==1)
+			            		$('#graphDiplayStatus').html('Graph Display: <span style="color:#DB4D6D">Processing!</span>');
 			                setTimeout(function(){ c.query(e.val(), s);}, timeOut);
 			            }
 			            else{
+							$('#graphDiplayStatus').html('Graph Display');
 			                drawGraphTask1(target_id);	
 			            }
 		            }
@@ -609,10 +617,11 @@ function runTask2(){
 			            var resJson = eval('('+res[i]+')');
 			            //alert(resJson.task2_status.int32);
 			            if(resJson.task2_status.int32!=2){
+			            	$('#graphDiplayStatus').html('Graph Display: <span style="color:#DB4D6D">Processing!</span>');
 			                setTimeout(function(){ c.query(e.val(), s);}, timeOut);
 			            }
 			            else{
-			                
+			               	$('#graphDiplayStatus').html('Graph Display');
 			                drawGraphTask2(nodeID);
 			            }
 		            }
@@ -628,7 +637,7 @@ function runTask2(){
     connector.query(expressionGetProtocol.val(), successGetProtocol);
 }
 
-function drawGraphTask3(nodeID){
+function drawGraphTask3(nodeID, inputFriendNum){
     var connTask3 = new AsterixDBConnection().dataverse("Tasks");
     var whereClauseStr = '$node.node_id='+nodeID;
     //alert(whereClauseStr);
@@ -652,8 +661,8 @@ function drawGraphTask3(nodeID){
             else{
                 //draw graph
                 sys.getNode(nodeID).data.color=colorArray[0];
-
-                for(var k=0; k<friendNum; ++k){
+                var minFriendNum = (friendNum>inputFriendNum?inputFriendNum:friendNum);
+                for(var k=0; k<minFriendNum; ++k){
                     sys.getNode(suggestedFriends[k].int32.toString()).data.color=colorArray[1];
                 }
                 sys.addEdge("-1", "-2", {directed:false, color:"#FFFFFF"})
@@ -679,6 +688,7 @@ function runTask3(){
     }
     var nodeID = tableName[nodeLabel];
     var numFriendsStr = $('#task3_num_friends').val().toString();
+    var inputFriendNum = $('#task3_num_friends').val();
     var numIterStr = $('#task3_num_iteration').val().toString();
     $('#tips').html("");
     var connector = new AsterixDBConnection().dataverse("Communication");
@@ -701,7 +711,8 @@ function runTask3(){
 	    var target_id = resJson.target_id.int32.toString();
 	    var number_of_results = numFriendsStr;
         
-        if(task3_status=="0"){
+        if(task3_status=="0" || preIterNum!=number_of_iterations){
+        	preIterNum = number_of_iterations;
             task3_status="1";
 	        var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0, "load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
 	    
@@ -726,10 +737,12 @@ function runTask3(){
 			            var resJson = eval('('+res[i]+')');
 			            //alert(resJson.task3_status.int32);
 			            if(resJson.task3_status.int32!=2){
+			            	$('#graphDiplayStatus').html('Graph Display: <span style="color:#DB4D6D">Processing!</span>');
 			                setTimeout(function(){ c.query(e.val(), s);}, timeOut);
 			            }
 			            else{
-			                drawGraphTask3(nodeID);	
+			            	$('#graphDiplayStatus').html('Graph Display');
+			                drawGraphTask3(nodeID, inputFriendNum);	
 			            }
 		            }
 		        }
@@ -737,7 +750,7 @@ function runTask3(){
 	        }
         }
         else if(task3_status=="2"){
-            drawGraphTask3(nodeID);
+            drawGraphTask3(nodeID, inputFriendNum);
         }
 	}
     }
