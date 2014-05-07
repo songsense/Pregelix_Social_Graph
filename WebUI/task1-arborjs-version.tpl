@@ -118,7 +118,6 @@
 	<input id="target_id" class="task1Text" name="target_id" type="text"/>
 	</br>
 	<button class="button" id="runTask1" type="submit">Run Task1</button>
-	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
       <div id="task2" class="taskBlock">
 	<p class="controlBlockTitle">Task 2: Group Recommendation</p>
@@ -130,7 +129,6 @@
 	<input id="task2_num_iteration" class="task1Text" name="task2_num_iteration" type="text"/>
 	</br>
 	<button class="button" id="runTask2" type="submit">Run Task2</button>
-	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
       <div id="task3" class="taskBlock">
 	<p class="controlBlockTitle">Task 3: Friend Recommendation</p>
@@ -145,7 +143,6 @@
 	<input id="task3_num_iteration" class="task1Text" name="task3_num_iteration" type="text"/>
 	</br>
 	<button class="button" id="runTask3" type="submit">Run Task3</button>
-	<button class="reloadButton" type="submit">Reload Graph</button>
       </div>
     </div>
   </div>
