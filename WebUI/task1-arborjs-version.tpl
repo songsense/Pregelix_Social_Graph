@@ -109,7 +109,7 @@
 	<input id="filePath" type="file" name="filePath"/>
       </div>
       <div id="task1" class="taskBlock">
-	<p class="controlBlockTitle">Task 1: Connection Strength</p>
+	<p class="controlBlockTitle">Task 1: Connection Tracing</p>
 	<p class="controlBlockContent">Shortest Distance Over Weighted Paths</p>
 	<span style="margin-left:5px">Source Name:</span>
 	<input id="source_id" class="task1Text" name="source_id" type="text"/>
@@ -120,7 +120,7 @@
 	<button class="button" id="runTask1" type="submit">Run Task1</button>
       </div>
       <div id="task2" class="taskBlock">
-	<p class="controlBlockTitle">Task 2: Group Recommendation</p>
+	<p class="controlBlockTitle">Task 2: Community Identification</p>
 	<p class="controlBlockContent">Different Communities in Graph</p>
 	<span style="margin-left:5px">Name:</span>
 	<input id="task2_node" class="task1Text" name="task2_node" type="text"/>
