@@ -13,7 +13,7 @@ import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.io.FloatWritable;
 /**
- * Simple VertexOutputFormat that supports {@link SimplePageRankVertex}
+ * Simple VertexOutputFormat that supports {@link edu.uci.ics.biggraph.algo.SpanningTreeVertex}
  */
 public class SpanningTreeOutptFormat extends
 TextVertexOutputFormat<VLongWritable, IntWritable, FloatWritable> {

@@ -17,6 +17,7 @@ package edu.uci.ics.biggraph.client;
 
 import java.io.IOException;
 
+import edu.uci.ics.biggraph.algo.PageRankVertex;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -98,6 +99,10 @@ public class Client {
         // specific for task 3: social suggestion
         job.getConfiguration().setLong(SocialSuggestionVertex.ITERATIONS, options.maxIterations);
         job.getConfiguration().setLong(SocialSuggestionVertex.NUM_RESULTS, options.numResults);
+
+        // specific for pagerank:
+        job.getConfiguration().setLong(PageRankVertex.ITERATIONS, options.maxIterations);
+        job.getConfiguration().setLong(PageRankVertex.NUM_VERTICES, options.numVertices);
         return options;
     }
 
