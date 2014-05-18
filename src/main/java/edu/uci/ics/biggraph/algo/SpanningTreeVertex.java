@@ -28,8 +28,8 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
     /** vertex value to be set */
     IntWritable vertexValueToSet = new IntWritable();
 	/** deleted edge */
-	float edgeDeleted = -1.0f;
-	FloatWritable edgeDeletedWritable = new FloatWritable(-1.0f);
+	final float edgeDeleted = -1.0f;
+	final FloatWritable edgeDeletedWritable = new FloatWritable(-1.0f);
 	/** record the msg sender's id */
 	ArrayList<Long> msgSenderIds = new ArrayList<Long>(); 
 	List<Edge<VLongWritable, FloatWritable> > edgeList;
@@ -54,13 +54,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 				++i;
 			}
 		}
-		// no tag information
-		sb.append(" ").append(0);
 		return Integer.toString(i) + sb.toString();
-//		if (i > 1)
-//			return "0";
-//		else
-//			return "";
 	}
 	
 	
@@ -131,7 +125,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 				
 				// send the message to all its neighbors except it's parent
 				// NOTE: we did not use the strategy that
-				//  only send the message to the nodes it did not receive message
+				//  only sends the message to the nodes it did not receive message
 				// this is because, we need the destination vertex to receive this obsolete
 				// message such that they can delete their out going edges to the vertex
 				msgToSent.setHelloCounterParentId(minCnt, getVertexId().get());
@@ -186,12 +180,26 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 	private void setEdgeDeleted(List<Edge<VLongWritable, FloatWritable> > edgeList, long idToDelete) {
 		for (Edge<VLongWritable, FloatWritable> edge : edgeList) {
 			if (edge.getDestVertexId().get() == idToDelete) {
-				edge.setEdgeValue(edgeDeletedWritable);
+                FloatWritable value = new FloatWritable(edgeDeleted);
+				edge.setEdgeValue(value);
+                printMessage(idToDelete, edge);
 				return;
 			}
 		}		
 	}
-	
+
+    private void printMessage(long idToDelete, Edge<VLongWritable, FloatWritable> edge) {
+        if (getVertexId().get() != 12 && getVertexId().get() != 16) {
+            return;
+        }
+        System.out.print("==== ");
+        System.out.print("vertex: " + getVertexId().toString());
+        System.out.print(" removes edge to vertex: " + idToDelete);
+        System.out.print(" edge value is: " + edge.getEdgeValue());
+        System.out.print(" edge dest id is: " + edge.getDestVertexId().toString());
+        System.out.println(" ====");
+    }
+
     public static void main(String[] args) throws Exception {
         PregelixJob job = new PregelixJob(SpanningTreeVertex.class.getSimpleName());
         job.setVertexClass(SpanningTreeVertex.class);
