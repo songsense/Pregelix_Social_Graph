@@ -50,7 +50,7 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
 		int i = 0;
 		for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
 			if (!isEdgeDeleted(edge)) {
-				sb.append(" ").append(edge.getDestVertexId().get()).append(" ").append(edge.getEdgeValue().get());
+				sb.append("\t").append(edge.getDestVertexId().get()).append("\t").append(edge.getEdgeValue().get());
 				++i;
 			}
 		}

@@ -35,8 +35,6 @@ public class PageRankVertexInputFormat extends
 @SuppressWarnings("rawtypes")
 class PageRankVertexReader extends
         TextVertexInputFormat.TextVertexReader<VLongWritable, DoubleWritable, FloatWritable, DoubleWritable> {
-
-    private final static String separator = " ";
     private Vertex vertex;
     private VLongWritable vertexId = new VLongWritable();
     private List<VLongWritable> pool = new ArrayList<VLongWritable>();
@@ -62,7 +60,8 @@ class PageRankVertexReader extends
         vertex.getEdges().clear();
         vertex.reset();
         Text line = getRecordReader().getCurrentValue();
-        String[] fields = line.toString().split(separator);
+        String raw = line.toString();
+        String[] fields = ADMParser.split(raw);
         /**
          * for data format, see:
          * https://docs.google.com/a/uci.edu/document/d/18jaKJT3OCVdKgXPB6JMClRKvsl2IWx8vJYfiTgFjxd0/edit

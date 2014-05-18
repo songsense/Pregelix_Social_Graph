@@ -30,8 +30,6 @@ TextVertexInputFormat<VLongWritable, WeightedPathWritable, FloatWritable, Weight
 @SuppressWarnings("rawtypes")
 class WeightedShortestPathsGraphReader extends
         TextVertexReader<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> {
-
-    private final static String separator = " ";
     private Vertex vertex;
     private VLongWritable vertexId = new VLongWritable();
     private List<VLongWritable> pool = new ArrayList<VLongWritable>();

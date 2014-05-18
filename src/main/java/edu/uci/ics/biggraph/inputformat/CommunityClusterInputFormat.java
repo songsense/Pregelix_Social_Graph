@@ -30,8 +30,6 @@ public class CommunityClusterInputFormat extends
 @SuppressWarnings("rawtypes")
 class CommunityClusterGraphReader extends
         TextVertexReader<VLongWritable, VLongIntWritable, FloatWritable, VLongWritable> {
-
-    private final static String separator = " ";
     private Vertex vertex;
     private VLongWritable vertexId = new VLongWritable();
     private List<VLongWritable> pool = new ArrayList<VLongWritable>();
