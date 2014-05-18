@@ -19,24 +19,35 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
     }
 
     /* Fields specification */
-    /** target_node: int32 (primary key) */
+    /** id: string (primary key) */
+    String id;
+    /** login user id (user_id: int32) */
+    private int user_id;
+    /** the destination id (target_user_id: int32) */
+    private int target_user_id;
+    /** the length of the path (length: int32) */
+    private int length;
+    /** the path from the src to dst (path: [int32]) */
+    private LinkedList<Integer> path = null;
+
+    // FIXME: old code to be deleted
     private int target_node;
     /** weight: double */
     private double weight;
-    /** path: [int32] */
-    private LinkedList<Integer> path = null;
+
 
     private TaskOneTypeAccessor() {
     }
 
-    public void setVertex(int target, double weight, LinkedList<Integer> path) {
-        synchronized (this) {
-            assert target >= 0;
-
-            this.target_node = target;
-            this.weight = weight;
-            this.path = (path == null) ? new LinkedList<Integer>() : path;
-        }
+    public void setVertex(String id, int user_id, int target_user_id,
+                          int length, LinkedList<Integer> path) {
+        System.out.println("[Task1:setVertex] id: " + id + ", user id: " + user_id +
+                    "target: " + target_user_id + ", path length: " + length);
+        this.id = id;
+        this.user_id = user_id;
+        this.target_user_id = target_user_id;
+        this.length = length;
+        this.path = path;
     }
 
     /**
@@ -65,8 +76,10 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
 
     private String assembleFields() {
         JsonObjectBuilder model = Json.createObjectBuilder()
-                .add("target_node", target_node)
-                .add("weight", weight);
+                .add("id", id)
+                .add("user_id", user_id)
+                .add("target_user_id", target_user_id)
+                .add("length", length);
 
         Iterator<Integer> it = path.iterator();
         JsonArrayBuilder t = Json.createArrayBuilder();
@@ -92,8 +105,8 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("use dataverse Tasks;");
-        sb.append("delete $t from dataset TaskOne where $t.target_node = " +
-                target_node + ";");
+        sb.append("delete $t from dataset TaskOne where $t.id = " +
+                id + ";");
 
         String cmd = sb.toString();
         cmd = URLGenerator.cmdParser(cmd);
@@ -106,7 +119,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
         LinkedList<Integer> path = new LinkedList<Integer>();
         path.add(2);
         path.add(3);
-        one.setVertex(1, 2.4, path);
+//        one.setVertex(1, 2.4, path);
         System.out.println(one.assembleFields());
         System.out.println(one.makeURL());
     }
