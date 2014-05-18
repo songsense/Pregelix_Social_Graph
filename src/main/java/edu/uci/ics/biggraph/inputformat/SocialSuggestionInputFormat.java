@@ -57,7 +57,9 @@ class SocialSuggestionGraphReader extends
         vertex.getMsgList().clear();
         vertex.getEdges().clear();
 
-        String[] fields = getCurrentVertexFromTxt();
+        Text line = getRecordReader().getCurrentValue();
+        String raw = line.toString();
+        String[] fields = ADMParser.split(raw);
 
         if (fields.length > 0) {
             // set source vertex ID
@@ -80,10 +82,25 @@ class SocialSuggestionGraphReader extends
         return vertex;
     }
 
+    @Deprecated
     private String[] getCurrentVertexFromTxt() throws IOException, InterruptedException {
         Text line = getRecordReader().getCurrentValue();
         System.out.println("Input line: " + line);
         String[] fields = line.toString().split(separator);
+
+        return fields;
+    }
+
+    private String[] getCurrentVertexFromAdm() throws IOException, InterruptedException {
+        Text line = getRecordReader().getCurrentValue();
+        System.out.println("Input line: " + line);
+        ArrayList<String> slist = ADMParser.ADM2Graph(line.toString());
+        int size = slist.size();
+        String[] fields = new String[size];
+
+        for (int i = 0; i < size; i++) {
+            fields[i] = slist.get(i);
+        }
 
         return fields;
     }

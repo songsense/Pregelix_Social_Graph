@@ -1,10 +1,5 @@
 package edu.uci.ics.biggraph.inputformat;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
@@ -21,52 +16,143 @@ import java.util.ArrayList;
  * Created by liqiangw on 5/17/14.
  */
 public class ADMParser {
+    /**
+     * Convert ADM file into graph data that can be
+     * understand by applications.
+     *
+     * It's hard coded.
+     */
     public static ArrayList<String> ADM2Graph(String line) {
-        if (line == null || line.equals("")) {
+        if (line == null || line.length() == 0) {
+            return null;
+        }
+        System.out.println("In ADM2Graph: " + line);
+
+        char c;
+        int len = line.length();
+        ArrayList<String> slist = new ArrayList<String>();
+
+        // source_node
+        int index = line.indexOf(':', 0);
+        StringBuilder sb = new StringBuilder();
+        if (index < 0 || ++index >= len) {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        while (Character.isDigit((c = line.charAt(index)))) {
+            sb.append(c);
+            index++;
+        }
+        if (line.charAt(index) != ',') {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        slist.add(sb.toString());
+
+        // target_node (label skipped)
+        ArrayList<String> targets = new ArrayList<String>();
+        index = line.indexOf(',', index + 1);
+        if (index < 0) {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        index = line.indexOf(':', index);
+        if (index < 0) {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        if (index + 2 >= len || line.charAt(++index) != '{'
+                || line.charAt(++index) != '{') {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        int nSize = 0;
+        sb = new StringBuilder();
+        while (++index < len
+                && (Character.isDigit(c = line.charAt(index)) || c == ','
+                    || c == '-' || c == '+')) {
+            if (c != ',') {
+                sb.append(c);
+                if (index + 1 < len && !Character.isDigit(c = line.charAt(index + 1)) &&
+                    c != '-' && c != '+') {
+                    nSize++;
+                    targets.add(sb.toString());
+                    sb = new StringBuilder();
+                }
+            }
+        }
+        --index;
+        slist.add(1, Integer.toString(nSize));
+        if (index + 2 >= len || line.charAt(++index) != '}'
+                || line.charAt(++index) != '}') {
+            System.err.println("ADM2Graph: Invalid input format");
             return null;
         }
 
-        ArrayList<String> ret = new ArrayList<String>();
-        String tmp;
-        System.out.println(line);
-
-        JsonReader jsonReader = Json.createReader(new StringReader(line));
-        JsonObject jsonObject = jsonReader.readObject();
-        jsonReader.close();
-
-        // read id
-        tmp = jsonObject.get("source_node").toString();
-        ret.add(tmp);
-
-        // read target node (skipping label)
-        tmp = jsonObject.get("target_node").toString();
-        jsonReader = Json.createReader(new StringReader(tmp));
-        JsonArray jsonArray = jsonReader.readArray();
-        int size = jsonArray.size();
-
-        ret.add(Integer.toString(size));
-        for (int i = 0; i < size; i++) {
-            ret.add(Integer.toString(jsonArray.getInt(i)));
+        // weight
+        ArrayList<String> weights = new ArrayList<String>();
+        index = line.indexOf(':', index);
+        if (index < 0) {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        if (index + 2 >= len || line.charAt(++index) != '{'
+                || line.charAt(++index) != '{') {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
+        }
+        while (++index < len
+                && (Character.isDigit(c = line.charAt(index)) || c == ','
+                    || c == '.' || c == '-' || c == '+')) {
+            if (c != ',') {
+                sb.append(c);
+                if (index + 1 < len && !Character.isDigit(c = line.charAt(index + 1)) &&
+                    c != '.' && c != '-' && c != '+') {
+                    nSize--;
+                    weights.add(sb.toString());
+                    sb = new StringBuilder();
+                }
+            }
+        }
+        --index;
+        if (nSize != 0 || index + 2 >= len || line.charAt(++index) != '}'
+                || line.charAt(++index) != '}') {
+            System.err.println("ADM2Graph: Invalid input format");
+            return null;
         }
 
-        // read target node weight
-        tmp = jsonObject.get("weight").toString();
-        jsonReader = Json.createReader(new StringReader(tmp));
-        jsonArray = jsonReader.readArray();
-        assert jsonArray.size() == size;
-        for (int i = 0; i < size; i++) {
-            ret.add(Double.toString(jsonArray.getJsonNumber(i).doubleValue()));
+        // intermix the target nodes and their weight
+        assert targets.size() == weights.size();
+        int nodeSize = targets.size();
+        for (int i = 0; i < nodeSize; i++) {
+            slist.add(targets.get(i));
+            slist.add(weights.get(i));
         }
 
-        return ret;
+        return slist;
+    }
+
+    /**
+     * Split one line of ADM graph file into separate tokens.
+     */
+    public static String[] split(String line) {
+        ArrayList<String> slist = ADMParser.ADM2Graph(line.toString());
+        int size = slist.size();
+        String[] fields = new String[size];
+
+        for (int i = 0; i < size; i++) {
+            fields[i] = slist.get(i);
+        }
+
+        return fields;
     }
 
     public static void main(String[] args) {
-        ArrayList<String> list;
-        String str = "{\"source_node\":1,\"label\":\"Siming\",\"target_node\":[2,3],\"weight\":[1.0,1.0]}";
-        list = ADM2Graph(str);
-        for (String s : list) {
-            System.out.println(s);
+        Object[] list;
+        String str = args[0];
+        list = ADM2Graph(str).toArray();
+        for (Object s : list) {
+            System.out.println((String) s);
         }
     }
 }
