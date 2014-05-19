@@ -1,0 +1,113 @@
+drop dataverse Communication if exists;
+create dataverse Communication;
+use dataverse Communication;
+
+create type ProtocolType as open{
+       id: int32,
+       load_graph: int32,
+       task1_status: int32,
+       task2_status: int32,
+       task3_status: int32,
+       graph_file_path: string,
+       number_of_iterations: int32,
+       source_id: int32,
+       target_id: int32,
+       number_of_results: int32
+}
+
+create dataset Protocol(ProtocolType)
+primary key id;
+
+
+drop dataverse Tasks if exists;
+create dataverse Tasks;
+use dataverse Tasks;
+
+create type TaskOneType as open{
+       target_node: int32,
+       weight: double,
+       path: [int32]
+}
+
+create type TaskTwoType as open{
+       node_id: int32,
+       community_id: int32
+}
+
+create type TaskThreeType as open{
+       node_id: int32,
+       suggested_friends: [int32]
+}
+
+create dataset TaskOne(TaskOneType)
+primary key target_node;
+
+create dataset TaskTwo(TaskTwoType)
+primary key node_id;
+
+create dataset TaskThree(TaskThreeType)
+primary key node_id;
+
+####
+
+use dataverse Communication;
+insert into dataset Protocol(
+       {
+       "id":0,
+       "load_graph": 0,
+       "task1_status":0,
+       "task2_status":0,
+       "task3_status":0,
+       "graph_file_path":"",
+       "number_of_iterations":-1,
+       "source_id":-1,
+       "target_id":-1,
+       "number_of_results":-1
+       }      
+);
+
+use dataverse Tasks;
+
+insert into dataset TaskOne(
+       {
+       "target_node":3,
+       "weight":1.0,
+       "path":[0,1,3]
+       }	
+);
+
+insert into dataset TaskTwo(
+       {
+       "node_id":0,
+       "community_id":0
+       }           		
+);
+
+insert into dataset TaskTwo(
+       {
+       "node_id":1,
+       "community_id":0
+       }           		
+);
+
+insert into dataset TaskTwo(
+       {
+       "node_id":2,
+       "community_id":1
+       }           		
+);
+
+insert into dataset TaskTwo(
+       {
+       "node_id":3,
+       "community_id":1
+       }           		
+);
+
+
+insert into dataset TaskThree(
+       {
+       "node_id":0,
+       "suggested_friends":[1,2]
+       }      
+);
