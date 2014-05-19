@@ -49,15 +49,15 @@ class SubGraphWriter extends
 
     private String buildValueLine(Vertex<VLongWritable, IntWritable, FloatWritable, ?> vertex) {
         StringBuilder sb = new StringBuilder();
-        int size = vertex.getNumOutEdges();
-        sb.append(size);
+        int size = 0;
         for (Edge<VLongWritable, FloatWritable> edge : vertex.getEdges()) {
-            if (edge.getEdgeValue().get() >= 0.0f) {
+            if (edge.getEdgeValue().get() > 0.0f) {
+                size++;
                 sb.append(" ").append(edge.getDestVertexId().get()).append(" ")
                         .append(edge.getEdgeValue().get());
             }
         }
-        return sb.toString();
+        return Integer.toString(size) + sb.toString();
     }
 
     public static final String ITERATIONS = "SocialSuggestionVertex.iteration";

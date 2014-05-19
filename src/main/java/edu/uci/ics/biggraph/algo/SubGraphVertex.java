@@ -63,7 +63,11 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                 for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
                     sendMsg(edge.getDestVertexId(), msgToSent);
                     // set the value of the outgoing edge #iteration
-                    edge.setEdgeValue(new FloatWritable((float) step));
+                    if (step == maxIteration) {
+                        edge.setEdgeValue(new FloatWritable(0.0f));
+                    } else {
+                        edge.setEdgeValue(new FloatWritable((float) step));
+                    }
                 }
             } else {
                 // set itself vertex value INT_MAX
@@ -163,16 +167,17 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                 }
 
                 // Only let marginal vertices send message
-                // -1l so to notify that the current vertex is
+                // 0 so to notify that the current vertex is
                 // actually useless
                 System.out.println("\t[" + getVertexId().get() + "]:"
                         + " about to send msg");
                 if (minCnt != Integer.MAX_VALUE) {
-                    msgToSent.setHelloCounterParentId(-1L, getVertexId().get());
+                    // value should not below 0
+                    msgToSent.setHelloCounterParentId(0, getVertexId().get());
                     for (Edge<VLongWritable, FloatWritable> e : getEdges()) {
+                        sendMsg(e.getDestVertexId(), msgToSent);
                         System.out.println("\t[" + getVertexId().get() + "]:"
                                 + " about to send msg to " + e);
-                        sendMsg(e.getDestVertexId(), msgToSent);
                     }
                     System.out.println("\t[" + getVertexId().get() + "]:"
                             + " sending msg complete!");
@@ -198,7 +203,7 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                         + " begin to receive msg...");
                 while (msgIterator.hasNext()) {
                     HelloCntParentIdWritable msg = msgIterator.next();
-                    if (msg.getHelloCounter() == -1L) {
+                    if (msg.getHelloCounter() == 0) {
                         Edge<VLongWritable, FloatWritable> e
                                 = edgeHashMap.get(msg.getParentId());
                         e.setEdgeValue(new FloatWritable(0.0f));

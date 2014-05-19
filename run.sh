@@ -25,7 +25,7 @@ elif [ $1 == 3 ]; then
 	bin/pregelix ${PROJ_TARGET}/project-0.2.9-jar-with-dependencies.jar edu.uci.ics.biggraph.algo.SocialSuggestionVertex -inputpaths ${INPUT_PATH} -outputpath ${OUTPUT_PATH} -ip `bin/getip.sh` -port 13199 -iterations 10 -results-num 5
 elif [ $1 == 5 ]; then
 	echo running task 5...
-	bin/pregelix ${PROJ_TARGET}/project-0.2.9-jar-with-dependencies.jar edu.uci.ics.biggraph.algo.SubGraphVertex -inputpaths ${INPUT_PATH} -outputpath ${OUTPUT_PATH} -ip `bin/getip.sh` -port 13199 -iterations 4
+	bin/pregelix ${PROJ_TARGET}/project-0.2.9-jar-with-dependencies.jar edu.uci.ics.biggraph.algo.SubGraphVertex -inputpaths ${INPUT_PATH} -outputpath ${OUTPUT_PATH} -ip `bin/getip.sh` -port 13199 -iterations 3
 elif [ $1 == rebuild ]; then
 	echo rebuilding the database...
 	cd ${PROJ_CLASSES}
