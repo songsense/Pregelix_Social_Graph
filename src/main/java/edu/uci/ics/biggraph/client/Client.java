@@ -15,9 +15,13 @@
 
 package edu.uci.ics.biggraph.client;
 
-import java.io.IOException;
-
 import edu.uci.ics.biggraph.algo.PageRankVertex;
+import edu.uci.ics.biggraph.algo.SocialSuggestionVertex;
+import edu.uci.ics.biggraph.algo.SubGraphVertex;
+import edu.uci.ics.biggraph.algo.WeightedShortestPathVertex;
+import edu.uci.ics.pregelix.api.job.PregelixJob;
+import edu.uci.ics.pregelix.core.base.IDriver.Plan;
+import edu.uci.ics.pregelix.core.driver.Driver;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -25,12 +29,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import edu.uci.ics.pregelix.api.job.PregelixJob;
-import edu.uci.ics.pregelix.core.base.IDriver.Plan;
-import edu.uci.ics.pregelix.core.driver.Driver;
-
-import edu.uci.ics.biggraph.algo.SocialSuggestionVertex;
-import edu.uci.ics.biggraph.algo.WeightedShortestPathVertex;
+import java.io.IOException;
 
 public class Client {
 
@@ -103,6 +102,10 @@ public class Client {
         // specific for pagerank:
         job.getConfiguration().setLong(PageRankVertex.ITERATIONS, options.maxIterations);
         job.getConfiguration().setLong(PageRankVertex.NUM_VERTICES, options.numVertices);
+
+        // specific for task 5L sub graph
+        job.getConfiguration().setLong(SubGraphVertex.ITERATIONS, options.maxIterations);
+
         return options;
     }
 

@@ -86,7 +86,7 @@ public class TaskOne extends Task {
         changeMode.waitFor();
 
         // run the command
-        System.setProperty("user.dir", pregelixPa   th);
+        System.setProperty("user.dir", pregelixPath);
         Process p = Runtime.getRuntime().exec(pregelixPath + "task1.sh", null, new File(pregelixPath));
         p.waitFor();
     }
