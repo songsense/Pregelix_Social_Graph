@@ -13,6 +13,7 @@ import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +27,7 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
     HelloCntParentIdWritable msgToSent = new HelloCntParentIdWritable();
     /** vertex value to be set */
     IntWritable vertexValueToSet = new IntWritable();
-    List<Edge<VLongWritable, FloatWritable> > edgeList;
+    List<Edge<VLongWritable, FloatWritable>> edgeList;
 
     /** Maximum iteration */
     public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
@@ -65,7 +66,7 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                     edge.setEdgeValue(new FloatWritable((float) step));
                 }
             } else {
-                // set itself vertex value as -1L
+                // set itself vertex value INT_MAX
                 vertexValueToSet.set(Integer.MAX_VALUE);
                 setVertexValue(vertexValueToSet);
                 // set all values of its outgoing edges 0.0f
@@ -73,7 +74,7 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                     edge.setEdgeValue(new FloatWritable(0.0f));
                 }
             }
-        } else if (step >= 2 && step <= maxIteration) { // general steps
+        } else if (step >= 2 && step < maxIteration) { // general steps
             edgeList = getEdges();
 
             // In order to avoid any duplicates, we should only let vertex values
@@ -142,6 +143,73 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                         edge.setEdgeValue(new FloatWritable((float) step));
                     }
                 }
+            }
+        } else if (step == maxIteration) {
+            int vertexValue = getVertexValue().get();
+
+            if (vertexValue == Integer.MAX_VALUE) {
+                System.out.println("[compute] iteration = " + getSuperstep()
+                        + ", vertex id = " + getVertexId().get()
+                        + ", current val = " + getVertexValue().get());
+                int minCnt = Integer.MAX_VALUE;
+
+                while (msgIterator.hasNext()) {
+                    HelloCntParentIdWritable msg = msgIterator.next();
+
+                    // update the minimum hello counter
+                    if (minCnt > (int) msg.getHelloCounter()) {
+                        minCnt = (int) msg.getHelloCounter();
+                    }
+                }
+
+                // Only let marginal vertices send message
+                // -1l so to notify that the current vertex is
+                // actually useless
+                System.out.println("\t[" + getVertexId().get() + "]:"
+                        + " about to send msg");
+                if (minCnt != Integer.MAX_VALUE) {
+                    msgToSent.setHelloCounterParentId(-1L, getVertexId().get());
+                    for (Edge<VLongWritable, FloatWritable> e : getEdges()) {
+                        System.out.println("\t[" + getVertexId().get() + "]:"
+                                + " about to send msg to " + e);
+                        sendMsg(e.getDestVertexId(), msgToSent);
+                    }
+                    System.out.println("\t[" + getVertexId().get() + "]:"
+                            + " sending msg complete!");
+                }
+            }
+        } else if (step == maxIteration + 1) {
+            int vertexValue = getVertexValue().get();
+            if (vertexValue != Integer.MAX_VALUE) {
+                System.out.println("[compute] iteration = " + getSuperstep()
+                        + ", vertex id = " + getVertexId().get()
+                        + ", current val = " + getVertexValue().get());
+
+                HashMap<Long, Edge<VLongWritable, FloatWritable>> edgeHashMap
+                        = new HashMap<Long, Edge<VLongWritable, FloatWritable>>();
+                for (Edge<VLongWritable, FloatWritable> e : getEdges()) {
+                    edgeHashMap.put(e.getDestVertexId().get(), e);
+                }
+
+                // If receives the message from the vertices that do
+                // not belong to the sub-graph, change the edges value
+                // back to 0.0f
+                System.out.println("\t[" + getVertexId().get() + "]:"
+                        + " begin to receive msg...");
+                while (msgIterator.hasNext()) {
+                    HelloCntParentIdWritable msg = msgIterator.next();
+                    if (msg.getHelloCounter() == -1L) {
+                        Edge<VLongWritable, FloatWritable> e
+                                = edgeHashMap.get(msg.getParentId());
+                        e.setEdgeValue(new FloatWritable(0.0f));
+                        System.out.println("\t[" + getVertexId().get() + "]:"
+                                + " find marginal vertex = " + e.getDestVertexId());
+                    }
+                }
+            } else { // vertices that we do not need
+                System.out.println("[compute] iteration = " + getSuperstep()
+                        + ", vertex id = " + getVertexId().get()
+                        + ", current val = " + getVertexValue().get());
             }
         }
         voteToHalt();

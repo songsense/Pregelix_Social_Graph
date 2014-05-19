@@ -52,7 +52,7 @@ class SubGraphWriter extends
         int size = vertex.getNumOutEdges();
         sb.append(size);
         for (Edge<VLongWritable, FloatWritable> edge : vertex.getEdges()) {
-            if (edge.getEdgeValue().get() < (float) maxIteration) {
+            if (edge.getEdgeValue().get() >= 0.0f) {
                 sb.append(" ").append(edge.getDestVertexId().get()).append(" ")
                         .append(edge.getEdgeValue().get());
             }
