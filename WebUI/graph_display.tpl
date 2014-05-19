@@ -102,7 +102,7 @@
     }
 
     #indexMenu{
-      width: 101.5%;
+      width: 98.4%;
       float: left;
       margin-top: 0px;
       margin-bottom: 5px;
