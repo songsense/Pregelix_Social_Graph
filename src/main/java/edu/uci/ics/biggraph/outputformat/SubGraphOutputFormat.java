@@ -1,12 +1,13 @@
 package edu.uci.ics.biggraph.outputformat;
 
+import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.biggraph.io.FloatWritable;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.pregelix.api.graph.Edge;
-import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.io.VertexWriter;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat;
+
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -51,11 +52,16 @@ class SubGraphWriter extends
         int size = vertex.getNumOutEdges();
         sb.append(size);
         for (Edge<VLongWritable, FloatWritable> edge : vertex.getEdges()) {
-            sb.append(" ").append(edge.getDestVertexId().get()).append(" ")
-                    .append(edge.getEdgeValue().get());
+            if (edge.getEdgeValue().get() < (float) maxIteration) {
+                sb.append(" ").append(edge.getDestVertexId().get()).append(" ")
+                        .append(edge.getEdgeValue().get());
+            }
         }
         return sb.toString();
     }
+
+    public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
+    private int maxIteration = Vertex.getContext().getConfiguration().getInt(ITERATIONS, 10);
 }
 
 

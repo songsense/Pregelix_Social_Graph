@@ -1,23 +1,24 @@
 package edu.uci.ics.biggraph.algo;
 
 import edu.uci.ics.biggraph.client.Client;
+import edu.uci.ics.biggraph.inputformat.SubGraphInputFormat;
 import edu.uci.ics.biggraph.io.FloatWritable;
 import edu.uci.ics.biggraph.io.HelloCntParentIdWritable;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.outputformat.SubGraphOutputFormat;
-import edu.uci.ics.biggraph.inputformat.SubGraphInputFormat;
 import edu.uci.ics.pregelix.api.graph.Edge;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
 /**
+ * Task 5: Generate a sub graph of given range from a large graph.
  * Created by liqiangw on 5/18/14.
  */
 public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable> {
@@ -25,8 +26,6 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
     HelloCntParentIdWritable msgToSent = new HelloCntParentIdWritable();
     /** vertex value to be set */
     IntWritable vertexValueToSet = new IntWritable();
-    /** record the msg sender's id */
-    ArrayList<Long> msgSenderIds = new ArrayList<Long>();
     List<Edge<VLongWritable, FloatWritable> > edgeList;
 
     /** Maximum iteration */
@@ -53,6 +52,7 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
             System.out.println("[compute] iteration = " + getSuperstep()
                     + ", vertex id = " + getVertexId().get());
 
+            // In step 1, only root vertex sends messages.
             if (isRoot()) {
                 vertexValueToSet.set(0);
                 setVertexValue(vertexValueToSet);
@@ -61,11 +61,17 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                 msgToSent.setHelloCounterParentId(0L, getVertexId().get());
                 for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
                     sendMsg(edge.getDestVertexId(), msgToSent);
+                    // set the value of the outgoing edge #iteration
+                    edge.setEdgeValue(new FloatWritable((float) step));
                 }
             } else {
                 // set itself vertex value as -1L
                 vertexValueToSet.set(Integer.MAX_VALUE);
                 setVertexValue(vertexValueToSet);
+                // set all values of its outgoing edges 0.0f
+                for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
+                    edge.setEdgeValue(new FloatWritable(0.0f));
+                }
             }
         } else if (step >= 2 && step <= maxIteration) { // general steps
             edgeList = getEdges();
@@ -74,16 +80,21 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
             // be changed only once.
             int vertexValue = getVertexValue().get();
             if (vertexValue == Integer.MAX_VALUE) {
-                msgSenderIds.clear();
+                int minCnt = Integer.MAX_VALUE;
+                long minCntVertexId = -1L;
+
+                // Record Ids of vertices sending message to the current
+                // vertex in the last iteration.
+                HashSet<Long> senders = new HashSet<Long>();
 
                 // We only accept message from the vertex with the lowest value
                 // in order to avoid duplicates
-                int minCnt = Integer.MAX_VALUE;
-                long minCntVertexId = -1L;
                 while (msgIterator.hasNext()) {
                     HelloCntParentIdWritable msg = msgIterator.next();
-                    // save the sender's id of message
-                    msgSenderIds.add(msg.getParentId());
+
+                    if (!senders.contains(msg.getParentId())) {
+                        senders.add(msg.getParentId());
+                    }
 
                     // update the minimum hello counter
                     if (minCnt > (int) msg.getHelloCounter()) {
@@ -101,17 +112,34 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                         + ", vertex id = " + getVertexId().get()
                         + ", current val = " + getVertexValue().get()
                         + ", val got from id " + minCntVertexId);
+                System.out.print("\t[" + getVertexId().get() + "] receive from: ");
+                Iterator<Long> it = senders.iterator();
+                while (it.hasNext()) {
+                    System.out.print(it.next() + " ");
+                }
+                System.out.println(". set size = " + senders.size());
 
-                // send the message to all its neighbors except it's parent
                 msgToSent.setHelloCounterParentId(minCnt, getVertexId().get());
                 System.out.println("\t[" + getVertexId().get() + "]:"
                             + " minCount = " + minCnt);
                 for (Edge<VLongWritable, FloatWritable> edge : edgeList) {
                     long destVertexId = edge.getDestVertexId().get();
+
+                    // send the message to all its neighbors except it's parent
                     if (destVertexId != minCntVertexId) {
                         sendMsg(edge.getDestVertexId(), msgToSent);
                         System.out.println("\t[" + getVertexId().get() + "]:"
                             + " sending to " + destVertexId);
+                    }
+
+                    // Set the value of the outgoing edge #iteration-1 as
+                    // a response so that both side of one edge have the same
+                    // edge value if those two vertices are incorporated as
+                    // candidates of this sub-graph.
+                    if (senders.contains(destVertexId)) {
+                        edge.setEdgeValue(new FloatWritable((float) step - 1));
+                    } else {
+                        edge.setEdgeValue(new FloatWritable((float) step));
                     }
                 }
             }

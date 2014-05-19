@@ -18,6 +18,16 @@ public class DatabaseInitializer {
             "};" +
             "create dataset OriginalGraph(GraphType) primary key source_node;";
 
+    private static final String INIT_DISPLAY_STATEMENT =
+            "create type DisplayGraphType as open {" +
+                "id: string," +
+                "user_id: int32," +
+                "label: string," +
+                "target_nodes: [int32]" +
+            "}" +
+            "create dataset DisplayGraph(DisplayGraphType) primary key user_id;";
+
+
     // FIXME: still use this?
     private static final String INIT_BACKBONE_STATEMENT =
             "drop dataverse BackBoneGraph if exists;" +
@@ -98,9 +108,10 @@ public class DatabaseInitializer {
             "}" +
             "create dataset TaskFour(TaskFourType) primary key user_id;";
 
+
     public static void initializeAll() throws IOException {
         initializeOriginalGraph();
-        initializeBackBoneGraph();
+        initializeDisplayGraph();
         initializeCommunication();
         initializeTasks();
     }
@@ -111,8 +122,15 @@ public class DatabaseInitializer {
         Commander.sendGet(url);
     }
 
+    @Deprecated
     public static void initializeBackBoneGraph() throws IOException {
         String aql = URLGenerator.cmdParser(INIT_BACKBONE_STATEMENT);
+        String url = URLGenerator.generate("localhost", 19002, RestAPI.DDL, aql);
+        Commander.sendGet(url);
+    }
+
+    public static void initializeDisplayGraph() throws IOException {
+        String aql = URLGenerator.cmdParser(INIT_DISPLAY_STATEMENT);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.DDL, aql);
         Commander.sendGet(url);
     }
