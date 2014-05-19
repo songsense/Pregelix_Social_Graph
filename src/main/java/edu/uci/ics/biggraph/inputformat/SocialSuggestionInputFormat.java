@@ -1,24 +1,22 @@
 package edu.uci.ics.biggraph.inputformat;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import edu.uci.ics.biggraph.io.IntWritable;
+import edu.uci.ics.biggraph.io.VLongArrayListWritable;
+import edu.uci.ics.biggraph.io.VLongWritable;
+import edu.uci.ics.pregelix.api.graph.Vertex;
+import edu.uci.ics.pregelix.api.io.VertexReader;
+import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
+import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
+import edu.uci.ics.pregelix.api.util.BspUtils;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
-import edu.uci.ics.biggraph.io.IntWritable;
-import edu.uci.ics.biggraph.io.VLongArrayListWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.pregelix.api.graph.Edge;
-import edu.uci.ics.pregelix.api.graph.Vertex;
-import edu.uci.ics.pregelix.api.io.VertexReader;
-import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
-import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
-import edu.uci.ics.pregelix.api.util.BspUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SocialSuggestionInputFormat extends 
 TextVertexInputFormat<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable>{
@@ -58,16 +56,17 @@ class SocialSuggestionGraphReader extends
 
         vertex.getMsgList().clear();
         vertex.getEdges().clear();
+
         Text line = getRecordReader().getCurrentValue();
-        System.out.println("Input line: " + line);
-        String[] fields = line.toString().split(separator);
-        
+        String raw = line.toString();
+        String[] fields = ADMParser.split(raw);
+
         if (fields.length > 0) {
             // set source vertex ID
             long src = Long.parseLong(fields[0]);
             vertexId.set(src);
             vertex.setVertexId(vertexId);
-            
+
             // set vertex value
             VLongArrayListWritable vertexValue = new VLongArrayListWritable();
             int numNeighbors = Integer.parseInt(fields[1]);
@@ -75,12 +74,35 @@ class SocialSuggestionGraphReader extends
                 long dest = Long.parseLong(fields[2*i + 2]);
                 VLongWritable destId = allocate();
                 destId.set(dest);
-                
+
                 vertex.addEdge(destId, new IntWritable(1));
             }
         }
-        
+
         return vertex;
+    }
+
+    @Deprecated
+    private String[] getCurrentVertexFromTxt() throws IOException, InterruptedException {
+        Text line = getRecordReader().getCurrentValue();
+        System.out.println("Input line: " + line);
+        String[] fields = line.toString().split(separator);
+
+        return fields;
+    }
+
+    private String[] getCurrentVertexFromAdm() throws IOException, InterruptedException {
+        Text line = getRecordReader().getCurrentValue();
+        System.out.println("Input line: " + line);
+        ArrayList<String> slist = ADMParser.ADM2Graph(line.toString());
+        int size = slist.size();
+        String[] fields = new String[size];
+
+        for (int i = 0; i < size; i++) {
+            fields[i] = slist.get(i);
+        }
+
+        return fields;
     }
     
     private VLongWritable allocate() {
