@@ -6,7 +6,7 @@
   <script type="text/javascript" src="static/js/jquery-ui/js/jquery-1.10.2.js"></script>
   <script type="text/javascript" src="static/js/jquery-ui/js/jquery-ui-1.10.4.custom.js"></script>
   <script type="text/javascript" src="static/js/asterix-sdk-stable.js"></script>
-  <script type="text/javascript" src="static/js/asterix_task1.js"></script>
+  <script type="text/javascript" src="static/js/graphDisplay.js"></script>
   <script type="text/javascript" src="static/js/arbor.js"></script>
   <script type="text/javascript" src="static/js/arbor-graphics.js"></script>
   <script type="text/javascript" src="static/js/arbor-tween.js"></script>
@@ -102,7 +102,7 @@
     }
 
     #indexMenu{
-      width: 101.5%;
+      width: 98.4%;
       float: left;
       margin-top: 0px;
       margin-bottom: 5px;
@@ -162,7 +162,9 @@
         <h3 class="controlBlockTitle">Load Graph</h3>
         <div>
           <p style="margin-bottom:3px">Choose your graph file:</p>
-          <input id="filePath" type="file" name="filePath"/>
+          <form enctype="multipart/form-data" action="/upload" method="POST" target="iframeName1">
+            <input id="filePath" type="file" name="upload"/>
+          </form>
         </div>
         <h3 class="controlBlockTitle">Connection Tracing</h3>
         <div>
@@ -202,5 +204,7 @@
       </div>
     </div>
   </div>
+  <iframe name="iframeName1" id="iframeID1" src="" width="0" height="0"
+  frameborder="0" />
 </body>
 </html>

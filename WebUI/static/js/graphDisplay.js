@@ -210,12 +210,7 @@ var Renderer = function(canvas){
 /*----- use above functions to draw graph ---*/
 
 
-function addResult(dom, res) {
-    //alert("add result");
-    for (i in res) {
-        $(dom).append(res[i] + "<br/>");
-    }
-}
+
 
 
 /*---- global variable ----*/
@@ -224,6 +219,7 @@ function addResult(dom, res) {
 var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/";
 
 var sys;
+
 var fileName;
 
 
@@ -233,7 +229,7 @@ var numColor = colorArray.length;
 
 var timeOut = 1300;
 
-var tableName = {};
+var labelNodeIDTable = {};
 
 var preSourceNode = "0";
 
@@ -247,14 +243,76 @@ var defaultNodeColor = "#4F726C";
 
 var defaultEdgeColor = "#535953";
 
+var allNodes = [];
+
+var allEdges = [];
+
+
 //var nodeIDStr = "";
+
+function clearColoredNodesAndEdges(){
+	coloredNodes = [];
+	coloredEdges = [];
+	labelNodeIDTable = {};
+}
+
+
+function initializeRender(){
+	sys = arbor.ParticleSystem(3500, 50, 0.5);
+    sys.parameters({gravity:true});
+    sys.renderer = Renderer('#graph');
+}
+
+
+function initializeCommunication(){
+
+
+    var queryInitial = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph": 0,"task1_status":0,"task2_status":0,"task3_status":0,"graph_file_path":"","number_of_iterations":-1,"source_id":-1,"target_id":-1,"number_of_results":-1});';
+    var xmlhttp2;
+    if(window.XMLHttpRequest){
+		xmlhttp2 = new XMLHttpRequest();
+    }
+    else{
+		xmlhttp2 = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    
+    xmlhttp2.open("GET", "http://localhost:19002/update?statements="+queryInitial);
+    xmlhttp2.send();
+}
+
+function uploadFile(){
+	$('form').submit();
+}
+
+function deleteAllNodesAndEdges(){
+	//alert("delete");
+	for(var i=0; i<allEdges.length; ++i){
+		var nodeArray = allEdges[i].split("||");
+		var sourceNode = nodeArray[0];
+		var targetNode = nodeArray[1];
+		var edgeArray = sys.getEdges(sourceNode, targetNode);
+		sys.pruneEdge(edgeArray[0]);
+	}
+	for(var i=0; i<allNodes.length; ++i){
+		var node = sys.getNode(allNodes[i]);
+		sys.pruneNode(node);
+	}
+	//alert(allEdges.length);
+	//alert(allNodes.length);
+	allEdges = [];
+	allNodes = [];
+}
 
 function drawGraph(dom, res){
     //var sys = arbor.ParticleSystem(100, 50, 0.1);
+    /*
     sys = arbor.ParticleSystem(3500, 50, 0.5);
     sys.parameters({gravity:true});
     sys.renderer = Renderer(dom);
+    */
     
+    deleteAllNodesAndEdges();
+    var nodeSet = {};
     for(i in res){
 	//alert(res[i]);
 		var resJson = eval('('+res[i]+')');
@@ -264,13 +322,18 @@ function drawGraph(dom, res){
 		
 		//alert("sourceNode:"+sourceNode);
 		var label=resJson.label;
-		tableName[label]=sourceNode;
+		labelNodeIDTable[label]=sourceNode;
 		//alert(label);
 		sys.addNode(sourceNode, {label:label, color:defaultNodeColor});
+		allNodes.push(sourceNode);
+		nodeSet[sourceNode] = true;
 		
 		for(var i=0; i<targetNodeArray.length; ++i){
 		    var targetNode = targetNodeArray[i].int32.toString();
-		    sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
+		    if(!nodeSet[targetNode]==true){
+		    	sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
+		    	allEdges.push(sourceNode+"||"+targetNode);
+		    }
 		}
     }
 }
@@ -279,6 +342,7 @@ function loadGraph(){
     
     $('#tips').html("");
     
+
     var A = new AsterixDBConnection().dataverse("OriginalGraph");
     var expression0a = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset Graph"))
@@ -302,7 +366,8 @@ function loadGraph(){
 			var target_id = resJson.target_id.int32.toString();
 			var number_of_results = resJson.number_of_results.int32.toString();
 			var load_graph = "2";
-			var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
+			//var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
+			var graph_file_path = pathGraph+'/'+fileName;
 			//alert(graph_file_path);
 			var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
 			//alert(querySetFlag);
@@ -327,6 +392,15 @@ function loadGraph(){
 
 
 function loadGraphFirstTime(){
+
+	//$('#iframeID1').html("");
+
+	//alert("load");
+
+	clearColoredNodesAndEdges();
+
+	initializeCommunication();
+
     fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
 
     var queryCreate = 'drop dataverse OriginalGraph if exists; create dataverse OriginalGraph; use dataverse OriginalGraph; create type GraphType as open{source_node: int32, label: string, target_node:{{int32}}, weight:{{double}}} \n create dataset Graph(GraphType) primary key source_node;';
@@ -438,12 +512,12 @@ function runTask1(){
     clearNodeEdgeColor();
     var source_label = $('#source_id').val().toString();
     var target_label = $('#target_id').val().toString();
-    if(!(source_label in tableName && target_label in tableName)){
+    if(!(source_label in labelNodeIDTable && target_label in labelNodeIDTable)){
     	alert("No such source or target node!");
     	return;
     }
-    var source_node = tableName[source_label];
-    var target_node = tableName[target_label];
+    var source_node = labelNodeIDTable[source_label];
+    var target_node = labelNodeIDTable[target_label];
     
     $('#tips').html("");
     
@@ -515,19 +589,7 @@ function runTask1(){
     connector.query(expressionGetProtocol.val(), successGetProtocol);
 }
 
-function initialize(){
-    var queryInitial = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph": 0,"task1_status":0,"task2_status":0,"task3_status":0,"graph_file_path":"","number_of_iterations":-1,"source_id":-1,"target_id":-1,"number_of_results":-1});';
-    var xmlhttp2;
-    if(window.XMLHttpRequest){
-		xmlhttp2 = new XMLHttpRequest();
-    }
-    else{
-		xmlhttp2 = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    
-    xmlhttp2.open("GET", "http://localhost:19002/update?statements="+queryInitial);
-    xmlhttp2.send();
-}
+
 
 function drawGraphTask2(nodeID){
     //get the commit_id
@@ -584,11 +646,11 @@ function runTask2(){
     //alert("run task2");
     clearNodeEdgeColor();
     var nodeLabel = $('#task2_node').val().toString();
-    if(!(nodeLabel in tableName)){
+    if(!(nodeLabel in labelNodeIDTable)){
     	alert("No such node!");
     	return;
     }
-    var nodeID = tableName[nodeLabel];
+    var nodeID = labelNodeIDTable[nodeLabel];
     var numIterStr = $('#task2_num_iteration').val().toString();
     $('#tips').html("");
     
@@ -706,11 +768,11 @@ function drawGraphTask3(nodeID, inputFriendNum){
 function runTask3(){
     clearNodeEdgeColor();
     var nodeLabel = $('#task3_node').val().toString();
-    if(!(nodeLabel in tableName)){
+    if(!(nodeLabel in labelNodeIDTable)){
     	alert("No such node!");
     	return;
     }
-    var nodeID = tableName[nodeLabel];
+    var nodeID = labelNodeIDTable[nodeLabel];
     var numFriendsStr = $('#task3_num_friends').val().toString();
     var inputFriendNum = $('#task3_num_friends').val();
     var numIterStr = $('#task3_num_iteration').val().toString();
@@ -784,9 +846,11 @@ function runTask3(){
 
 $(document).ready(function(){
 
-    initialize();
+    initializeRender();
 
-    $("#filePath").change(loadGraphFirstTime);
+    $("#filePath").change(uploadFile);
+
+    $("#iframeID1").load(loadGraphFirstTime);
 
     $("#runTask1").click(runTask1);
 

@@ -1,0 +1,81 @@
+drop dataverse Graph if exists;
+create dataverse Graph;
+use dataverse Graph;
+
+create type GraphType as open{
+       source_node: int32,
+       label: string,      
+       target_nodes: [int32],
+       weight: [double] 
+}
+
+create dataset OriginalGraph(GraphType) primary key source_node;
+
+create type DisplayGraphType as open {
+       id: string,
+       login_user_id: int32, 
+       source_node: int32, 
+       label: string,      
+       target_nodes: [int32] 
+}
+create dataset DisplayGraph(DisplayGraphType) primary key id;
+
+
+drop dataverse Tasks if exists;
+create dataverse Tasks;
+use dataverse Tasks;
+
+create type TaskOneType as open{
+       id: string,
+       login_user_id: int32,
+       target_user_id: int32,
+       length: int32,
+       path: [int32]
+
+}
+
+create dataset TaskOne(TaskOneType) primary key id;
+create index TaskOneIdx on TaskOne(login_user_id);
+
+create type TaskTwoType as open {
+       user_id: int32,
+       community_id: int32
+}
+create dataset TaskTwo(TaskTwoType) primary key user_id;
+
+create type TaskThreeType as open {
+       user_id: int32, 
+       suggested_friends: [int32]
+}
+create dataset TaskThree(TaskThreeType) primary key user_id;
+
+
+create type TaskFourType as open {
+       user_id: int32, 
+       importance: double
+}
+create dataset TaskFour(TaskFourType) primary key user_id;
+
+
+####
+use dataverse Graph;
+
+load dataset OriginalGraph using localfs
+    (("path"="locolhost:///home/zhimin/study/CS295/Pregelix-Graph-UI/graphFiles/OriginalGraph.adm"),("format"="adm"));
+
+load dataset DisplayGraph using localfs
+       (("path"="locolhost:///home/zhimin/study/CS295/Pregelix-Graph-UI/graphFiles/DisplayGraph.adm"),("format"="adm"));
+
+use dataverse Tasks;
+
+load dataset OriginalGraph using localfs
+    (("path"="locolhost:///home/zhimin/study/CS295/Pregelix-Graph-UI/graphFiles/TaskOne.adm"),("format"="adm"));
+
+load dataset DisplayGraph using localfs
+       (("path"="locolhost:///home/zhimin/study/CS295/Pregelix-Graph-UI/graphFiles/TaskTwo.adm"),("format"="adm"));
+
+load dataset OriginalGraph using localfs
+    (("path"="locolhost:///home/zhimin/study/CS295/Pregelix-Graph-UI/graphFiles/TaskThree.adm"),("format"="adm"));
+
+load dataset DisplayGraph using localfs
+       (("path"="locolhost:///home/zhimin/study/CS295/Pregelix-Graph-UI/graphFiles/TaskFour.adm"),("format"="adm"));

@@ -1,3 +1,6 @@
+# create a graph randomly
+
+
 import os
 import sys
 import random
