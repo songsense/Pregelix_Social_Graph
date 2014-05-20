@@ -1,0 +1,4 @@
+{"user_id":1, "suggested_friends":[2,3,4,5]}
+{"user_id":2, "suggested_friends":[3,4,5]}
+{"user_id":3, "suggested_friends":[4,5,6]}
+{"user_id":7, "suggested_friends":[8,9]}

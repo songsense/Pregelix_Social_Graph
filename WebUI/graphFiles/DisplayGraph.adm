@@ -1,0 +1,8 @@
+{"id":"1_1", "login_user_id": 1, "source_node":1, "label":"Siming", "target_nodes":[2,3]}
+{"id":"1_2", "login_user_id": 1, "source_node":2, "label":"Liqiang", "target_nodes":[1,4]}
+{"id":"1_3", "login_user_id": 1, "source_node":3, "label":"Zhimin", "target_nodes":[1,4]}
+{"id":"1_4", "login_user_id": 1, "source_node":4, "label":"Jenny", "target_nodes":[2,3]}
+{"id":"7_7", "login_user_id": 7, "source_node":7, "label":"Jordan", "target_nodes":[8]}
+{"id":"7_8", "login_user_id": 7, "source_node":8, "label":"Evelyn", "target_nodes":[7,9,10]}
+{"id":"7_9", "login_user_id": 7, "source_node":9, "label":"Emily", "target_nodes":[8,10]}
+{"id":"7_10","login_user_id": 7, "source_node":10, "label":"Justin", "target_nodes":[8,9]}
