@@ -30,14 +30,18 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
     List<Edge<VLongWritable, FloatWritable>> edgeList;
 
     /** Maximum iteration */
-    public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
+    public static final String ITERATIONS = "SubGraphVertex.iteration";
     private int maxIteration = -1;
+    /** The shortest paths id */
+    public static final String SOURCE_ID = "SubGraphVertex.sourceId";
+    /** Default shortest paths id */
+    public static final long SOURCE_ID_DEFAULT = 1;
 
     /**
      * Check out if the current vertex is the starting (root) one.
      */
-    private boolean isRoot() {
-        return (getVertexValue().get() == 0);
+    private boolean isSource() {
+        return (getVertexId().get() == getContext().getConfiguration().getLong(SOURCE_ID, SOURCE_ID_DEFAULT));
     }
 
     @Override
@@ -50,11 +54,11 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
         // set it to INT_MAX
         long step = getSuperstep();
         if (step == 1) {
-            System.out.println("[compute] iteration = " + getSuperstep()
-                    + ", vertex id = " + getVertexId().get());
+//            System.out.println("[compute] iteration = " + getSuperstep()
+//                    + ", vertex id = " + getVertexId().get());
 
             // In step 1, only root vertex sends messages.
-            if (isRoot()) {
+            if (isSource()) {
                 vertexValueToSet.set(0);
                 setVertexValue(vertexValueToSet);
 
@@ -113,28 +117,28 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                 vertexValueToSet.set(minCnt);
                 setVertexValue(vertexValueToSet);
 
-                System.out.println("[compute] iteration = " + getSuperstep()
-                        + ", vertex id = " + getVertexId().get()
-                        + ", current val = " + getVertexValue().get()
-                        + ", val got from id " + minCntVertexId);
-                System.out.print("\t[" + getVertexId().get() + "] receive from: ");
-                Iterator<Long> it = senders.iterator();
-                while (it.hasNext()) {
-                    System.out.print(it.next() + " ");
-                }
-                System.out.println(". set size = " + senders.size());
+//                System.out.println("[compute] iteration = " + getSuperstep()
+//                        + ", vertex id = " + getVertexId().get()
+//                        + ", current val = " + getVertexValue().get()
+//                        + ", val got from id " + minCntVertexId);
+//                System.out.print("\t[" + getVertexId().get() + "] receive from: ");
+//                Iterator<Long> it = senders.iterator();
+//                while (it.hasNext()) {
+//                    System.out.print(it.next() + " ");
+//                }
+//                System.out.println(". set size = " + senders.size());
 
                 msgToSent.setHelloCounterParentId(minCnt, getVertexId().get());
-                System.out.println("\t[" + getVertexId().get() + "]:"
-                            + " minCount = " + minCnt);
+//                System.out.println("\t[" + getVertexId().get() + "]:"
+//                            + " minCount = " + minCnt);
                 for (Edge<VLongWritable, FloatWritable> edge : edgeList) {
                     long destVertexId = edge.getDestVertexId().get();
 
                     // send the message to all its neighbors except it's parent
                     if (destVertexId != minCntVertexId) {
                         sendMsg(edge.getDestVertexId(), msgToSent);
-                        System.out.println("\t[" + getVertexId().get() + "]:"
-                            + " sending to " + destVertexId);
+//                        System.out.println("\t[" + getVertexId().get() + "]:"
+//                            + " sending to " + destVertexId);
                     }
 
                     // Set the value of the outgoing edge #iteration-1 as
@@ -152,9 +156,9 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
             int vertexValue = getVertexValue().get();
 
             if (vertexValue == Integer.MAX_VALUE) {
-                System.out.println("[compute] iteration = " + getSuperstep()
-                        + ", vertex id = " + getVertexId().get()
-                        + ", current val = " + getVertexValue().get());
+//                System.out.println("[compute] iteration = " + getSuperstep()
+//                        + ", vertex id = " + getVertexId().get()
+//                        + ", current val = " + getVertexValue().get());
                 int minCnt = Integer.MAX_VALUE;
 
                 while (msgIterator.hasNext()) {
@@ -169,26 +173,26 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                 // Only let marginal vertices send message
                 // 0 so to notify that the current vertex is
                 // actually useless
-                System.out.println("\t[" + getVertexId().get() + "]:"
-                        + " about to send msg");
+//                System.out.println("\t[" + getVertexId().get() + "]:"
+//                        + " about to send msg");
                 if (minCnt != Integer.MAX_VALUE) {
                     // value should not below 0
                     msgToSent.setHelloCounterParentId(0, getVertexId().get());
                     for (Edge<VLongWritable, FloatWritable> e : getEdges()) {
                         sendMsg(e.getDestVertexId(), msgToSent);
-                        System.out.println("\t[" + getVertexId().get() + "]:"
-                                + " about to send msg to " + e);
+//                        System.out.println("\t[" + getVertexId().get() + "]:"
+//                                + " about to send msg to " + e);
                     }
-                    System.out.println("\t[" + getVertexId().get() + "]:"
-                            + " sending msg complete!");
+//                    System.out.println("\t[" + getVertexId().get() + "]:"
+//                            + " sending msg complete!");
                 }
             }
         } else if (step == maxIteration + 1) {
             int vertexValue = getVertexValue().get();
             if (vertexValue != Integer.MAX_VALUE) {
-                System.out.println("[compute] iteration = " + getSuperstep()
-                        + ", vertex id = " + getVertexId().get()
-                        + ", current val = " + getVertexValue().get());
+//                System.out.println("[compute] iteration = " + getSuperstep()
+//                        + ", vertex id = " + getVertexId().get()
+//                        + ", current val = " + getVertexValue().get());
 
                 HashMap<Long, Edge<VLongWritable, FloatWritable>> edgeHashMap
                         = new HashMap<Long, Edge<VLongWritable, FloatWritable>>();
@@ -199,22 +203,18 @@ public class SubGraphVertex extends Vertex<VLongWritable, IntWritable, FloatWrit
                 // If receives the message from the vertices that do
                 // not belong to the sub-graph, change the edges value
                 // back to 0.0f
-                System.out.println("\t[" + getVertexId().get() + "]:"
-                        + " begin to receive msg...");
+//                System.out.println("\t[" + getVertexId().get() + "]:"
+//                        + " begin to receive msg...");
                 while (msgIterator.hasNext()) {
                     HelloCntParentIdWritable msg = msgIterator.next();
                     if (msg.getHelloCounter() == 0) {
                         Edge<VLongWritable, FloatWritable> e
                                 = edgeHashMap.get(msg.getParentId());
                         e.setEdgeValue(new FloatWritable(0.0f));
-                        System.out.println("\t[" + getVertexId().get() + "]:"
-                                + " find marginal vertex = " + e.getDestVertexId());
+//                        System.out.println("\t[" + getVertexId().get() + "]:"
+//                                + " find marginal vertex = " + e.getDestVertexId());
                     }
                 }
-            } else { // vertices that we do not need
-                System.out.println("[compute] iteration = " + getSuperstep()
-                        + ", vertex id = " + getVertexId().get()
-                        + ", current val = " + getVertexValue().get());
             }
         }
         voteToHalt();

@@ -105,7 +105,7 @@ public class Client {
 
         // specific for task 5L sub graph
         job.getConfiguration().setLong(SubGraphVertex.ITERATIONS, options.maxIterations);
-
+        job.getConfiguration().setLong(SubGraphVertex.SOURCE_ID, options.sourceId);
         return options;
     }
 

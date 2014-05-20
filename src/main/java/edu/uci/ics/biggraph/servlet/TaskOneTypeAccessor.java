@@ -22,7 +22,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
     /** id: string (primary key) */
     String id;
     /** login user id (user_id: int32) */
-    private int user_id;
+    private int login_user_id;
     /** the destination id (target_user_id: int32) */
     private int target_user_id;
     /** the length of the path (length: int32) */
@@ -30,21 +30,15 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
     /** the path from the src to dst (path: [int32]) */
     private LinkedList<Integer> path = null;
 
-    // FIXME: old code to be deleted
-    private int target_node;
-    /** weight: double */
-    private double weight;
-
-
     private TaskOneTypeAccessor() {
     }
 
-    public void setVertex(String id, int user_id, int target_user_id,
+    public void setVertex(String id, int login_user_id, int target_user_id,
                           int length, LinkedList<Integer> path) {
-        System.out.println("[Task1:setVertex] id: " + id + ", user id: " + user_id +
+        System.out.println("[Task1:setVertex] id: " + id + ", user id: " + login_user_id +
                     "target: " + target_user_id + ", path length: " + length);
         this.id = id;
-        this.user_id = user_id;
+        this.login_user_id = login_user_id;
         this.target_user_id = target_user_id;
         this.length = length;
         this.path = path;
@@ -77,7 +71,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
     private String assembleFields() {
         JsonObjectBuilder model = Json.createObjectBuilder()
                 .add("id", id)
-                .add("user_id", user_id)
+                .add("login_user_id", login_user_id)
                 .add("target_user_id", target_user_id)
                 .add("length", length);
 

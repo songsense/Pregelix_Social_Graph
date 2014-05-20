@@ -21,14 +21,15 @@ public class DatabaseInitializer {
     private static final String INIT_DISPLAY_STATEMENT =
             "create type DisplayGraphType as open {" +
                 "id: string," +
-                "user_id: int32," +
+                "login_user_id: int32," +
+                "source_node: int32," +
                 "label: string," +
                 "target_nodes: [int32]" +
             "}" +
-            "create dataset DisplayGraph(DisplayGraphType) primary key user_id;";
-
+            "create dataset DisplayGraph(DisplayGraphType) primary key id;";
 
     // FIXME: still use this?
+    @Deprecated
     private static final String INIT_BACKBONE_STATEMENT =
             "drop dataverse BackBoneGraph if exists;" +
             "create dataverse BackBoneGraph;" +
@@ -82,13 +83,13 @@ public class DatabaseInitializer {
             // task 1
             "create type TaskOneType as open{" +
                 "id: string," +
-                "user_id: int32," +
+                "login_user_id: int32," +
                 "target_user_id: int32," +
                 "length: int32," +
                 "path: [int32]" +
             "};" +
             "create dataset TaskOne(TaskOneType) primary key id;" +
-            "create index TaskOneIdx on TaskOne(user_id);" +
+            "create index TaskOneIdx on TaskOne(login_user_id);" +
             // task 2
             "create type TaskTwoType as open {" +
                 "user_id: int32," +
