@@ -45,7 +45,7 @@ def getGraph(graphPath):
 	listFile = os.listdir(graphPath)
 	return listFile[0]
 
-def runTask(taskName, pregelixPath, projectJarPath, className, graphPath, outputPath, getIp, portNo,iterations, graphSize):
+def runTask4(taskName, pregelixPath, projectJarPath, className, graphPath, outputPath, getIp, portNo,iterations, graphSize):
 	script = "bin/pregelix " + projectJarPath + " " 
 	script = script + className + " -inputpaths " + graphPath 
 	script = script + " -outputpath " + outputPath + " -ip " + getIp 
@@ -134,16 +134,16 @@ def saveTask4ToDB(admFileName):
 		print "Encountered connection error; stopping execution with code: " + str(response)
 		sys.exit(1)
 
-if __name__ == '__main__':
+	def task4():
 	graphName = getGraph(graphPath)
 	print "get the number of vertexes in the graph..."
 	graphSize = open(graphPath+graphName,'rb').read().count('\n')
 	print "the vertexes # in the graph: ", graphSize
 	
 	print "begin running Pregelix Jobs..."
-	runTask(stTaskName, pregelixPath, 
+	runTask4(stTaskName, pregelixPath, 
 		projectJarPath, stMainClassName, graphPath, stOutputPath, getIp, portNo, iterations, graphSize)
-	runTask(pageRankTaskName, pregelixPath, 
+	runTask4(pageRankTaskName, pregelixPath, 
 		projectJarPath, pageRankClassName, graphPath, pageRankOutputPath, getIp, portNo, iterations, graphSize)
 
 	print "analyze the results of CDS..."

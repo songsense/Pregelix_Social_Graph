@@ -15,10 +15,7 @@
 
 package edu.uci.ics.biggraph.client;
 
-import edu.uci.ics.biggraph.algo.PageRankVertex;
-import edu.uci.ics.biggraph.algo.SocialSuggestionVertex;
-import edu.uci.ics.biggraph.algo.SubGraphVertex;
-import edu.uci.ics.biggraph.algo.WeightedShortestPathVertex;
+import edu.uci.ics.biggraph.algo.*;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.core.base.IDriver.Plan;
 import edu.uci.ics.pregelix.core.driver.Driver;
@@ -93,11 +90,18 @@ public class Client {
         FileOutputFormat.setOutputPath(job, new Path(options.outputPath));
         job.getConfiguration().setLong(PregelixJob.NUM_VERTICE, options.numVertices);
         job.getConfiguration().setLong(PregelixJob.NUM_EDGES, options.numEdges);
+
+        // specific for task 1: shortest path
         job.getConfiguration().setLong(WeightedShortestPathVertex.SOURCE_ID, options.sourceId);
+
+        // specific for task 2: community clusters
+        job.getConfiguration().setLong(CommunityClusterVertex.COMMUITY_CLUSTER_ITERATIONS, options.maxIterations);
         
         // specific for task 3: social suggestion
         job.getConfiguration().setLong(SocialSuggestionVertex.ITERATIONS, options.maxIterations);
         job.getConfiguration().setLong(SocialSuggestionVertex.NUM_RESULTS, options.numResults);
+
+        // specific for spanning tree: no need
 
         // specific for pagerank:
         job.getConfiguration().setLong(PageRankVertex.ITERATIONS, options.maxIterations);
