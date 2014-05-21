@@ -35,6 +35,7 @@ if __name__ == '__main__':
 	for line in results:
 		line = line.replace("\n","")
 		line = line.replace("int32:","")
+		line = line.replace("orderedlist:","")
 		line = line.replace("{","")
 		line = line.replace("}","")
 		line = "{" + line + "}"

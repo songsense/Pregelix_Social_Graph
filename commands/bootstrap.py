@@ -72,6 +72,18 @@ def bootstrap():
                                importance: double
                         }
                         create dataset TaskFour(TaskFourType) primary key user_id;
+
+                        drop dataverse Account if exists;
+                         create dataverse Account;
+                         use dataverse Account;
+
+                         create type AccountType as open{
+                               user_id: int32,
+                               label: string,      
+                               password: string
+                        }
+
+                        create dataset AccountInfo(AccountType) primary key user_id;
                     '''
 
     ddl = {
