@@ -9,8 +9,8 @@ cd ${PREGELIX_LIB_HOME}
 #bin/startCluster.sh
 
 echo ********Starting the main program**********
-if [ $1 ==  ]; then 
-	echo argument needed
+if [ $# != 1 ]; then 
+	echo Usage: ./run.sh \[1,2,3,5,rebuild\]
 	exit
 fi
 
