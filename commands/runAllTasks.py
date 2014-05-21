@@ -5,7 +5,7 @@ import task4
 pregelixPath = "/Users/soushimei/Documents/pregelix/hyracks/pregelix/pregelix-dist/target/pregelix-dist-0.2.9-binary-assembly/"
 # path to the graph
 ## change here for your path
-graphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/"
+graphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/data/graph/"
 ## change here for your path
 projectJarPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/project-0.2.9-jar-with-dependencies.jar"
 # path to spanning tree results
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
 	# run task four
 	print "run task four..."
-	task4.task4()
+	task4.task4(pregelixPath, graphPath, projectJarPath)
 
 	# run display graph
 	print "run display graph task..."
