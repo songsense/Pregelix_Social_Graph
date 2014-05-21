@@ -6,23 +6,14 @@ pageRankDict = {}
 stDict = {}
 # final result
 finalResults = {}
-# path to pregelix
-## change here for your path
-pregelixPath = "/Users/soushimei/Documents/pregelix/hyracks/pregelix/pregelix-dist/target/pregelix-dist-0.2.9-binary-assembly/"
 # path to spanning tree results
 stOutputPath = "/tmp/pregelix/st/"
 # path to pageRank results
 pageRankOutputPath = "/tmp/pregelix/pageRank/"
-# path to the graph
-## change here for your path
-graphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/"
 # graph name
 graphName = ""
 # graph size
 graphSize = 0
-# jar path to our project
-## change here for your path
-projectJarPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/project-0.2.9-jar-with-dependencies.jar"
 # spanning tree main class name
 stMainClassName = "edu.uci.ics.biggraph.algo.SpanningTreeVertex"
 # spanning tree task name
@@ -134,7 +125,7 @@ def saveTask4ToDB(admFileName):
 		print "Encountered connection error; stopping execution with code: " + str(response)
 		sys.exit(1)
 
-	def task4():
+def task4(pregelixPath, graphPath, projectJarPath):
 	graphName = getGraph(graphPath)
 	print "get the number of vertexes in the graph..."
 	graphSize = open(graphPath+graphName,'rb').read().count('\n')

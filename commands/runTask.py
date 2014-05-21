@@ -7,7 +7,7 @@ pregelixPath = "/Users/soushimei/Documents/pregelix/hyracks/pregelix/pregelix-di
 outputPath = "/tmp/pregelix/results/"
 # path to the graph
 ## change here for your path
-graphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/"
+graphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/data/graph/"
 ## change here for your path
 projectJarPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/project-0.2.9-jar-with-dependencies.jar"
 # get ip script
@@ -37,6 +37,7 @@ def runTask(taskName, pregelixPath, projectJarPath, className, graphPath, output
 	file = open(filePathName, 'w')
 	file.write(script)
 	file.close()
+	print "begin to run job with command: ", script
 	st = os.stat(filePathName)
 	os.chmod(filePathName, st.st_mode | 0111)
 	os.system(filePathName)
