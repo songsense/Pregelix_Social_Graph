@@ -33,12 +33,12 @@ public class WeightedPathWriter extends
         String id = SOURCE_ID + "_" + targetUserId;
         ArrayList<Double> pathInDouble = vertex.getVertexValue().getPathArrayList();
         LinkedList<Integer> path = new LinkedList<Integer>();
-        int length = path.size();
 
         for (double node : pathInDouble) {
             int n = (int) node;
             path.add(n);
         }
+        int length = path.size();
 
         TaskOneTypeAccessor t = TaskOneTypeAccessor.getInstance();
 //        t.setVertex(targetUserId, weight, path);
