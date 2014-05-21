@@ -214,56 +214,68 @@ var Renderer = function(canvas){
 
 
 /*---- global variable ----*/
-//var pathGraph = "/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/";
 
+//The path to store the graph files in the server
+//var pathGraph = "/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/";
 var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/";
 
 var sys;
 
 var fileName;
 
-
+//color for different comminities
 var colorArray=["#CA7A2C", "#E03C8A", "#42AA5D", "#DB4D6D", "#64363C","#D0104C","#E2943B","#77428D","#E87A90","#787878"];
 
 var numColor = colorArray.length;
 
+//the time interval to query dataset Protocol
 var timeOut = 1300;
 
+//Hash table. Key: label, Value: node_id
 var labelNodeIDTable = {};
 
 var preSourceNode = "0";
 
 var preIterNum = "0";
 
+//array to store colored nodes
 var coloredNodes = [];
 
+//array to store colored edges
 var coloredEdges = [];
 
 var defaultNodeColor = "#4F726C";
 
 var defaultEdgeColor = "#535953";
 
+//array to store all nodes
 var allNodes = [];
 
+//array to store all edges
 var allEdges = [];
 
 
-//var nodeIDStr = "";
-
+/*
+clear coloredNodes, colored Edges and labelNOdeIDTable
+*/
 function clearColoredNodesAndEdges(){
 	coloredNodes = [];
 	coloredEdges = [];
 	labelNodeIDTable = {};
 }
 
-
+/*
+Render for drawing graph
+*/
 function initializeRender(){
 	sys = arbor.ParticleSystem(3500, 50, 0.5);
     sys.parameters({gravity:true});
     sys.renderer = Renderer('#graph');
 }
 
-
+/*
+initialize the communication dataverse
+*/
 function initializeCommunication(){
 
 
@@ -280,10 +292,16 @@ function initializeCommunication(){
     xmlhttp2.send();
 }
 
+/*
+upload the file to server
+*/
 function uploadFile(){
 	$('form').submit();
 }
 
+/*
+delete all nodes and edges in the graph
+*/
 function deleteAllNodesAndEdges(){
 	//alert("delete");
 	for(var i=0; i<allEdges.length; ++i){
@@ -303,13 +321,10 @@ function deleteAllNodesAndEdges(){
 	allNodes = [];
 }
 
+/*
+draw the graph
+*/
 function drawGraph(dom, res){
-    //var sys = arbor.ParticleSystem(100, 50, 0.1);
-    /*
-    sys = arbor.ParticleSystem(3500, 50, 0.5);
-    sys.parameters({gravity:true});
-    sys.renderer = Renderer(dom);
-    */
     
     deleteAllNodesAndEdges();
     var nodeSet = {};
@@ -338,144 +353,9 @@ function drawGraph(dom, res){
     }
 }
 
-function loadGraph(){
-    
-    $('#tips').html("");
-    
-
-    var A = new AsterixDBConnection().dataverse("OriginalGraph");
-    var expression0a = new FLWOGRExpression()
-	.ForClause("$node", new AExpression("dataset Graph"))
-	.ReturnClause("$node");
-    
-    var success = function(res){
-		drawGraph('#graph', res["results"]);
-		var connector = new AsterixDBConnection().dataverse("Communication");
-		var expressionGetProtocol = new FLWOGRExpression()
-	    .ForClause("$node", new AExpression("dataset Protocol"))
-	    .ReturnClause("$node");
-		var successGetProtocol = function(tempres){
-		    var res=tempres["results"];
-		    for(i in res){
-			var resJson = eval('('+res[i]+')');
-			var task1_status = resJson.task1_status.int32.toString();
-			var task2_status = resJson.task2_status.int32.toString();
-			var task3_status = resJson.task3_status.int32.toString();
-			var number_of_iterations = resJson.number_of_iterations.int32.toString();
-			var source_id = resJson.source_id.int32.toString();
-			var target_id = resJson.target_id.int32.toString();
-			var number_of_results = resJson.number_of_results.int32.toString();
-			var load_graph = "2";
-			//var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
-			var graph_file_path = pathGraph+'/'+fileName;
-			//alert(graph_file_path);
-			var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0,"load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
-			//alert(querySetFlag);
-			
-			var xmlhttp2;
-			if(window.XMLHttpRequest){
-			    xmlhttp2 = new XMLHttpRequest();
-			}
-			else{
-			    xmlhttp2 = new ActiveXObject("Microsoft.XMLHTTP");
-			}
-			
-			xmlhttp2.open("GET", "http://localhost:19002/update?statements="+querySetFlag);
-			xmlhttp2.send();
-		    }
-		}
-		connector.query(expressionGetProtocol.val(), successGetProtocol);
-    }
-    A.query(expression0a.val(),  success);
-}
-
-
-
-function loadGraphFirstTime(){
-
-	//$('#iframeID1').html("");
-
-	//alert("load");
-
-	clearColoredNodesAndEdges();
-
-	initializeCommunication();
-
-    fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
-
-    var queryCreate = 'drop dataverse OriginalGraph if exists; create dataverse OriginalGraph; use dataverse OriginalGraph; create type GraphType as open{source_node: int32, label: string, target_node:{{int32}}, weight:{{double}}} \n create dataset Graph(GraphType) primary key source_node;';
-
-    var queryUpdate = 'use dataverse OriginalGraph; load dataset Graph using localfs(("path"="localhost://'+pathGraph+fileName+'"),("format"="adm"));';
-    
-    //alert(queryCreate);
-    //alert(queryUpdate);
-    var xmlhttp;
-    if(window.XMLHttpRequest){
-		xmlhttp = new XMLHttpRequest();
-    }
-    else{
-		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-    }
-    //xmlhttp = new XDomainRequest();
-    //alert(queryUpdate);
-    xmlhttp.open("GET","http://localhost:19002/ddl?ddl="+queryCreate);
-    xmlhttp.send();
-    
-    xmlhttp.onreadystatechange=function(){
-		var xmlhttp1;
-		if(window.XMLHttpRequest){
-		    xmlhttp1 = new XMLHttpRequest();
-		}
-		else{
-		    xmlhttp1 = new ActiveXObject("Microsoft.XMLHTTP");
-		}
-		//alert(queryCreate);
-		xmlhttp1.open("GET", "http://localhost:19002/update?statements="+queryUpdate);
-		xmlhttp1.send();
-		xmlhttp1.onreadystatechange=function(){
-		    loadGraph();
-		}
-    }
-}
-
-function drawGraphTask1(target_id){
-    var connTask1 = new AsterixDBConnection().dataverse("Tasks");
-    var whereClauseStr = '$node.target_node='+target_id;
-    //alert(whereClauseStr);
-    var expTask1 = new FLWOGRExpression()
-	.ForClause("$node", new AExpression("dataset TaskOne"))
-	.WhereClause(new AExpression(whereClauseStr))
-	.ReturnClause("$node");
-    var succTask1 = function(tempres){
-        var res = tempres["results"];
-        for(i in res){
-            var resJson = eval('('+res[i]+')');
-            var path = resJson.path.orderedlist;
-            //draw graph
-            //alert("start:"+path[0].int32.toString());
-            sys.getNode(path[0].int32.toString()).data.color="#FF0000";
-            sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
-	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
-	    	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
-            for(var j=1; j<path.length-1; ++j){
-                if(j!=1){
-                    sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
-		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
-				}
-            	var sourceNodeObj = sys.getNode(path[j].int32.toString());
-            	var targetNodeObj = sys.getNode(path[j+1].int32.toString());
-            	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-            	sys.pruneEdge(edgeArray[0]);
-            	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
-				edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-				coloredEdges.push(edgeArray[0]);
-           
-            }
-        }
-    }
-    connTask1.query(expTask1.val(), succTask1);
-}
-
+/*
+change the color of nodes and edges to default color
+*/
 function clearNodeEdgeColor(){
 
     for(var i=0; i<coloredNodes.length; ++i){
@@ -507,9 +387,95 @@ function clearNodeEdgeColor(){
 	}
 }
 
+function loadGraph(){
+
+	clearColoredNodesAndEdges();
+
+	initializeCommunication();
+
+    fileName = $("#filePath").val().replace(/^.*[\\\/]/, '');
+
+    var queryCreate = 'drop dataverse OriginalGraph if exists; create dataverse OriginalGraph; use dataverse OriginalGraph; create type GraphType as open{source_node: int32, label: string, target_node:{{int32}}, weight:{{double}}} \n create dataset Graph(GraphType) primary key source_node;';
+
+    var queryUpdate = 'use dataverse OriginalGraph; load dataset Graph using localfs(("path"="localhost://'+pathGraph+fileName+'"),("format"="adm"));';
+    
+    //use Ajax to create database
+    var xmlhttp;
+    if(window.XMLHttpRequest){
+		xmlhttp = new XMLHttpRequest();
+    }
+    else{
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.open("GET","http://localhost:19002/ddl?ddl="+queryCreate);
+    xmlhttp.send();
+    
+    xmlhttp.onreadystatechange=function(){
+		var xmlhttp1;
+		if(window.XMLHttpRequest){
+		    xmlhttp1 = new XMLHttpRequest();
+		}
+		else{
+		    xmlhttp1 = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		//use Ajax to load data 
+		xmlhttp1.open("GET", "http://localhost:19002/update?statements="+queryUpdate);
+		xmlhttp1.send();
+    }
+}
+
+/*
+draw the graph of task 1
+*/
+function drawGraphTask1(target_id){
+
+	//query the path of target id
+    var connTask1 = new AsterixDBConnection().dataverse("Tasks");
+    var whereClauseStr = '$node.target_node='+target_id;
+    var expTask1 = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset TaskOne"))
+	.WhereClause(new AExpression(whereClauseStr))
+	.ReturnClause("$node");
+    var succTask1 = function(tempres){
+        var res = tempres["results"];
+        for(i in res){
+            var resJson = eval('('+res[i]+')');
+            var path = resJson.path.orderedlist;
+            
+            //change the colors of source node and target node
+            sys.getNode(path[0].int32.toString()).data.color="#FF0000";
+            sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
+	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
+	    	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
+
+	    	// change the color of intermedia nodes
+            for(var j=1; j<path.length-1; ++j){
+                if(j!=1){
+                    sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
+				}
+            	var sourceNodeObj = sys.getNode(path[j].int32.toString());
+            	var targetNodeObj = sys.getNode(path[j+1].int32.toString());
+            	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+            	sys.pruneEdge(edgeArray[0]);
+            	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
+				edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+				coloredEdges.push(edgeArray[0]);
+           
+            }
+        }
+    }
+    connTask1.query(expTask1.val(), succTask1);
+}
+
+
 function runTask1(){
     
     clearNodeEdgeColor();
+
+    //get source label and target label. And judge if nodes are legal
     var source_label = $('#source_id').val().toString();
     var target_label = $('#target_id').val().toString();
     if(!(source_label in labelNodeIDTable && target_label in labelNodeIDTable)){
@@ -521,6 +487,7 @@ function runTask1(){
     
     $('#tips').html("");
     
+    //get current statuses of database
     var connector = new AsterixDBConnection().dataverse("Communication");
     var expressionGetProtocol = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset Protocol"))
@@ -534,18 +501,20 @@ function runTask1(){
 		    var task2_status = resJson.task2_status.int32.toString();
 		    var task3_status = resJson.task3_status.int32.toString();
 		    var number_of_iterations = resJson.number_of_iterations.int32.toString();
-		    //var graph_file_path = resJson.graph_file_path;
-	            var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
+		    var graph_file_path = resJson.graph_file_path + "/" + fileName;
+	        //var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 		    var number_of_results = resJson.number_of_results.int32.toString();
 		    
 		    var task1_status = resJson.task1_status.int32.toString();
 		    var source_id = source_node;
 		    var target_id = target_node;
+		    //if there is no results in dataset or source node changed, we need to recompute
 	        if(task1_status=="0" || preSourceNode!=source_id){
 				task1_status="1";
 				preSourceNode = source_id;
 		        var querySetFlag = 'use dataverse Communication; delete $node from dataset Protocol; insert into dataset Protocol({"id":0, "load_graph":'+load_graph+',"task1_status":'+task1_status+',"task2_status":'+task2_status+',"task3_status":'+task3_status+',"graph_file_path":"'+graph_file_path+'", "number_of_iterations":'+number_of_iterations+',"source_id":'+source_id+',"target_id":'+target_id+',"number_of_results":'+number_of_results+'});';
 		        var xmlhttp3;
+		        //use Ajax to set values of Protocol dataset
 		        if(window.XMLHttpRequest){
 			    	xmlhttp3 = new XMLHttpRequest();
 		        }
@@ -557,6 +526,7 @@ function runTask1(){
 		        xmlhttp3.send();
 		        xmlhttp3.onreadystatechange=function(){
 
+		        	//query Protocol repeatedly until the computed results are ready
 				    var c = new AsterixDBConnection().dataverse("Communication");
 				    var e = new FLWOGRExpression()
 				        .ForClause("$node", new AExpression("dataset Protocol"))
@@ -565,7 +535,6 @@ function runTask1(){
 			        	var res=tempres["results"];
 			        	for(i in res){
 					    	var resJson = eval('('+res[i]+')');
-					    	//alert(resJson.task1_status.int32);
 					    	if(resJson.task1_status.int32!=2){
 					        	if(resJson.task1_status.int32==1)
 					            	$('#graphDiplayStatus').html('Graph Display: <span style="color:#DB4D6D">Processing!</span>');
@@ -594,7 +563,8 @@ function runTask1(){
 function drawGraphTask2(nodeID){
     //get the commit_id
     var whereClauseStr = "$node.node_id="+nodeID;
-    //alert(whereClauseStr);
+ 
+ 	//query the comminity id of input node
     var connectorGetCommID = new AsterixDBConnection().dataverse("Tasks");
     var expressionGetCommID = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset TaskTwo"))
@@ -603,6 +573,7 @@ function drawGraphTask2(nodeID){
     var successGetCommID = function(resCommIDTemp){
         var resCommID = resCommIDTemp["results"];
         for(j in resCommID){
+        	//get the nodes with same community
             var resJson = eval('('+resCommID[j]+')');
             var commID = resJson.community_id.int32.toString();
             var commIDNum = resJson.community_id.int32;
@@ -614,15 +585,18 @@ function drawGraphTask2(nodeID){
 			.ReturnClause("$node");
             var successGetNode = function(resNodeTemp){
                 var resNode = resNodeTemp["results"];
-                //draw graph
+                
+                //change the color of nodes with same comminity
+                //In order to flush the memory (such that the changed color can be displayed automatically,
+                // we have to add node "-1" and "-2" first and then delete them
                 sys.addNode("-1", {label:"-1", color:"#FFFFFF"});
                 sys.addNode("-2", {label:"-2", color:"#FFFFFF"});
                 for(m in resNode){
                     var resJson = eval('('+resNode[m]+')');
                     var nodeStr = resJson.node_id.int32.toString();
-                    //alert(nodeStr);
                     sys.getNode(nodeStr).data.color=colorArray[commIDNum%numColor];
 		    		coloredNodes.push(sys.getNode(nodeStr));
+
                     // renew graph
                     sys.addEdge("-1", "-2", {directed:false, color:"#FFFFFF"})
                     var edgeArray = sys.getEdges("-1","-2");
@@ -642,8 +616,7 @@ function drawGraphTask2(nodeID){
 
 function runTask2(){
 
-    //set flag
-    //alert("run task2");
+    
     clearNodeEdgeColor();
     var nodeLabel = $('#task2_node').val().toString();
     if(!(nodeLabel in labelNodeIDTable)){
@@ -669,8 +642,8 @@ function runTask2(){
 		    var task2_status = resJson.task2_status.int32.toString();
 		    var task3_status = resJson.task3_status.int32.toString();
 		    var number_of_iterations = numIterStr;
-		    //var graph_file_path = resJson.graph_file_path;
-            var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
+		    var graph_file_path = resJson.graph_file_path+'/'+fileName;
+            //var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 	    	var source_id = resJson.source_id.int32.toString();
 	    	var target_id = resJson.target_id.int32.toString();
 	    	var number_of_results = resJson.number_of_results.int32.toString();
@@ -690,7 +663,6 @@ function runTask2(){
 	        	xmlhttp3.send();
 
 	        	xmlhttp3.onreadystatechange=function(){
-		    	//alert("change");
 			    	var c = new AsterixDBConnection().dataverse("Communication");
 			    	var e = new FLWOGRExpression()
 			        .ForClause("$node", new AExpression("dataset Protocol"))
@@ -724,18 +696,15 @@ function runTask2(){
 function drawGraphTask3(nodeID, inputFriendNum){
     var connTask3 = new AsterixDBConnection().dataverse("Tasks");
     var whereClauseStr = '$node.node_id='+nodeID;
-    //alert(whereClauseStr);
     var expTask3 = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset TaskThree"))
 	.WhereClause(new AExpression(whereClauseStr))
-    //.WhereClause(new AExpression("$node.target_node = 3"))
 	.ReturnClause("$node");
     var succTask3 = function(tempres){
         var res = tempres["results"];
         sys.addNode("-1", {label:"-1", color:"#FFFFFF"});
         sys.addNode("-2", {label:"-2", color:"#FFFFFF"});
         for(i in res){
-            //alert("draw");
             var resJson = eval('('+res[i]+')');
             var suggestedFriends = resJson.suggested_friends.orderedlist;
             var friendNum = suggestedFriends.length;
@@ -791,8 +760,8 @@ function runTask3(){
 		    var task2_status = resJson.task2_status.int32.toString();
 		    var task3_status = resJson.task3_status.int32.toString();
 		    var number_of_iterations = numIterStr;
-		    //var graph_file_path = resJson.graph_file_path;
-	            var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
+		    var graph_file_path = resJson.graph_file_path+'/'+fileName;
+	        //var graph_file_path = pathGraph.substr(0, pathGraph.length-4)+"txt/"+fileName.substr(0, fileName.length-3)+"txt";
 		    var source_id = resJson.source_id.int32.toString();
 		    var target_id = resJson.target_id.int32.toString();
 		    var number_of_results = numFriendsStr;
@@ -850,7 +819,7 @@ $(document).ready(function(){
 
     $("#filePath").change(uploadFile);
 
-    $("#iframeID1").load(loadGraphFirstTime);
+    $("#iframeID1").load(loadGraph);
 
     $("#runTask1").click(runTask1);
 
