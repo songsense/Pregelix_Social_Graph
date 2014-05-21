@@ -136,6 +136,8 @@ def task4(pregelixPath, graphPath, projectJarPath):
 		projectJarPath, stMainClassName, graphPath, stOutputPath, getIp, portNo, iterations, graphSize)
 	runTask4(pageRankTaskName, pregelixPath, 
 		projectJarPath, pageRankClassName, graphPath, pageRankOutputPath, getIp, portNo, iterations, graphSize)
+	
+	global pageRankDict, stDict, finalResults
 
 	print "analyze the results of CDS..."
 	analyzeResults(stOutputPath, stDict)
@@ -154,7 +156,5 @@ def task4(pregelixPath, graphPath, projectJarPath):
 	print "save the final results to the AsterixDB..."
 	saveTask4ToDB(admFileName)
 	print "all done!"
-	
-
 
 
