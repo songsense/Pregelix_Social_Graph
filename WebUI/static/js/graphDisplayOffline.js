@@ -249,6 +249,7 @@ function clearGraphVariables(){
 	coloredNodes = [];
 	coloredEdges = [];
 	labelNodeIDTable = {};
+	nodeSet = {};
 }
 
 
@@ -401,36 +402,74 @@ function loadGraph(){
 /*
 draw Task1
 */
-function drawGraphTask1(sourceNode, targetNode){
+function drawTaskOne(sourceNode, targetNode){
 	var connTask1 = new AsterixDBConnection().dataverse("Tasks");
     var whereClauseSourceNodeStr = '$node.login_user_id='+sourceNode;
     var whereClauseTargetNodeStr = '$node.target_user_id='+targetNode;
     //alert(whereClauseStr);
     var expTask1 = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset TaskOne"))
-	.WhereClause(new AExpression(whereClauseSourceNodeStr), new AExpression(whereClauseTargetNodeStr))
+	.WhereClause().and(new AExpression(whereClauseSourceNodeStr), new AExpression(whereClauseTargetNodeStr))
 	.ReturnClause("$node");
 	var succTask1 = function(tempres){
-
+		var res = tempres["results"];
+        for(i in res){
+            var resJson = eval('('+res[i]+')');
+            var path = resJson.path.orderedlist;
+            //draw graph
+            // for(var j=0; j<path.length; ++j)
+            	// alert(path[j].int32.toString());
+            sys.getNode(path[0].int32.toString()).data.color="#FF0000";
+            sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
+	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
+	    	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
+            for(var j=1; j<path.length-1; ++j){
+                if(j!=1){
+                	if(path[j].int32.toString() in nodeSet){
+                    	sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		    			coloredNodes.push(sys.getNode(path[j].int32.toString()));
+		    			//draw edges in the graph
+		    			var sourceNodeObj = sys.getNode(path[j].int32.toString());
+            			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
+		            	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+		            	sys.pruneEdge(edgeArray[0]);
+		            	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
+						edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+						coloredEdges.push(edgeArray[0]);
+		    		}
+		    		else{
+		    			//add two nodes and add two edges
+		    		}
+				}
+           
+            }
+        }
 	}
 	connTask1.query(expTask1.val(), succTask1);
 }
 
+function drawTaskOneOutDisplayGraph(sourceNode, targetNode){
+
+}
 
 /*
 run task 1
 */
 function runTask1(){
-	return;
-	if(loginStatus == false){
+	if(logInStatus == false){
 		alert("Please login first!");
 		return;
 	}
 	clearNodeEdgeColor();
 	var targetNode = $('#target_id').val().toString();
 	var sourceNode = logInUserId;
-	if(true)
-	drawGraphTask1(sourceNode, targetNode);
+	drawTaskOne(sourceNode, targetNode);
+	/*if(targetNode in nodeSet){
+		drawTaskOneInDisplayGraph(sourceNode, targetNode);
+	}
+	else{
+		drawTaskOneOutDisplayGraph(sourceNode, targetNode);
+	}*/
 }
 
 
@@ -444,7 +483,7 @@ $(document).ready(function(){
 
     //$("#iframeID1").load(loadGraphFirstTime);
 
-    //$("#runTask1").click(runTask1);
+    
 
     //$("#runTask2").click(runTask2);
 
@@ -462,6 +501,8 @@ $(document).ready(function(){
     $('#logOutButton').click(logOut);
 
     $('#iframeID1').load(checkAndLoadGraph);
+
+    $("#runTask1").click(runTask1);
 
 
 });
