@@ -1,6 +1,12 @@
 package edu.uci.ics.biggraph.inputformat;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * ADMParser - Convert ADM graph file like:
@@ -22,6 +28,39 @@ public class ADMParser {
      *
      * It's hard coded.
      */
+    public static ArrayList<String> ADM2Graph2(String line) {
+        if (line == null || line.length() == 0) {
+            return null;
+        }
+        System.out.println("In ADM2Graph: " + line);
+
+
+        ArrayList<String> ret = new ArrayList<String>();
+        JsonReader jsonReader = Json.createReader(new StringReader(line));
+        Map map = jsonReader.readObject();
+
+        // source_node
+        ret.add(map.get("source_node").toString());
+
+        // target_node (label skipped) and weight
+        JsonArray targetNodes = (JsonArray) map.get("target_nodes");
+        JsonArray weights = (JsonArray) map.get("weight");
+        int size = targetNodes.size();
+        if (size != weights.size()) {
+            System.err.println("ADM2Graph: wrong formated line!");
+            return null;
+        }
+        ret.add(Integer.toString(size));
+        for (int i = 0; i < size; i++) {
+            ret.add(targetNodes.get(i).toString());
+            ret.add(weights.get(i).toString());
+        }
+
+        return ret;
+    }
+
+
+    @Deprecated
     public static ArrayList<String> ADM2Graph(String line) {
         if (line == null || line.length() == 0) {
             return null;
@@ -136,7 +175,7 @@ public class ADMParser {
      * Split one line of ADM graph file into separate tokens.
      */
     public static String[] split(String line) {
-        ArrayList<String> slist = ADMParser.ADM2Graph(line.toString());
+        ArrayList<String> slist = ADMParser.ADM2Graph2(line.toString());
         int size = slist.size();
         String[] fields = new String[size];
 
@@ -150,7 +189,7 @@ public class ADMParser {
     public static void main(String[] args) {
         Object[] list;
         String str = args[0];
-        list = ADM2Graph(str).toArray();
+        list = ADM2Graph2(str).toArray();
         for (Object s : list) {
             System.out.println((String) s);
         }

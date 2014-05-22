@@ -17,20 +17,20 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
     }
 
     /* Fields specification */
-    /** node_id: int32 (primary key) */
-    private int node_id;
+    /** user_id: int32 (primary key) */
+    private int user_id;
     /** community_id: int32 */
     private int community_id;
 
     private TaskTwoTypeAccessor() {
     }
 
-    synchronized public void setVertex(int node_id, int community_id) {
+    synchronized public void setVertex(int user_id, int community_id) {
         synchronized (this) {
-            System.out.println("[TaskTwo: setVertex]:" + node_id + " " + community_id);
-            assert node_id >= 0;
+            System.out.println("[TaskTwo: setVertex]:" + user_id + " " + community_id);
+            assert user_id >= 0;
 
-            this.node_id = node_id;
+            this.user_id = user_id;
             this.community_id = community_id;
         }
     }
@@ -52,7 +52,7 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
     @Override
     public void storeEntry() throws IOException {
         synchronized (this) {
-            System.out.println("[Task2 storeEntry():" + node_id);
+            System.out.println("[Task2 storeEntry():" + user_id);
             removeEntry();
 
             String url = makeURL();
@@ -62,7 +62,7 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
 
     private String assembleFields() {
         JsonObjectBuilder model = Json.createObjectBuilder()
-                .add("node_id", node_id)
+                .add("user_id", user_id)
                 .add("community_id", community_id);
 
         return model.build().toString();
@@ -81,8 +81,8 @@ public class TaskTwoTypeAccessor extends DataTypeAccessor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("use dataverse Tasks;");
-        sb.append("delete $t from dataset TaskTwo where $t.node_id = " +
-                node_id + ";");
+        sb.append("delete $t from dataset TaskTwo where $t.user_id = " +
+                user_id + ";");
 
         String cmd = sb.toString();
         cmd = URLGenerator.cmdParser(cmd);

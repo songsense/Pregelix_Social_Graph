@@ -1,5 +1,6 @@
 package edu.uci.ics.biggraph.outputformat;
 
+import edu.uci.ics.biggraph.algo.WeightedShortestPathVertex;
 import edu.uci.ics.biggraph.io.FloatWritable;
 import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.io.WeightedPathWritable;
@@ -28,8 +29,8 @@ public class WeightedPathWriter extends
         getRecordWriter().write(new Text(vertex.getVertexId().toString()),
                 new Text(vertex.getVertexValue().toString() ));
 
-        int targetId = (int) vertex.getVertexId().get();
-        double weight = (int) vertex.getVertexValue().getWeight();
+        int targetUserId = (int) vertex.getVertexId().get();
+        String id = SOURCE_ID + "_" + targetUserId;
         ArrayList<Double> pathInDouble = vertex.getVertexValue().getPathArrayList();
         LinkedList<Integer> path = new LinkedList<Integer>();
 
@@ -37,9 +38,14 @@ public class WeightedPathWriter extends
             int n = (int) node;
             path.add(n);
         }
+        int length = path.size();
 
         TaskOneTypeAccessor t = TaskOneTypeAccessor.getInstance();
-        t.setVertex(targetId, weight, path);
+//        t.setVertex(targetUserId, weight, path);
+        t.setVertex(id, SOURCE_ID, targetUserId, length, path);
         t.storeEntry();
     }
+
+    public static final int SOURCE_ID = (int) Vertex.getContext().getConfiguration().
+            getLong(WeightedShortestPathVertex.SOURCE_ID, WeightedShortestPathVertex.SOURCE_ID_DEFAULT);
 }

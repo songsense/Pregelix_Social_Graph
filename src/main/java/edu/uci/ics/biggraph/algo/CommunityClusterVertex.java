@@ -20,13 +20,13 @@ public class CommunityClusterVertex extends Vertex<VLongWritable, VLongIntWritab
     VLongWritable msg2Sent = new VLongWritable();
     VLongIntWritable vertexValue2Set = new VLongIntWritable();
     /** Maximum iteration */
-    public static final String ITERATIONS = "SocialSuggestionVertex.iteration";
+    public static final String COMMUITY_CLUSTER_ITERATIONS = "SocialSuggestionVertex.iteration";
     private int maxIteration = -1;
 	
 	@Override
 	public void compute(Iterator<VLongWritable> msgIterator) throws Exception {
         // initialize the number of iteration
-        maxIteration = getContext().getConfiguration().getInt(ITERATIONS, 5);
+        maxIteration = getContext().getConfiguration().getInt(COMMUITY_CLUSTER_ITERATIONS, 5);
 
 		// initialize vertex id with maximum count
 		long maxVertexId = getVertexValue().getVertexId();

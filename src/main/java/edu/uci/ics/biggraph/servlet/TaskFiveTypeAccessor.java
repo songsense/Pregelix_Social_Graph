@@ -8,33 +8,40 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * Created by liqiangw on 4/28/14.
+ * Created by liqiangw on 5/19/14.
  */
-public class TaskThreeTypeAccessor extends DataTypeAccessor {
-    private static TaskThreeTypeAccessor ourInstance = new TaskThreeTypeAccessor();
+public class TaskFiveTypeAccessor extends DataTypeAccessor {
+
+    private static TaskFiveTypeAccessor ourInstance = new TaskFiveTypeAccessor();
 
     // FIXME: Should we eliminate singleton pattern?
-    public static TaskThreeTypeAccessor getInstance() {
+    public static TaskFiveTypeAccessor getInstance() {
 //        return ourInstance;
-        return new TaskThreeTypeAccessor();
+        return new TaskFiveTypeAccessor();
     }
 
     /* Fields specification */
-    /** user_id: int32 (primary key) */
-    private int user_id;
-    /** suggested_friends: [int32] */
-    private LinkedList<Integer> suggested_friends = null;
+    /** id: string */
+    private String id;
+    /** login_user_id: int32 */
+    private int login_user_id;
+    /** source_node: int32 */
+    private int source_node;
+    /** label: string */
+    private String label = "";
+    /** target_nodes: [int32] */
+    private LinkedList<Integer> target_nodes;
 
-    private TaskThreeTypeAccessor() {
+    private TaskFiveTypeAccessor() {
     }
 
-    public void setVertex(int user_id, LinkedList<Integer> suggested_friends) {
-        synchronized (this) {
-            assert user_id >= 0;
-
-            this.user_id = user_id;
-            this.suggested_friends = suggested_friends;
-        }
+    public void setVertex(String id, int login_user_id, int source_node,
+                          String label, LinkedList<Integer> target_nodes) {
+        this.id = id;
+        this.login_user_id = login_user_id;
+        this.source_node = source_node;
+        this.label = label;
+        this.target_nodes = target_nodes;
     }
 
     /**
@@ -53,32 +60,32 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
      */
     @Override
     public void storeEntry() throws IOException {
-        synchronized (this) {
-            removeEntry();
+        removeEntry();
 
-            String url = makeURL();
-            Commander.sendGet(url);
-        }
+        String url = makeURL();
+        Commander.sendGet(url);
     }
 
     private String assembleFields() {
         JsonObjectBuilder model = Json.createObjectBuilder()
-                .add("user_id", user_id);
+                .add("id", id)
+                .add("login_user_id", login_user_id)
+                .add("source_node", source_node)
+                .add("label", label);
 
-        Iterator<Integer> it = suggested_friends.iterator();
+        Iterator<Integer> it = target_nodes.iterator();
         JsonArrayBuilder t = Json.createArrayBuilder();
         while (it.hasNext()) {
             t.add(it.next());
         }
-//        t.addNull(); // requirement for ordered list
-        model.add("suggested_friends", t);
+        model.add("target_nodes", t);
 
         return model.build().toString();
     }
 
     private String makeURL() {
         String cmds = assembleFields();
-        String aql = URLGenerator.update("Tasks", "TaskThree", cmds);
+        String aql = URLGenerator.update("Graph", "DisplayGraph", cmds);
         aql = URLGenerator.cmdParser(aql);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.UPDATE, aql);
 
@@ -88,9 +95,9 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
     private void removeEntry() throws IOException {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("use dataverse Tasks;");
-        sb.append("delete $t from dataset TaskThree where $t.user_id = " +
-                user_id + ";");
+        sb.append("use dataverse Graph;");
+        sb.append("delete $t from dataset DisplayGraph where $t.id = " +
+                id + ";");
 
         String cmd = sb.toString();
         cmd = URLGenerator.cmdParser(cmd);
@@ -99,13 +106,6 @@ public class TaskThreeTypeAccessor extends DataTypeAccessor {
     }
 
     public static void main(String[] args) {
-        TaskThreeTypeAccessor one = getInstance();
-        LinkedList<Integer> path = new LinkedList<Integer>();
-        path.add(2);
-        path.add(3);
 
-        one.setVertex(1, path);
-        System.out.println(one.assembleFields());
-        System.out.println(one.makeURL());
     }
 }

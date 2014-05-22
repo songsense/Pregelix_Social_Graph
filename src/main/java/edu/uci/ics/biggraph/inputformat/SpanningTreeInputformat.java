@@ -31,8 +31,6 @@ public class SpanningTreeInputformat extends
 @SuppressWarnings("rawtypes")
 class SpanningTreeGraphReader extends
         TextVertexReader<VLongWritable, IntWritable, FloatWritable, HelloCntParentIdWritable> {
-
-    private final static String separator = " ";
     private Vertex vertex;
     private VLongWritable vertexId = new VLongWritable();
     private IntWritable vertexValue = new IntWritable();

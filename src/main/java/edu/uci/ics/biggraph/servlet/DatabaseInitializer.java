@@ -7,15 +7,29 @@ import java.io.IOException;
  */
 public class DatabaseInitializer {
     private static final String INIT_GRAPH_STATEMENT =
-            "drop dataverse OriginalGraph if exists;" +
-            "create dataverse OriginalGraph;" +
-            "use dataverse OriginalGraph;" +
+            "drop dataverse Graph if exists;" +
+            "create dataverse Graph;" +
+            "use dataverse Graph;" +
             "create type GraphType as open{" +
                 "source_node: int32," +
+                "label: string" +
                 "target_nodes: [int32]," +
-            "weight: [double]" +
+                "weight: [double]" +
             "};" +
-            "create dataset Graph(GraphType) primary key source_node;";
+            "create dataset OriginalGraph(GraphType) primary key source_node;";
+
+    private static final String INIT_DISPLAY_STATEMENT =
+            "create type DisplayGraphType as open {" +
+                "id: string," +
+                "login_user_id: int32," +
+                "source_node: int32," +
+                "label: string," +
+                "target_nodes: [int32]" +
+            "}" +
+            "create dataset DisplayGraph(DisplayGraphType) primary key id;";
+
+    // FIXME: still use this?
+    @Deprecated
     private static final String INIT_BACKBONE_STATEMENT =
             "drop dataverse BackBoneGraph if exists;" +
             "create dataverse BackBoneGraph;" +
@@ -26,6 +40,7 @@ public class DatabaseInitializer {
                 "weight: [double]" +
             "};" +
             "create dataset BackBoneNode(BackBoneNodeType) primary key source_node";
+
     private static final String INIT_COMMUNICATION_STATEMENT =
             "drop dataverse Communication if exists;" +
             "create dataverse Communication;" +
@@ -43,6 +58,7 @@ public class DatabaseInitializer {
                 "number_of_results: int32" +
             "};" +
             "create dataset Protocol(ProtocolType) primary key id;";
+
     private static final String INSERT_COMMUNICATION_STATEMENT =
             "use dataverse Communication;" +
             "insert into dataset Protocol" +
@@ -59,30 +75,44 @@ public class DatabaseInitializer {
                 "\"number_of_results\": 5" +
             "}" +
             ");";
+
     private static final String INIT_TASKS_STATEMENT =
             "drop dataverse Tasks if exists;" +
             "create dataverse Tasks;" +
             "use dataverse Tasks;" +
+            // task 1
             "create type TaskOneType as open{" +
-                "target_node: int32," +
-                "weight: double," +
+                "id: string," +
+                "login_user_id: int32," +
+                "target_user_id: int32," +
+                "length: int32," +
                 "path: [int32]" +
             "};" +
-            "create dataset TaskOne(TaskOneType) primary key target_node;" +
-            "create type TaskTwoType as open{" +
-                "node_id: int32," +
+            "create dataset TaskOne(TaskOneType) primary key id;" +
+            "create index TaskOneIdx on TaskOne(login_user_id);" +
+            // task 2
+            "create type TaskTwoType as open {" +
+                "user_id: int32," +
                 "community_id: int32" +
-            "};" +
-            "create dataset TaskTwo(TaskTwoType) primary key node_id;" +
-            "create type TaskThreeType as open{" +
-                "node_id: int32," +
+            "}" +
+            "create dataset TaskTwo(TaskTwoType) primary key user_id;" +
+            // task 3
+            "create type TaskThreeType as open {" +
+                "user_id: int32," +
                 "suggested_friends: [int32]" +
-            "};" +
-            "create dataset TaskThree(TaskThreeType) primary key node_id;";
+            "}" +
+            "create dataset TaskThree(TaskThreeType) primary key user_id;" +
+            // task 4
+            "create type TaskFourType as open {" +
+                "user_id: int32," +
+                "importance: double" +
+            "}" +
+            "create dataset TaskFour(TaskFourType) primary key user_id;";
+
 
     public static void initializeAll() throws IOException {
         initializeOriginalGraph();
-        initializeBackBoneGraph();
+        initializeDisplayGraph();
         initializeCommunication();
         initializeTasks();
     }
@@ -93,8 +123,15 @@ public class DatabaseInitializer {
         Commander.sendGet(url);
     }
 
+    @Deprecated
     public static void initializeBackBoneGraph() throws IOException {
         String aql = URLGenerator.cmdParser(INIT_BACKBONE_STATEMENT);
+        String url = URLGenerator.generate("localhost", 19002, RestAPI.DDL, aql);
+        Commander.sendGet(url);
+    }
+
+    public static void initializeDisplayGraph() throws IOException {
+        String aql = URLGenerator.cmdParser(INIT_DISPLAY_STATEMENT);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.DDL, aql);
         Commander.sendGet(url);
     }
@@ -113,5 +150,9 @@ public class DatabaseInitializer {
         String aql = URLGenerator.cmdParser(INIT_TASKS_STATEMENT);
         String url = URLGenerator.generate("localhost", 19002, RestAPI.DDL, aql);
         Commander.sendGet(url);
+    }
+
+    public static void main(String[] args) throws IOException {
+        initializeTasks();
     }
 }

@@ -31,8 +31,6 @@ TextVertexInputFormat<VLongWritable, VLongArrayListWritable, IntWritable, VLongA
 @SuppressWarnings("rawtypes")
 class SocialSuggestionGraphReader extends
     TextVertexReader<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> {
-    private final static String separator = " ";
-    
     private Vertex vertex;
     private VLongWritable vertexId = new VLongWritable();
     private List<VLongWritable> pool = new ArrayList<VLongWritable>();
@@ -80,29 +78,6 @@ class SocialSuggestionGraphReader extends
         }
 
         return vertex;
-    }
-
-    @Deprecated
-    private String[] getCurrentVertexFromTxt() throws IOException, InterruptedException {
-        Text line = getRecordReader().getCurrentValue();
-        System.out.println("Input line: " + line);
-        String[] fields = line.toString().split(separator);
-
-        return fields;
-    }
-
-    private String[] getCurrentVertexFromAdm() throws IOException, InterruptedException {
-        Text line = getRecordReader().getCurrentValue();
-        System.out.println("Input line: " + line);
-        ArrayList<String> slist = ADMParser.ADM2Graph(line.toString());
-        int size = slist.size();
-        String[] fields = new String[size];
-
-        for (int i = 0; i < size; i++) {
-            fields[i] = slist.get(i);
-        }
-
-        return fields;
     }
     
     private VLongWritable allocate() {

@@ -183,6 +183,7 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
 
         @Override
         public int compareTo(VertexFrequency that) {
+            assert that != null;
             if (this.freq > that.freq) {
                 return -1;
             } else if (this.freq == that.freq) {
