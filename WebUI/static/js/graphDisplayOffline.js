@@ -214,7 +214,6 @@ var sys;
 
 var fileName;
 
-
 var colorArray=["#CA7A2C", "#E03C8A", "#42AA5D", "#DB4D6D", "#64363C","#D0104C","#E2943B","#77428D","#E87A90","#787878"];
 
 var numColor = colorArray.length;
@@ -245,16 +244,23 @@ var logInUserId;
 
 var nodeSet = {};
 
+var backgroundColor = "#F8C3CD";
+var outsideNodes = [];
+var outsideEdges = [];
+
+
 function clearGraphVariables(){
 	coloredNodes = [];
 	coloredEdges = [];
 	labelNodeIDTable = {};
 	nodeSet = {};
+	outsideNodes = [];
+	outsideEdges = [];
 }
 
 
 function initializeRender(){
-	sys = arbor.ParticleSystem(3500, 50, 0.5);
+	sys = arbor.ParticleSystem(1500, 10, 0.5);
     sys.parameters({gravity:true});
     sys.renderer = Renderer('#graph');
 }
@@ -292,9 +298,57 @@ function logOut(){
 }
 
 /*
+*	clear the outside nodes
+*/
+function clearOutsideNodes() {
+	for(var i=0; i<outsideEdges.length; ++i){
+		var nodeArray = outsideEdges[i].split("||");
+		var sourceNode = nodeArray[0];
+		var targetNode = nodeArray[1];
+		var edgeArray = sys.getEdges(sourceNode, targetNode);
+		sys.pruneEdge(edgeArray[0]);
+	}
+	outsideEdges = [];
+
+	for (var i = 0; i < outsideNodes.length; ++i) {
+		var node = sys.getNode(outsideNodes[i]);
+		sys.pruneNode(node);
+	}
+	outsideNodes = [];
+}
+
+/*
+*	add the outside nodes beside to a inside node
+*/
+function addOutsideNode(outsideNode, insideNode) {
+	var connection = new AsterixDBConnection().dataverse("Graph");
+	var expression = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset OriginalGraph"))
+	.WhereClause(new AExpression("$node.source_node=" + outsideNode))
+	.ReturnClause("$node.label");
+
+	var successGetLabel = function(tempres) {
+		var res = tempres["results"];
+		for (i in res) {
+			var resJson = eval('(' + res[i] + ')');
+			var label = resJson.toString();
+			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
+			outsideNodes.push(sys.getNode(outsideNode));
+
+			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor});			
+			outsideEdges.push(insideNode+"||"+outsideNode);
+		}
+	}
+	connection.query(expression.val(), successGetLabel);
+	
+}
+
+
+/*
 delete all nodes and edges in the graph
 */
 function deleteAllNodesAndEdges(){
+	clearOutsideNodes();
 	//alert("delete");
 	for(var i=0; i<allEdges.length; ++i){
 		var nodeArray = allEdges[i].split("||");
@@ -307,6 +361,8 @@ function deleteAllNodesAndEdges(){
 		var node = sys.getNode(allNodes[i]);
 		sys.pruneNode(node);
 	}
+
+	
 	//alert(allEdges.length);
 	//alert(allNodes.length);
 	allEdges = [];
@@ -317,7 +373,10 @@ function deleteAllNodesAndEdges(){
 change the color of nodes and edges to default color
 */
 function clearNodeEdgeColor(){
-
+	// to Zhimin:
+	// in case I forgot to tell you 
+	// to clear outside nodes as well clear node edge color
+	clearOutsideNodes();
     for(var i=0; i<coloredNodes.length; ++i){
 		coloredNodes[i].data.color= defaultNodeColor;
     }
@@ -348,6 +407,7 @@ function clearNodeEdgeColor(){
 }
 
 
+
 /*
 draw the graph
 */
@@ -365,7 +425,7 @@ function drawGraph(dom, res){
 		var label=resJson.label;
 		labelNodeIDTable[label]=sourceNode;
 		//alert(label);
-		sys.addNode(sourceNode, {label:label, color:defaultNodeColor});
+		sys.addNode(sourceNode, {mass:3,label:label, color:defaultNodeColor});
 		allNodes.push(sourceNode);
 		nodeSet[sourceNode] = true;
 
@@ -461,6 +521,7 @@ function runTask1(){
 		return;
 	}
 	clearNodeEdgeColor();
+	clearOutsideNodes();
 	var targetNode = $('#target_id').val().toString();
 	var sourceNode = logInUserId;
 	drawTaskOne(sourceNode, targetNode);
@@ -472,6 +533,167 @@ function runTask1(){
 	}*/
 }
 
+/*
+draw task 2
+*/
+
+function doDrawTaskTwo(resNode) {
+	sys.addNode("tempNode1", {label:"tempNode1", color:"#FFFFFF"});
+	sys.addNode("tempNode2", {label:"tempNode2", color:"#FFFFFF"});	
+	var nodesInCommunity = [];
+	for (m in resNode) {
+		var resJson = eval('(' + resNode[m] + ')');
+		var nodeStr = resJson.user_id.int32.toString();
+		if (nodeStr in nodeSet) {
+			// color node
+			var nodeObj = sys.getNode(nodeStr);
+			nodeObj.data.color = colorArray[1];
+			coloredNodes.push(nodeObj);
+
+			nodesInCommunity.push(nodeStr);
+
+			sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"});
+			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
+			sys.pruneEdge(edgeArray[0]);
+		} else {			
+			addOutsideNode(nodeStr, logInUserId);
+		}
+	}	
+	sys.pruneNode(sys.getNode("tempNode1"));
+	sys.pruneNode(sys.getNode("tempNode2"));
+
+	for (var i = 0; i < nodesInCommunity.length; ++i) {
+		for (var j = 0; j < nodesInCommunity.length; ++j) {
+        	var sourceNodeObj = sys.getNode(nodesInCommunity[i]);
+        	var targetNodeObj = sys.getNode(nodesInCommunity[j]);
+			var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+			if (edgeArray.length == 0)
+				continue;
+			sys.pruneEdge(edgeArray[0]);
+			sys.addEdge(nodesInCommunity[i], nodesInCommunity[j], {directed:false, color:colorArray[1]})
+			edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+			coloredEdges.push(edgeArray[0]);
+		}
+	}
+}
+
+function queryDrawTaskTwo() {
+	nodeID = logInUserId;
+	// get the community id
+	var whereClauseStr = "$node.user_id="+nodeID;
+	var connectionGetCommID = new AsterixDBConnection().dataverse("Tasks");
+	var expressionGetCommID = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset TaskTwo"))
+	.WhereClause(new AExpression(whereClauseStr))
+	.ReturnClause("$node");
+
+	var successGetCommID = function(resCommIDTemp) {
+		var resCommID = resCommIDTemp["results"];		
+		for (j in resCommID) {
+			var resJson = eval('('+resCommID[j]+')');
+			var commID = resJson.community_id.int32.toString();			
+			var whereClauseStr = "$node.community_id="+commID;
+			var connectionGetNode = new AsterixDBConnection().dataverse("Tasks");
+			var expressionGetNode = new FLWOGRExpression()
+			.ForClause("$node", new AExpression("dataset TaskTwo"))
+			.WhereClause(new AExpression(whereClauseStr))
+			.ReturnClause("$node");
+
+			var successGetNode = function(resNodeTemp) {
+				var resNode = resNodeTemp["results"];				
+				doDrawTaskTwo(resNode);
+			}
+
+			connectionGetNode.query(expressionGetNode.val(), successGetNode);
+		}
+	}
+
+	connectionGetCommID.query(expressionGetCommID.val(), successGetCommID);
+}
+
+
+/*
+run task 2
+*/
+function runTask2() {
+	if (logInStatus == false) {
+		alert("Please login first!");
+		return;
+	}
+	clearNodeEdgeColor();
+	clearOutsideNodes();
+	queryDrawTaskTwo();	
+}
+
+/*
+draw task 3
+*/
+function doDrawTaskThree(resNode) {
+	var nodeID = logInUserId;
+	var inputFriendNum = $('#task3_num_friends').val();
+
+	sys.addNode("tempNode1", {label:"tempNode1",color:"#FFFFFF"});
+	sys.addNode("tempNode2", {label:"tempNode2",color:"#FFFFFF"});
+
+	for (i in resNode) {
+		var resJson = eval('(' + resNode[i] + ')');
+		var suggestedFriends = resJson.suggested_friends.orderedlist;
+		var friendNum = suggestedFriends.length;
+		if (friendNum == 0) {
+			$('#tips').html('<p style="font-size: 30px; text-align:center">No suggested friends!</p>');
+			continue;
+		} else {
+            sys.getNode(nodeID).data.color=colorArray[0];
+			coloredNodes.push(sys.getNode(nodeID));
+            var minFriendNum = (friendNum>inputFriendNum?inputFriendNum:friendNum);
+            for(var k=0; k<minFriendNum; ++k){
+            	var suggestedFriend = suggestedFriends[k].int32.toString();
+            	if (suggestedFriend in nodeSet) {
+             	   sys.getNode(suggestedFriend).data.color=colorArray[1];
+             	   coloredNodes.push(sys.getNode(suggestedFriend));
+	    		} else {	    			
+	    			addOutsideNode(suggestedFriend, nodeID);
+	    		}
+            }
+            sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"})
+            var edgeArray = sys.getEdges("tempNode1","tempNode2");
+            sys.pruneEdge(edgeArray[0]);
+		}
+	}
+
+	sys.pruneNode(sys.getNode("tempNode1"));
+	sys.pruneNode(sys.getNode("tempNode2"));
+}
+function queryDrawTaskThree() {
+	var nodeID = logInUserId;
+
+	var connGetRecomFriends = new AsterixDBConnection().dataverse("Tasks");
+	var whereClauseStr = "$node.user_id=" + nodeID;
+	var expressionRecomFriends = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset TaskThree"))
+	.WhereClause(new AExpression(whereClauseStr))
+	.ReturnClause("$node");
+
+	succGetRecomFriends = function(tempres) {
+		var resNode = tempres["results"];
+		doDrawTaskThree(resNode);
+	}
+
+	connGetRecomFriends.query(expressionRecomFriends.val(), succGetRecomFriends);
+}
+
+/*
+run task 3
+*/
+function runTask3() {
+	if (logInStatus == false) {
+		alert("Please login first!");
+		return;
+	}
+	clearNodeEdgeColor();
+	clearOutsideNodes();
+	queryDrawTaskThree();	
+}
 
 $(document).ready(function(){
 
@@ -503,6 +725,10 @@ $(document).ready(function(){
     $('#iframeID1').load(checkAndLoadGraph);
 
     $("#runTask1").click(runTask1);
+
+    $("#runTask2").click(runTask2);
+
+    $("#runTask3").click(runTask3);
 
 
 });

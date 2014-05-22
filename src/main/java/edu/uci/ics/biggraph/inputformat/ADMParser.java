@@ -47,7 +47,7 @@ public class ADMParser {
         JsonArray weights = (JsonArray) map.get("weight");
         int size = targetNodes.size();
         if (size != weights.size()) {
-            System.err.println("ADM2Graph: wrong formated line!");
+            System.err.println("ADM2Graph: wrong formatted line!");
             return null;
         }
         ret.add(Integer.toString(size));
