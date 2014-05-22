@@ -235,16 +235,6 @@
     <div id="controlBlock" style="float:left">
 
       <div id = "accordion">
-<<<<<<< HEAD:WebUI/graph_display.tpl
-        <h3 class="controlBlockTitle">Load Graph</h3>
-        <div>
-          <p style="margin-bottom:3px">Choose your graph file:</p>
-          <form enctype="multipart/form-data" action="/upload" method="POST" target="iframeName1">
-            <input id="filePath" type="file" name="upload"/>
-          </form>
-        </div>
-=======
->>>>>>> 169f37d988f7cacb6d6567fde5b47efd7580af3f:WebUI/graph_display.tpl
         <h3 class="controlBlockTitle">Connection Tracing</h3>
         <div>
           <p class="controlBlockContent">Show Your Connection!</p>
@@ -280,11 +270,6 @@
       </div>
     </div>
   </div>
-<<<<<<< HEAD:WebUI/graph_display.tpl
-  <iframe name="iframeName1" id="iframeID1" src="" width="0" height="0"
-  frameborder="0" />
-=======
   <iframe name="iframeLogIn" id="iframeID1" src="" width="0" height="0" frameborder="0" />
->>>>>>> 169f37d988f7cacb6d6567fde5b47efd7580af3f:WebUI/graph_display.tpl
 </body>
 </html>
