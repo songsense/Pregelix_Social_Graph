@@ -421,6 +421,7 @@ function drawGraphTask1(sourceNode, targetNode){
 run task 1
 */
 function runTask1(){
+	return;
 	if(loginStatus == false){
 		alert("Please login first!");
 		return;
@@ -428,7 +429,7 @@ function runTask1(){
 	clearNodeEdgeColor();
 	var targetNode = $('#target_id').val().toString();
 	var sourceNode = logInUserId;
-	if()
+	if(true)
 	drawGraphTask1(sourceNode, targetNode);
 }
 
