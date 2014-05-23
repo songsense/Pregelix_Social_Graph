@@ -1,0 +1,11 @@
+We found a set of Facebook social network graph from:
+http://odysseas.calit2.uci.edu/doku.php/public:online_social_networks#facebook_social_graph
+
+And we tranlate the raw data type into ADM compatible format using several scripts:
+- raw2adm.py: tranlate raw data type into ADM file.
+- namegen.py: randomly generate full names from two name datasets.
+- readline.sh: extract first n lines of data from a large set of graph data.
+
+We also collect a lite version of name sets for random name generation:
+- first-names.txt
+- surnames.txt
