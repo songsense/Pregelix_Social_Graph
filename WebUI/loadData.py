@@ -32,7 +32,7 @@ def loadData():
 
                         use dataverse Account;
 
-                       load dataset AccountInfo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/Account.adm"),("format"="adm"));
+                        load dataset AccountInfo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/Account.adm"),("format"="adm"));
                     '''
 
     load = {
