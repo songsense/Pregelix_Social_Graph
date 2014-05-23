@@ -611,7 +611,7 @@ function doDrawTaskTwo(resNode) {
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
 		} else {			
-			addOutsideNode(nodeStr, logInUserId);
+			findIntermediateNodeNDraw(nodeStr);
 		}
 	}	
 	sys.pruneNode(sys.getNode("tempNode1"));
@@ -682,6 +682,38 @@ function runTask2() {
 }
 
 /*
+		Find the last known intermediate node and draw the outside node
+*/
+function findIntermediateNodeNDraw(outsideNode) {
+	var connectionGetPath = new AsterixDBConnection().dataverse("Tasks");
+	var exprGetPath = new FLWOGRExpression()
+	.ForClause("$n", new AExpression("dataset TaskOne"))
+	.WhereClause().and(
+		new AExpression("$n.login_user_id="+logInUserId),
+		new AExpression("$n.target_user_id="+outsideNode))
+	.ReturnClause("$n.path");
+
+	var succGetPath = function(tempres) {
+		var res = tempres["results"];
+		for (var i in res) {
+			var resJson = eval('(' + res[i] + ')');
+			var path = resJson.orderedlist;
+			var lastInNodeSet = logInUserId;
+			for (var i = 2; i < path.length; ++i) {
+				var nodeStr = path[i].int32.toString();				
+				if (!(nodeStr in nodeSet)) {
+					break;
+				}				
+				lastInNodeSet = nodeStr;
+			}
+			addOutsideNode(outsideNode, lastInNodeSet);
+		}
+	}
+
+	connectionGetPath.query(exprGetPath.val(), succGetPath);
+}
+
+/*
 draw task 3
 */
 function doDrawTaskThree(resNode) {
@@ -707,8 +739,8 @@ function doDrawTaskThree(resNode) {
             	if (suggestedFriend in nodeSet) {
              	   sys.getNode(suggestedFriend).data.color=colorArray[1];
              	   coloredNodes.push(sys.getNode(suggestedFriend));
-	    		} else {	    			
-	    			addOutsideNode(suggestedFriend, nodeID);
+	    		} else {	    	
+	    			findIntermediateNodeNDraw(suggestedFriend);		    			
 	    		}
             }
             sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"})
@@ -780,7 +812,7 @@ function queryDrawTaskFour() {
 				coloredNodes.push(nodeObj);				
 			} else if (numOutsideVIP < maxNumOutsideVIP) {
 				++numOutsideVIP;
-				addOutsideNode(user_id, logInUserId);
+				findIntermediateNodeNDraw(user_id);
 			}
 		}
 		var nodeObj = sys.getNode(logInUserId);
