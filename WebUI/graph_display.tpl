@@ -243,7 +243,7 @@
           </br>
           <button class="button" id="runTask1" type="submit">Run</button>
         </div>
-        <h3 id = "runTask2", class="controlBlockTitle">Community Display</h3>
+        <h3 class="controlBlockTitle">Community Display</h3>
         <div>
           <p class="controlBlockContent">Show Your Community!</p>
           <!--
@@ -252,10 +252,10 @@
           </br>
           <span style="margin-left:5px">Number Of Iteration:</span>
           <input id="task2_num_iteration" class="task1Text" name="task2_num_iteration" type="text"/>
-        
           </br>
+        -->          
           <button class="button" id="runTask2" type="submit">Run</button>
-          -->
+          
         </div>
         <h3 class="controlBlockTitle">Friend Recommendation</h3>
         <div><p class="controlBlockContent">Show Your Potential Friends!</p>
@@ -269,13 +269,14 @@
           <!--
           </br>
           <span style="margin-left:5px">Number Of Iteration:</span>          
-          <input id="task3_num_iteration" class="task1Text" name="task3_num_iteration" type="text"/>
+          <input id="task3_num_iteration" class="task1Text" name="task3_num_iteration" type="text"/>          
           -->
           </br>
           <button class="button" id="runTask3" type="submit">Run</button>
         </div>
         <h3 class="controlBlockTitle">VIP Recommendation</h3>
         <div><p class="controlBlockContent">Show VIPs near you!</p>
+          <!--
           <span style="margin-left:5px">Name:</span>
           <input id="task4_node" class="task1Text" name="task4_node" type="text"/>
           </br>
@@ -285,6 +286,7 @@
           <span style="margin-left:5px">Number Of Iteration:</span>
           <input id="task4_num_iteration" class="task1Text" name="task4_num_iteration" type="text"/>
           </br>
+        -->
           <button class="button" id="runTask4" type="submit">Run</button>
         </div>
       </div>

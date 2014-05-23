@@ -261,6 +261,8 @@ var backgroundColor = "#F8C3CD";
 var outsideNodes = [];
 var outsideEdges = [];
 
+var maxNumVIP = 5;
+var maxNumOutsideVIP = 5;
 
 
 function clearGraphVariables(){
@@ -279,7 +281,7 @@ function clearGraphVariables(){
 
 
 function initializeRender(){
-	sys = arbor.ParticleSystem(1500, 10, 0.5);
+	sys = arbor.ParticleSystem(3500, 50, 0.5);
     sys.parameters({gravity:true});
     sys.renderer = Renderer('#graph');
 }
@@ -354,7 +356,7 @@ function addOutsideNode(outsideNode, insideNode) {
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
 			outsideNodes.push(sys.getNode(outsideNode));
 
-			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor});			
+			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor, dashFlag: true});			
 			outsideEdges.push(insideNode+"||"+outsideNode);
 		}
 	}
@@ -410,8 +412,6 @@ function clearNodeEdgeColor(){
 		var targetNode = coloredEdges[i].target;
 		sys.pruneEdge(coloredEdges[i]);
 		sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
-
-
     }
     coloredEdges = [];
 
@@ -754,6 +754,57 @@ function runTask3() {
 	queryDrawTaskThree();	
 }
 
+/*
+*	query and draw the task 4
+*/
+function queryDrawTaskFour() {
+	// get max number VIP list
+	var connectionGetMaxNumVIPList = new AsterixDBConnection().dataverse("Tasks");
+	var expGetMaxNumVIPList = new FLWOGRExpression()
+	.ForClause("$n", new AExpression("dataset TaskFour"))
+	.OrderbyClause(new AExpression("$n.importance"), "desc")
+	.LimitClause(new AExpression(maxNumVIP.toString()))
+	.ReturnClause("$n.user_id");
+
+	var succGetMaxNumVIPList = function(tempres) {
+		var numOutsideVIP = 0;
+		var resNode = tempres["results"];
+		for (i in resNode) {
+			var resJson = eval('(' + resNode[i] + ')');
+			var user_id = resJson.int32.toString();
+			if (user_id == logInUserId) {
+				continue;
+			}
+			if (user_id in nodeSet) {
+				// color node
+				var nodeObj = sys.getNode(user_id);
+				nodeObj.data.color = colorArray[1];
+				coloredNodes.push(nodeObj);				
+			} else if (numOutsideVIP < maxNumOutsideVIP) {
+				++numOutsideVIP;
+				addOutsideNode(user_id, logInUserId);
+			}
+		}
+		var nodeObj = sys.getNode(logInUserId);
+		nodeObj.data.color = colorArray[0];
+		coloredNodes.push(nodeObj);	
+	}
+
+	connectionGetMaxNumVIPList.query(expGetMaxNumVIPList.val(), succGetMaxNumVIPList);
+}
+/*
+run task 4
+*/
+function runTask4() {
+	if (logInStatus == false) {
+		alert("Please login first!");
+		return;
+	}
+	clearNodeEdgeColor();
+	clearOutsideNodes();
+	queryDrawTaskFour();
+}
+
 
 $(document).ready(function(){
 
@@ -792,6 +843,8 @@ $(document).ready(function(){
     $("#runTask2").click(runTask2);
 
     $("#runTask3").click(runTask3);
+
+    $("#runTask4").click(runTask4);
 
 
 });
