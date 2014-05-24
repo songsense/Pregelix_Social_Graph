@@ -187,6 +187,7 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
 //        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
         job.setMessageCombinerClass(DefaultMessageCombiner.class);
         job.setNoramlizedKeyComputerClass(VLongNormalizedKeyComputer.class);
+        job.setDynamicVertexValueSize(true);
         job.getConfiguration().setLong(SOURCE_ID, 0);
         Client.run(args, job);
     }

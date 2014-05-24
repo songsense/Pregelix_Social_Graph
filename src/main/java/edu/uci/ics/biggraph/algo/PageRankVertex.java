@@ -115,11 +115,13 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
     }
 
     private void PrintStatus(DoubleWritable tmpVertexValue) {
+        /*
         System.out.print("===== ");
         System.out.print(" Vertex: " + getVertexId().toString());
         System.out.print(" with tmpVertexValue: " + tmpVertexValue.toString());
         System.out.print(" total vertexes number: " + getNumVertices());
         System.out.println(" =====");
+        */
     }
 
     public static void main(String[] args) throws Exception {
