@@ -260,13 +260,18 @@ var nodeSet = {};
 
 
 var backgroundColor = "#F8C3CD";
-var outsideNodes = [];
-var outsideEdges = [];
+var outsideNodesSetSet = {};
+var outsideEdgesSet = {};
 
 var maxNumVIP = 5;
 var maxNumOutsideVIP = 5;
 
-var maxDegreeArray = [4, 4, 3];
+var maxDegreeArray = [4, 4, 3, 3, 3, 2, 2];
+
+var maxNodeNum = 49;
+
+var maxLevel = 3;
+
 
 
 
@@ -278,11 +283,12 @@ function clearGraphVariables(){
 
 	nodeSet = {};
 
-	outsideNodes = [];
-	outsideEdges = [];
+	outsideNodesSet = {};
+	outsideEdgesSet = {};
 
 	allEdges = [];
 	allNodes = [];
+
 }
 
 
@@ -328,21 +334,23 @@ function logOut(){
 /*
 *	clear the outside nodes
 */
-function clearOutsideNodes() {
-	for(var i=0; i<outsideEdges.length; ++i){
-		var nodeArray = outsideEdges[i].split("||");
+function clearOutsideNodesSet() {
+	
+	for(var edge in outsideEdgesSet){
+		var nodeArray = edge.split("||");
 		var sourceNode = nodeArray[0];
 		var targetNode = nodeArray[1];
 		var edgeArray = sys.getEdges(sourceNode, targetNode);
 		sys.pruneEdge(edgeArray[0]);
 	}
-	outsideEdges = [];
 
-	for (var i = 0; i < outsideNodes.length; ++i) {
-		var node = sys.getNode(outsideNodes[i]);
+	outsideEdgesSet = {};
+
+	for (var nodeStr in outsideNodesSet) {
+		var node = sys.getNode(nodeStr);
 		sys.pruneNode(node);
 	}
-	outsideNodes = [];
+	outsideNodesSet = {};
 }
 
 /*
@@ -361,10 +369,10 @@ function addOutsideNode(outsideNode, insideNode) {
 			var resJson = eval('(' + res[i] + ')');
 			var label = resJson.toString();
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
-			outsideNodes.push(sys.getNode(outsideNode));
+			outsideNodesSet[outsideNode] = true;
 
 			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor, dashFlag: true});			
-			outsideEdges.push(insideNode+"||"+outsideNode);
+			outsideEdgesSet[insideNode+"||"+outsideNode] = true;
 		}
 	}
 	connection.query(expression.val(), successGetLabel);
@@ -376,7 +384,7 @@ function addOutsideNode(outsideNode, insideNode) {
 delete all nodes and edges in the graph
 */
 function deleteAllNodesAndEdges(){
-	clearOutsideNodes();
+	clearOutsideNodesSet();
 	//alert("delete");
 
 	for(var i=0; i<allEdges.length; ++i){
@@ -387,13 +395,12 @@ function deleteAllNodesAndEdges(){
 		sys.pruneEdge(edgeArray[0]);
 	}
 	for(var i=0; i<allNodes.length; ++i){
+		//alert(allNodes[i]);
 		var node = sys.getNode(allNodes[i]);
 		sys.pruneNode(node);
 	}
 
-	
-	//alert(allEdges.length);
-	//alert(allNodes.length);
+
 	allEdges = [];
 	allNodes = [];
 
@@ -408,11 +415,8 @@ function clearNodeEdgeColor(){
 	// to Zhimin:
 	// in case I forgot to tell you 
 	// to clear outside nodes as well clear node edge color
-	clearOutsideNodes();
-    for(var i=0; i<coloredNodes.length; ++i){
-		coloredNodes[i].data.color= defaultNodeColor;
-    }
-    coloredNodes = [];
+	clearOutsideNodesSet();
+    
     
     for (var i=0; i<coloredEdges.length; ++i){
 		var sourceNode = coloredEdges[i].source;
@@ -421,6 +425,11 @@ function clearNodeEdgeColor(){
 		sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
     }
     coloredEdges = [];
+
+    for(var i=0; i<coloredNodes.length; ++i){
+		coloredNodes[i].data.color= defaultNodeColor;
+    }
+    coloredNodes = [];
 
     //flush
     for (var i=0; i<10; ++i){
@@ -464,11 +473,24 @@ function drawGraph(dom, res){
 		for(var i=0; i<targetNodeArray.length; ++i){
 		    var targetNode = targetNodeArray[i].int32.toString();
 		    sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
-		    allEdges.push(sourceNode+"||"+targetNode);
-		    
+		    allEdges.push(sourceNode+"||"+targetNode);		    
 		}
     }
 }*/
+
+function addNodeInGraph(inputNode, inputLabel, inputColor){
+	sys.addNode(inputNode, {label:inputLabel, color:inputColor});
+	allNodes.push(inputNode);
+	nodeSet[inputNode] = true;
+	
+}
+
+function addBiDirectEdgeInGraph(sourceNode, targetNode, inputColor){
+	sys.addEdge(sourceNode, targetNode, {directed:false, color:inputColor});
+	allEdges.push(sourceNode+"||"+targetNode);
+	sys.addEdge(targetNode, sourceNode, {directed:false, color:inputColor});
+	allEdges.push(targetNode+"||"+sourceNode);
+}
 
 function drawGraphBFS(dom, res){
 	deleteAllNodesAndEdges();
@@ -484,17 +506,17 @@ function drawGraphBFS(dom, res){
 		nodeNeighbors[sourceNode] = targetNodeArray;
 		nodeWeights[sourceNode] = resJson.importance.orderedlist[0];
 		nodeLabel[sourceNode] = resJson.label.orderedlist[0];
-		//alert(nodeLabel[sourceNode]);
 	}
 	var levelArray = [];
-	var maxLevel = maxDegreeArray.length;
 	var level = [logInUserId];
 	levelArray.push(level);
-	sys.addNode(logInUserId, {mass:3,label:nodeLabel[logInUserId], color:defaultNodeColor});
-	allNodes.push(logInUserId);
+	addNodeInGraph(logInUserId, nodeLabel[logInUserId], defaultNodeColor);
 	var visited = {};
 	visited[logInUserId] = true;
-	for(var k=0; k<maxLevel; ++k){
+	var nodeNum = 0;
+	var edgeSet = {};
+	for(var k=0; (k<maxLevel || nodeNum<maxNodeNum); ++k){
+		var neighborDisplayArray = [];
 		for(var j=0; j<levelArray[k].length; ++j){
 			var currNode = levelArray[k][j];
 			//alert(currNode);
@@ -503,40 +525,40 @@ function drawGraphBFS(dom, res){
 				neighborsWeights.push({node:nodeNeighbors[currNode][n].int32.toString(),weight:nodeWeights[nodeNeighbors[currNode][n].int32.toString()]});
 			}
 			neighborsWeights.sort(function(a, b){if(a.weight>b.weight) return -1; if(a.weight<b.weight) return 1; return 0});
-			// for(var n=0; n<neighborsWeights.length; ++n)
-			// 	alert(neighborsWeights[n].weight);
-			// alert("...");
 			var nodeCount = 0;
-			var neighborDisplayArray = [];
 			for(var n=0; n<nodeNeighbors[currNode].length; ++n){
 				var neighbor = neighborsWeights[n].node;
 				//alert(neighborsWeights[n].weight);
 				if(visited[neighbor]==true){
-					sys.addEdge(currNode, neighbor, {directed:false, color:defaultEdgeColor});
-					allEdges.push(currNode+"||"+neighbor);
+					if(!(edgeSet[currNode+"||"+neighbor]==true)){
+						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
+						edgeSet[currNode+"||"+neighbor]=true;
+						edgeSet[neighbor+"||"+currNode]=true;
+					}
 				}
 				else{
 					if(nodeCount<maxDegreeArray[k]){
-						sys.addNode(neighbor, {mass:3,label: nodeLabel[neighbor], color:defaultNodeColor});
-						allNodes.push(neighbor);
-						sys.addEdge(currNode, neighbor, {directed:false, color:defaultEdgeColor});
-						allEdges.push(currNode+"||"+neighbor);
+						addNodeInGraph(neighbor, nodeLabel[neighbor], defaultNodeColor);
 						visited[neighbor]=true;
 						neighborDisplayArray.push(neighbor);
-						nodeSet[neighbor] = true;
+						
+						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
+						edgeSet[currNode+"||"+neighbor]=true;
+						edgeSet[neighbor+"||"+currNode]=true;
+						
+						++nodeNum;
 					}
 					else
 						break;
 				}
 			}
-			levelArray.push(neighborDisplayArray);
 		}
-		if(levelArray[k+1].length == 0)
+		if(neighborDisplayArray.length == 0){
+			//alert(k);
 			break;
+		}
+		levelArray.push(neighborDisplayArray);
 	}
-
-	// for(str in nodeLabel)
-	// 	alert(nodeLabel[str]);
 }
 
 function loadGraph(){
@@ -624,12 +646,13 @@ function drawTaskOne(sourceNode, targetNode){
             		for(i in res){
             			var resJson = eval('('+res[i]+')');
             			targetLabel = resJson.label;
-            			sys.addNode(path[path.length-1].int32.toString(), {label:targetLabel, color:"#FF0000"});
-            			outsideNodes.push(path[path.length-1].int32.toString());
+
+            			sys.addNode(path[path.length-1].int32.toString(), {label:targetLabel, color:"#FF0000"});            			
+            			outsideNodesSet[path[path.length-1].int32.toString()] = true;
+            			//allNodes.push(path[path.length-1].int32.toString());
             		}
             	}
-            	connAccount.query(exp.val(),succAccount);
-            	
+            	connAccount.query(exp.val(),succAccount);            	
             }
             else{
             	sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
@@ -644,17 +667,8 @@ function drawTaskOne(sourceNode, targetNode){
 		    			
 		    		if(!(path[j+1].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-		    			/*
-		    			sys.addNode("-3", {label:"...", color:"#FFFFFF", font_color:"black", font_size:"40"});
-		    			sys.addEdge(path[j].int32.toString(), "-3", {directed:false, color:"#FF0000"});
-		    			var edgeArray = sys.getEdges(sys.getNode(path[j].int32.toString()), sys.getNode("-3"));
-		    			coloredEdges.push(edgeArray[0]);
-		    			sys.addEdge("-3", path[path.length-1].int32.toString(), {directed:false, color:"#FF0000"});
-		    			edgeArray = sys.getEdges(sys.getNode("-3"), sys.getNode(path[path.length-1].int32.toString()));
-		    			coloredEdges.push(edgeArray[0]);
-		    			*/
 		    			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
-		    			outsideEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
+		    			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
 		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
 		    			break;
 		    		}
@@ -683,10 +697,11 @@ function runTask1(){
 		return;
 	}
 	clearNodeEdgeColor();
-	clearOutsideNodes();
+	clearOutsideNodesSet();
 	var targetNode = $('#target_id').val().toString();
 	var sourceNode = logInUserId;
 	drawTaskOne(sourceNode, targetNode);
+
 
 }
 
@@ -715,13 +730,14 @@ function doDrawTaskTwo(resNode) {
 			sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"});
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
-		} else {			
-			addOutsideNode(nodeStr, logInUserId);
+		} else {
+			alert("not in nodeset:"+nodeStr);			
+			findIntermediateNodeNDraw(nodeStr);
 		}
 	}	
 	sys.pruneNode(sys.getNode("tempNode1"));
 	sys.pruneNode(sys.getNode("tempNode2"));
-
+	
 	for (var i = 0; i < nodesInCommunity.length; ++i) {
 		for (var j = 0; j < nodesInCommunity.length; ++j) {
         	var sourceNodeObj = sys.getNode(nodesInCommunity[i]);
@@ -735,6 +751,7 @@ function doDrawTaskTwo(resNode) {
 			coloredEdges.push(edgeArray[0]);
 		}
 	}
+	
 }
 
 function queryDrawTaskTwo() {
@@ -782,8 +799,41 @@ function runTask2() {
 	}
 	clearNodeEdgeColor();
 
-	clearOutsideNodes();
-	queryDrawTaskTwo();	
+	clearOutsideNodesSet();
+	queryDrawTaskTwo();
+
+}
+
+/*
+		Find the last known intermediate node and draw the outside node
+*/
+function findIntermediateNodeNDraw(outsideNode) {
+	var connectionGetPath = new AsterixDBConnection().dataverse("Tasks");
+	var exprGetPath = new FLWOGRExpression()
+	.ForClause("$n", new AExpression("dataset TaskOne"))
+	.WhereClause().and(
+		new AExpression("$n.login_user_id="+logInUserId),
+		new AExpression("$n.target_user_id="+outsideNode))
+	.ReturnClause("$n.path");
+
+	var succGetPath = function(tempres) {
+		var res = tempres["results"];
+		for (var i in res) {
+			var resJson = eval('(' + res[i] + ')');
+			var path = resJson.orderedlist;
+			var lastInNodeSet = logInUserId;
+			for (var i = 2; i < path.length; ++i) {
+				var nodeStr = path[i].int32.toString();				
+				if (!(nodeStr in nodeSet)) {
+					break;
+				}				
+				lastInNodeSet = nodeStr;
+			}
+			addOutsideNode(outsideNode, lastInNodeSet);
+		}
+	}
+
+	connectionGetPath.query(exprGetPath.val(), succGetPath);
 }
 
 /*
@@ -812,8 +862,8 @@ function doDrawTaskThree(resNode) {
             	if (suggestedFriend in nodeSet) {
              	   sys.getNode(suggestedFriend).data.color=colorArray[1];
              	   coloredNodes.push(sys.getNode(suggestedFriend));
-	    		} else {	    			
-	    			addOutsideNode(suggestedFriend, nodeID);
+	    		} else {	    	
+	    			findIntermediateNodeNDraw(suggestedFriend);		    			
 	    		}
             }
             sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"})
@@ -853,7 +903,7 @@ function runTask3() {
 		return;
 	}
 	clearNodeEdgeColor();
-	clearOutsideNodes();
+	clearOutsideNodesSet();
 	queryDrawTaskThree();	
 }
 
@@ -885,7 +935,7 @@ function queryDrawTaskFour() {
 				coloredNodes.push(nodeObj);				
 			} else if (numOutsideVIP < maxNumOutsideVIP) {
 				++numOutsideVIP;
-				addOutsideNode(user_id, logInUserId);
+				findIntermediateNodeNDraw(user_id);
 			}
 		}
 		var nodeObj = sys.getNode(logInUserId);
@@ -903,8 +953,8 @@ function runTask4() {
 		alert("Please login first!");
 		return;
 	}
-	clearNodeEdgeColor();
-	clearOutsideNodes();
+	clearOutsideNodesSet();
+	clearNodeEdgeColor();	
 	queryDrawTaskFour();
 }
 
