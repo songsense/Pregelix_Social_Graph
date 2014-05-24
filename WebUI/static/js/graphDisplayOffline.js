@@ -266,7 +266,9 @@ var outsideEdgesSet = {};
 var maxNumVIP = 5;
 var maxNumOutsideVIP = 5;
 
-var maxDegreeArray = [4, 4, 3, 3, 3, 2, 2];
+//var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
+
+var maxDegree = 4;
 
 var maxNodeNum = 49;
 
@@ -529,6 +531,7 @@ function drawGraphBFS(dom, res){
 			for(var n=0; n<nodeNeighbors[currNode].length; ++n){
 				var neighbor = neighborsWeights[n].node;
 				//alert(neighborsWeights[n].weight);
+				++nodeCount;
 				if(visited[neighbor]==true){
 					if(!(edgeSet[currNode+"||"+neighbor]==true)){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
@@ -537,7 +540,7 @@ function drawGraphBFS(dom, res){
 					}
 				}
 				else{
-					if(nodeCount<maxDegreeArray[k]){
+					if(nodeCount<maxDegree){
 						addNodeInGraph(neighbor, nodeLabel[neighbor], defaultNodeColor);
 						visited[neighbor]=true;
 						neighborDisplayArray.push(neighbor);
@@ -545,7 +548,6 @@ function drawGraphBFS(dom, res){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
 						edgeSet[currNode+"||"+neighbor]=true;
 						edgeSet[neighbor+"||"+currNode]=true;
-						
 						++nodeNum;
 					}
 					else
