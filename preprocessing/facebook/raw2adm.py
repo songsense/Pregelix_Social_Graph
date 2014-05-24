@@ -58,7 +58,7 @@ def convert(filename):
         # third item: target node
         # count the number of friends within the range of the graph
         fcnt = 0;
-        friends = "\"target_node\":["
+        friends = "\"target_nodes\":["
         # If no friends, just discard this node
         if strs_len == 1 or strs[1] == '' or int(strs[1]) > MAX_ENTRY:
             print "Warning: @line ", line_cnt, ", no friends"
@@ -86,8 +86,8 @@ def convert(filename):
         weight += "1.0]"
 
         # combine items
-        adm_entry = "{{" + source_node + "," + label + "," + \
-                    friends + "," + weight + "}}"
+        adm_entry = "{" + source_node + "," + label + "," + \
+                    friends + "," + weight + "}"
         #print adm_entry
         outfile.write(adm_entry + '\n')
 
