@@ -32,7 +32,7 @@ public class ADMParser {
         if (line == null || line.length() == 0) {
             return null;
         }
-        System.out.println("In ADM2Graph: " + line);
+//        System.out.println("In ADM2Graph: " + line);
 
 
         ArrayList<String> ret = new ArrayList<String>();

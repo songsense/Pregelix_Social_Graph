@@ -88,7 +88,7 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
         }
         if (getSuperstep() == 1) {
             tmpVertexValue.set(1.0 / numVertices);
-            PrintStatus(tmpVertexValue);
+            printStatus(tmpVertexValue);
             setVertexValue(tmpVertexValue);
         }
         if (getSuperstep() >= 2 && getSuperstep() <= maxIteration) {

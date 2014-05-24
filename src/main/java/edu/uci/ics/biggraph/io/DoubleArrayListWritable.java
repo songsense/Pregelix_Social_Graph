@@ -1,13 +1,12 @@
 package edu.uci.ics.biggraph.io;
 
+import edu.uci.ics.pregelix.api.io.WritableSizable;
 import edu.uci.ics.pregelix.api.util.ArrayListWritable;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Iterator;
-
-import edu.uci.ics.pregelix.api.io.WritableSizable;
 
 /**
  * Created by soushimei on 4/13/14.
@@ -44,7 +43,7 @@ public class DoubleArrayListWritable extends ArrayListWritable implements Writab
             value.readFields(in); // read a value
             add(value); // store it in values
             // for debug
-            System.out.print(" " + value.toString());
+//            System.out.print(" " + value.toString());
         }
 //        System.out.println("======");
     }
@@ -59,10 +58,10 @@ public class DoubleArrayListWritable extends ArrayListWritable implements Writab
         for (int i = 0; i < numValues; i++) {
             Double value = ((DoubleWritable) get(i)).get();
             DoubleWritable doubleWritable = new DoubleWritable(value);
-            System.out.print("");
-            System.out.println(value);
+//            System.out.print("");
+//            System.out.println(value);
             doubleWritable.write(out);
-            System.out.print(" " + doubleWritable.toString());
+//            System.out.print(" " + doubleWritable.toString());
         }
 //        System.out.println("======");
     }

@@ -27,7 +27,7 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         String nodeID = vertex.getVertexId().toString();
         String nodeVal = val.toString();
 
-        getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
+//        getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
 
         String[] friends = nodeVal.split(" ");
         LinkedList<Integer> list = new LinkedList<Integer>();
