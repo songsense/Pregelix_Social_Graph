@@ -234,6 +234,8 @@ var timeOut = 1300;
 
 var labelNodeIDTable = {};
 
+var nodeIDLabelTable = {};
+
 var preSourceNode = "0";
 
 var preIterNum = "0";
@@ -264,11 +266,16 @@ var outsideEdges = [];
 var maxNumVIP = 5;
 var maxNumOutsideVIP = 5;
 
+var maxDegreeArray = [4, 4, 3];
+
+
 
 function clearGraphVariables(){
 	coloredNodes = [];
 	coloredEdges = [];
 	labelNodeIDTable = {};
+	nodeIDLabelTable = {};
+
 	nodeSet = {};
 
 	outsideNodes = [];
@@ -435,6 +442,7 @@ function clearNodeEdgeColor(){
 /*
 draw the graph
 */
+/*
 function drawGraph(dom, res){
     
     deleteAllNodesAndEdges();
@@ -460,6 +468,75 @@ function drawGraph(dom, res){
 		    
 		}
     }
+}*/
+
+function drawGraphBFS(dom, res){
+	deleteAllNodesAndEdges();
+	var nodeNeighbors = {};
+	var nodeWeights = {};
+	var nodeLabel = {};
+	//alert(res.length);
+	for(i in res){
+		var resJson = eval('('+res[i]+')');
+		//alert(res);
+		var sourceNode = resJson.user_id.int32.toString();
+		var targetNodeArray = resJson.target_nodes.orderedlist;
+		nodeNeighbors[sourceNode] = targetNodeArray;
+		nodeWeights[sourceNode] = resJson.importance.orderedlist[0];
+		nodeLabel[sourceNode] = resJson.label.orderedlist[0];
+		//alert(nodeLabel[sourceNode]);
+	}
+	var levelArray = [];
+	var maxLevel = maxDegreeArray.length;
+	var level = [logInUserId];
+	levelArray.push(level);
+	sys.addNode(logInUserId, {mass:3,label:nodeLabel[logInUserId], color:defaultNodeColor});
+	allNodes.push(logInUserId);
+	var visited = {};
+	visited[logInUserId] = true;
+	for(var k=0; k<maxLevel; ++k){
+		for(var j=0; j<levelArray[k].length; ++j){
+			var currNode = levelArray[k][j];
+			//alert(currNode);
+			var neighborsWeights = [];
+			for(var n=0; n<nodeNeighbors[currNode].length; ++n){
+				neighborsWeights.push({node:nodeNeighbors[currNode][n].int32.toString(),weight:nodeWeights[nodeNeighbors[currNode][n].int32.toString()]});
+			}
+			neighborsWeights.sort(function(a, b){if(a.weight>b.weight) return -1; if(a.weight<b.weight) return 1; return 0});
+			// for(var n=0; n<neighborsWeights.length; ++n)
+			// 	alert(neighborsWeights[n].weight);
+			// alert("...");
+			var nodeCount = 0;
+			var neighborDisplayArray = [];
+			for(var n=0; n<nodeNeighbors[currNode].length; ++n){
+				var neighbor = neighborsWeights[n].node;
+				//alert(neighborsWeights[n].weight);
+				if(visited[neighbor]==true){
+					sys.addEdge(currNode, neighbor, {directed:false, color:defaultEdgeColor});
+					allEdges.push(currNode+"||"+neighbor);
+				}
+				else{
+					if(nodeCount<maxDegreeArray[k]){
+						sys.addNode(neighbor, {mass:3,label: nodeLabel[neighbor], color:defaultNodeColor});
+						allNodes.push(neighbor);
+						sys.addEdge(currNode, neighbor, {directed:false, color:defaultEdgeColor});
+						allEdges.push(currNode+"||"+neighbor);
+						visited[neighbor]=true;
+						neighborDisplayArray.push(neighbor);
+						nodeSet[neighbor] = true;
+					}
+					else
+						break;
+				}
+			}
+			levelArray.push(neighborDisplayArray);
+		}
+		if(levelArray[k+1].length == 0)
+			break;
+	}
+
+	// for(str in nodeLabel)
+	// 	alert(nodeLabel[str]);
 }
 
 function loadGraph(){
@@ -468,17 +545,45 @@ function loadGraph(){
 	
 	//get nodes, and draw graph
     $('#tips').html("");
-	var A = new AsterixDBConnection().dataverse("Graph");
+	var A = new AsterixDBConnection().dataverse("Tasks");
 	var whereClauseStr = '$node.login_user_id='+logInUserId;
-	var expression0a = new FLWOGRExpression()
-	.ForClause("$node", new AExpression("dataset DisplayGraph"))
+	var joinGraphTaskFourClauseStr = '$node.source_node=$weight.user_id';
+	var joinGraphAccountClauseStr = '$account.user_id=$node.source_node';
+
+	var expression1 = new FLWOGRExpression()
+	.ForClause("$weight", new AExpression("dataset TaskFour"))
+	// .ForClause("$account", new AExpression("dataset AccountInfo"))
+	.WhereClause(new AExpression(joinGraphTaskFourClauseStr))
+	.ReturnClause(
+		// "label" : "$account.label",
+		"$weight.importance"
+	);
+
+	var expression2 = new FLWOGRExpression()
+	.ForClause("$account", new AExpression("dataset AccountInfo"))
+	.WhereClause(new AExpression(joinGraphAccountClauseStr))
+	.ReturnClause(
+		"$account.label"
+	);
+
+	var expression = new FLWOGRExpression()
+	.ForClause('$node', new AExpression("dataset DisplayGraph"))
 	.WhereClause(new AExpression(whereClauseStr))
-	.ReturnClause("$node");
+	.ReturnClause({
+		"user_id": "$node.source_node",
+		"target_nodes": "$node.target_nodes",
+		"importance":expression1,
+		"label":expression2
+	});
+
+	
 	
 	var success = function(res){
-		drawGraph('#graph', res["results"]);
+		drawGraphBFS('#graph', res["results"]);
+		//alert(allNodes.length);
+		//alert(allEdges.length);
 	}
-	A.query(expression0a.val(),  success);
+	A.query(expression.val(),  success);
 		
 }
 
@@ -507,14 +612,13 @@ function drawTaskOne(sourceNode, targetNode){
             sys.getNode(path[0].int32.toString()).data.color="#FF0000";
             if(!(path[path.length-1].int32.toString() in nodeSet)){
 
-			    var connAccount = new AsterixDBConnection().dataverse("Account");
+			    var connAccount = new AsterixDBConnection().dataverse("Tasks");
 			    var whereClauseStr = '$node.user_id='+path[path.length-1].int32.toString();
 			    //alert(whereClauseStr);
 			    var exp = new FLWOGRExpression()
 				.ForClause("$node", new AExpression("dataset AccountInfo"))
 				.WhereClause().and(new AExpression(whereClauseStr))
 				.ReturnClause("$node");
-            	//alert("not in");
             	var succAccount = function(tempres){
             		var res = tempres["results"];
             		for(i in res){
@@ -522,7 +626,6 @@ function drawTaskOne(sourceNode, targetNode){
             			targetLabel = resJson.label;
             			sys.addNode(path[path.length-1].int32.toString(), {label:targetLabel, color:"#FF0000"});
             			outsideNodes.push(path[path.length-1].int32.toString());
-            			//allNodes.push(path[path.length-1].int32.toString());
             		}
             	}
             	connAccount.query(exp.val(),succAccount);

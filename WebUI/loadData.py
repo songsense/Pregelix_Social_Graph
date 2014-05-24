@@ -18,9 +18,9 @@ def loadData():
 
                         load dataset OriginalGraph using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/OriginalGraph.adm"),("format"="adm"));
 
-                        load dataset DisplayGraph using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/DisplayGraph.adm"),("format"="adm"));
-
                         use dataverse Tasks;
+
+                        load dataset DisplayGraph using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/DisplayGraph.adm"),("format"="adm"));
 
                         load dataset TaskOne using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/TaskOne.adm"),("format"="adm"));
 
@@ -29,8 +29,6 @@ def loadData():
                         load dataset TaskThree using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/TaskThree.adm"),("format"="adm"));
 
                         load dataset TaskFour using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/TaskFour.adm"),("format"="adm"));
-
-                        use dataverse Account;
 
                         load dataset AccountInfo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Graph_UI/graphFiles/Account.adm"),("format"="adm"));
                     '''
