@@ -1,13 +1,14 @@
+#!/usr/bin/python
 import runTask
 import bootstrap
 import task4
 ## change here for your path
-pregelixPath = "/Users/soushimei/Documents/pregelix/hyracks/pregelix/pregelix-dist/target/pregelix-dist-0.2.9-binary-assembly/"
+pregelixPath = "/Users/liqiangw/Documents/workspace/twitter_graph/hyracks/pregelix/pregelix-dist/target/pregelix-dist-0.2.9-binary-assembly/"
 # path to the graph
 ## change here for your path
-graphPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/data/graph/"
+graphPath = "/Volumes/TOSHIBA/BigGraphData/10k/adm/"
 ## change here for your path
-projectJarPath = "/Users/soushimei/Documents/workspace/Pregelix_Social_Graph/target/project-0.2.9-jar-with-dependencies.jar"
+projectJarPath = "/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/target/project-0.2.9-jar-with-dependencies.jar"
 # path to spanning tree results
 outputPath = "/tmp/pregelix/WeightedShortestPath/"
 # get ip script

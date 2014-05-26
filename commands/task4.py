@@ -37,9 +37,9 @@ def getGraph(graphPath):
 	return listFile[0]
 
 def runTask4(taskName, pregelixPath, projectJarPath, className, graphPath, outputPath, getIp, portNo,iterations, graphSize):
-	script = "bin/pregelix " + projectJarPath + " " 
-	script = script + className + " -inputpaths " + graphPath 
-	script = script + " -outputpath " + outputPath + " -ip " + getIp 
+	script = "bin/pregelix " + projectJarPath + " "
+	script = script + className + " -inputpaths " + graphPath
+	script = script + " -outputpath " + outputPath + " -ip " + getIp
 	script = script + " -port " + str(portNo) + " -iterations " + str(iterations)
 	script = script + " -vnum " + str(graphSize)
 	fileName = taskName + ".sh"
@@ -55,11 +55,11 @@ def analyzeResults(outputPath, resultDict):
 	from os.path import isfile, join
 	from os import listdir
 	files = [ f for f in listdir(outputPath) if isfile(join(outputPath,f)) and f[0] != '.' ]
-	
+
 	valueSum = 0.0
 	for fileName in files:
 		f = open(join(outputPath, fileName), "r")
-		lines = f.readlines()		
+		lines = f.readlines()
 		f.close()
 		for line in lines:
 			fields =  line.split("\t")
@@ -78,7 +78,7 @@ def synthetizeRsult(stDict, pageRankDict, finalResults):
 def cleanTask4DB():
 	import requests
 	from requests import ConnectionError, HTTPError
-	cleanDatasetStatment = '''		
+	cleanDatasetStatment = '''
 		create dataverse Tasks if not exists;
 		use dataverse Tasks;
 		create type TaskFourType if not exists as open  {
@@ -111,7 +111,7 @@ def saveTask4ToADM(finalResults):
 def saveTask4ToDB(admFileName):
 	import requests
 	from requests import ConnectionError, HTTPError
-	
+
 	loadStatement = '''use dataverse Tasks;load dataset TaskFour using localfs(("path"="localhost://''' + admFileName + '''"),("format"="adm"));'''
 	load = {"statements": loadStatement}
 	update_url = "http://" + asterix_host + ":" + str(asterix_port) + "/update"
@@ -128,15 +128,16 @@ def saveTask4ToDB(admFileName):
 def task4(pregelixPath, graphPath, projectJarPath):
 	graphName = getGraph(graphPath)
 	print "get the number of vertexes in the graph..."
+        print "graph path: ", graphPath, ", graph name: " + graphName
 	graphSize = open(graphPath+graphName,'rb').read().count('\n')
 	print "the vertexes # in the graph: ", graphSize
-	
+
 	print "begin running Pregelix Jobs..."
-	runTask4(stTaskName, pregelixPath, 
+	runTask4(stTaskName, pregelixPath,
 		projectJarPath, stMainClassName, graphPath, stOutputPath, getIp, portNo, iterations, graphSize)
-	runTask4(pageRankTaskName, pregelixPath, 
+	runTask4(pageRankTaskName, pregelixPath,
 		projectJarPath, pageRankClassName, graphPath, pageRankOutputPath, getIp, portNo, iterations, graphSize)
-	
+
 	global pageRankDict, stDict, finalResults
 
 	print "analyze the results of CDS..."
@@ -150,9 +151,9 @@ def task4(pregelixPath, graphPath, projectJarPath):
 	print "generate the ADM file for the results..."
 	admFileName = saveTask4ToADM(finalResults)
 	del finalResults
-	
+
 	print "clean the dataset before loading data into AsterixDB..."
-	cleanTask4DB()	
+	cleanTask4DB()
 	print "save the final results to the AsterixDB..."
 	saveTask4ToDB(admFileName)
 	print "all done!"
