@@ -26,8 +26,8 @@ public class WeightedPathWriter extends
     @Override
     public void writeVertex(Vertex<VLongWritable, WeightedPathWritable, FloatWritable, ?> vertex) throws IOException,
             InterruptedException {
-//        getRecordWriter().write(new Text(vertex.getVertexId().toString()),
-//                new Text(vertex.getVertexValue().toString() ));
+        getRecordWriter().write(new Text(vertex.getVertexId().toString()),
+                new Text(vertex.getVertexValue().toString() ));
 
         int targetUserId = (int) vertex.getVertexId().get();
         String id = SOURCE_ID + "_" + targetUserId;

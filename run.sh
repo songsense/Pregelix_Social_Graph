@@ -2,9 +2,11 @@ PREGELIX_LIB_HOME="/Users/liqiangw/Documents/workspace/twitter_graph/hyracks/pre
 PROJ_TARGET="`pwd`/target/"
 PROJ_CLASSES="`pwd`/target/classes/"
 #INPUT_PATH="`pwd`/data/task3/"
-INPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/adm"
+#INPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/adm"
+INPUT_PATH="/Volumes/TOSHIBA/BigGraphData/10k/adm"
 #OUTPUT_PATH="/tmp/wsp_result/"
-OUTPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/output"
+#OUTPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/output"
+OUTPUT_PATH="/Volumes/TOSHIBA/BigGraphData/10k/out"
 
 #echo *********Starting the cluster**************
 cd ${PREGELIX_LIB_HOME}
@@ -27,7 +29,7 @@ elif [ $1 == 3 ]; then
 	bin/pregelix ${PROJ_TARGET}/project-0.2.9-jar-with-dependencies.jar edu.uci.ics.biggraph.algo.SocialSuggestionVertex -inputpaths ${INPUT_PATH} -outputpath ${OUTPUT_PATH} -ip `bin/getip.sh` -port 13199 -iterations 10 -results-num 5
 elif [ $1 == 5 ]; then
 	echo running task 5...
-	bin/pregelix ${PROJ_TARGET}/project-0.2.9-jar-with-dependencies.jar edu.uci.ics.biggraph.algo.SubGraphVertex -inputpaths ${INPUT_PATH} -outputpath ${OUTPUT_PATH} -ip `bin/getip.sh` -port 13199 -iterations 3 -source-vertex 2
+	bin/pregelix ${PROJ_TARGET}/project-0.2.9-jar-with-dependencies.jar edu.uci.ics.biggraph.algo.SubGraphVertex -inputpaths ${INPUT_PATH} -outputpath ${OUTPUT_PATH} -ip `bin/getip.sh` -port 13199 -iterations 10 -source-vertex 2
 elif [ $1 == rebuild ]; then
 	echo rebuilding the database...
 	cd ${PROJ_CLASSES}

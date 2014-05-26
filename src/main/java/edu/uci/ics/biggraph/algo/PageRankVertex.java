@@ -114,7 +114,7 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
         return getVertexValue().toString();
     }
 
-    private void PrintStatus(DoubleWritable tmpVertexValue) {
+    private void printStatus(DoubleWritable tmpVertexValue) {
         /*
         System.out.print("===== ");
         System.out.print(" Vertex: " + getVertexId().toString());

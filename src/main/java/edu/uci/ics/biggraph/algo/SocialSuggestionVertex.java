@@ -129,13 +129,14 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
 
             curNumResults = tmpVertexValue.size();
             setVertexValue(tmpVertexValue);
-            
+
             // termination predicate
-//            if (curNumResults >= numResults) {
+            if (curNumResults >= numResults) {
 //                terminateJob();
-//
-//            }
-            
+                voteToHalt();
+                return;
+            }
+
             // send the newly received vertex IDs
             for (Edge<VLongWritable, IntWritable> edge : getEdges()) {
                 sendMsg(edge.getDestVertexId(), newVertices);
