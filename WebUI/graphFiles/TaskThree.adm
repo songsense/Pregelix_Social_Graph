@@ -1,4 +1,20 @@
-{"user_id":1, "suggested_friends":[2,3,4,5]}
-{"user_id":2, "suggested_friends":[3,4,5]}
-{"user_id":3, "suggested_friends":[4,5,6]}
-{"user_id":7, "suggested_friends":[8,9]}
+{ "user_id":   1, "suggested_friends":   [  4,   5,   6,   11,   7,   12,   13,   16,   14,   17,   15,   8,   9,   10,   19,   18,   20 ] }
+{ "user_id":   2, "suggested_friends":   [  3,   5,   6,   11,   7,   12,   13,   16,   14,   17,   15,   8,   9,   10,   19,   18,   20 ] }
+{ "user_id":   3, "suggested_friends":   [  2,   5,   6,   11,   7,   12,   13,   16,   14,   17,   15,   8,   9,   10,   19,   18,   20 ] }
+{ "user_id":   4, "suggested_friends":   [  1,   6,   11,   7,   12,   13,   16,   14,   17,   15,   8,   9,   10,   19,   18,   20 ] }
+{ "user_id":   5, "suggested_friends":   [  2,   3,   7,   12,   13,   16,   14,   17,   15,   1,   8,   9,   10,   19,   18,   20 ] }
+{ "user_id":   6, "suggested_friends":   [  4,   11,   8,   2,   3,   12,   13,   16,   9,   10,   14,   17,   15,   1,   20,   19,   18 ] }
+{ "user_id":   7, "suggested_friends":   [  5,   9,   10,   4,   11,   20,   2,   3,   12,   13,   16,   14,   17,   15,   1,   19,   18 ] }
+{ "user_id":   8, "suggested_friends":   [  6,   20,   5,   4,   11,   2,   3,   12,   13,   16,   14,   17,   15,   1,   19,   18 ] }
+{ "user_id":   9, "suggested_friends":   [  7,   6,   5,   4,   11,   2,   3,   12,   13,   16,   14,   17,   15,   1,   19,   18 ] }
+{ "user_id":   10, "suggested_friends":   [  7,   20,   6,   5,   4,   11,   2,   3,   12,   13,   16,   14,   17,   15,   1,   19,   18 ] }
+{ "user_id":   11, "suggested_friends":   [  14,   4,   6,   17,   15,   18,   2,   3,   7,   19,   1,   8,   9,   10,   20 ] }
+{ "user_id":   12, "suggested_friends":   [  17,   18,   5,   19,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   13, "suggested_friends":   [  16,   15,   5,   19,   18,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   14, "suggested_friends":   [  11,   16,   19,   5,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   15, "suggested_friends":   [  13,   11,   16,   17,   18,   5,   19,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   16, "suggested_friends":   [  13,   14,   15,   5,   17,   18,   4,   6,   19,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   17, "suggested_friends":   [  12,   11,   15,   18,   16,   5,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   18, "suggested_friends":   [  12,   13,   15,   17,   11,   16,   19,   5,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   19, "suggested_friends":   [  13,   14,   11,   12,   15,   18,   5,   16,   4,   6,   2,   3,   7,   1,   8,   9,   10,   20 ] }
+{ "user_id":   20, "suggested_friends":   [  8,   10,   7,   6,   5,   4,   11,   2,   3,   12,   13,   16,   14,   17,   15,   1,   19,   18 ] }

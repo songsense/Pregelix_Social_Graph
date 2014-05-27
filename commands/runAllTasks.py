@@ -1,4 +1,16 @@
-#!/usr/bin/python
+# usage:
+# change the following path variables
+# (too long to consider them as input of the script)
+# 1. pregelixPath: the path to the pregelix platform
+# 2. graphPath: the path to the adm graph file
+# 3. projectJarPath" the path to the project jar
+
+# The following variables need to be configured according to the graph
+# sourceId: source ID for task 1 and sub graph display;
+# numberResuls: number of results for task 3;
+# numVertices: number of vertices in the graph for task 4 (self configuration);
+# iterations: number of iterations to be run for task 2, 3 and sub graph display.
+
 import runTask
 import bootstrap
 import task4

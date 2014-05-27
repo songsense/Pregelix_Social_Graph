@@ -28,6 +28,12 @@ def bootstrap():
 
                         create dataset OriginalGraph(GraphType) primary key source_node;
 
+                        
+
+                        drop dataverse Tasks if exists;
+                        create dataverse Tasks;
+                        use dataverse Tasks;
+
                         create type DisplayGraphType as open {
                                id: string,
                                login_user_id: int32, 
@@ -36,11 +42,6 @@ def bootstrap():
                                target_nodes: [int32] 
                         }
                         create dataset DisplayGraph(DisplayGraphType) primary key id;
-
-
-                        drop dataverse Tasks if exists;
-                        create dataverse Tasks;
-                        use dataverse Tasks;
 
                         create type TaskOneType as open{
                                id: string,
@@ -73,9 +74,6 @@ def bootstrap():
                         }
                         create dataset TaskFour(TaskFourType) primary key user_id;
 
-                        drop dataverse Account if exists;
-                         create dataverse Account;
-                         use dataverse Account;
 
                          create type AccountType as open{
                                user_id: int32,
