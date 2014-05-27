@@ -1,3 +1,4 @@
+# usage: usage: python db_admcoconverter.py dataverse, dataset
 import sys
 import requests
 from requests import ConnectionError, HTTPError
