@@ -259,7 +259,7 @@ var logInUserId;
 var nodeSet = {};
 
 
-var backgroundColor = "#F8C3CD";
+var backgroundColor = "#B19693";
 var outsideNodesSetSet = {};
 var outsideEdgesSet = {};
 
