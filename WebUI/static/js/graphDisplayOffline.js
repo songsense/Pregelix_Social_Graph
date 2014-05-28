@@ -125,6 +125,10 @@ var Renderer = function(canvas){
 		ctx.beginPath()
 		if(edge.data.dashFlag == true)
 			ctx.setLineDash([5]);
+		if (edge.data.text != undefined) {
+			gfx.text(edge.data.text + " hops", (pt1.x+pt2.x)/2, (pt1.y+pt2.y)/2, {color:edge.data.color, align:"center", font:"Arial", size: 12})
+			//ctx.fillText(edge.data.text, (pt1.x+pt2.x)/2, (pt1.y+pt2.y)/2);
+		}
 		ctx.moveTo(tail.x, tail.y)
 		ctx.lineTo(head.x, head.y)
 		//ctx.dashedLine(head.x, head.y,tail.x, tail.y,[30,10]);
@@ -259,7 +263,7 @@ var logInUserId;
 var nodeSet = {};
 
 
-var backgroundColor = "#F8C3CD";
+var backgroundColor = "#B19693";
 var outsideNodesSetSet = {};
 var outsideEdgesSet = {};
 
@@ -358,7 +362,7 @@ function clearOutsideNodesSet() {
 /*
 *	add the outside nodes beside to a inside node
 */
-function addOutsideNode(outsideNode, insideNode) {
+function addOutsideNode(outsideNode, insideNode, distance2Dest) {
 	var connection = new AsterixDBConnection().dataverse("Graph");
 	var expression = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset OriginalGraph"))
@@ -373,7 +377,7 @@ function addOutsideNode(outsideNode, insideNode) {
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
 			outsideNodesSet[outsideNode] = true;
 
-			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor, dashFlag: true});			
+			sys.addEdge(insideNode, outsideNode, {text:distance2Dest.toString(), directed:false, color:backgroundColor, dashFlag: true});			
 			outsideEdgesSet[insideNode+"||"+outsideNode] = true;
 		}
 	}
@@ -756,7 +760,7 @@ function doDrawTaskTwo(resNode) {
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
 		} else {
-			alert("not in nodeset:"+nodeStr);			
+			//alert("not in nodeset:"+nodeStr);			
 			findIntermediateNodeNDraw(nodeStr);
 		}
 	}	
@@ -847,14 +851,16 @@ function findIntermediateNodeNDraw(outsideNode) {
 			var resJson = eval('(' + res[i] + ')');
 			var path = resJson.orderedlist;
 			var lastInNodeSet = logInUserId;
+			var step = 0;
 			for (var i = 2; i < path.length; ++i) {
 				var nodeStr = path[i].int32.toString();				
 				if (!(nodeStr in nodeSet)) {
+					distance2Dest = path.length-i;
 					break;
 				}				
 				lastInNodeSet = nodeStr;
 			}
-			addOutsideNode(outsideNode, lastInNodeSet);
+			addOutsideNode(outsideNode, lastInNodeSet, distance2Dest);
 		}
 	}
 
