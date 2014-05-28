@@ -13,7 +13,7 @@ http_header = { "content-type": "application/json" }
 def jsontest():
     return template('graph_display')
     # return template('test')
-    
+
 
 @route('/static/<filename:path>')
 def send_static(filename):
@@ -62,7 +62,7 @@ def run_log_in():
     password = request.forms.get('password');
     #print password;
     #print user_id+','+password
-    query_statement = 'use dataverse Account; for $n in dataset AccountInfo where $n.user_id='+str(user_id)+' return $n';
+    query_statement = 'use dataverse Tasks; for $n in dataset AccountInfo where $n.user_id='+str(user_id)+' return $n';
     query = {
         'query': query_statement
     };
@@ -70,6 +70,9 @@ def run_log_in():
         'content-type': 'application/json'
     }
     query_url = "http://" + asterix_host + ":" + str(asterix_port) + "/query"
+    ConnectionError = 1;
+    HTTPError = 1;
+    print query_url, query_statement;
     try:
         response = requests.get(query_url, params=query, headers=http_header)
         result = str(response.json()["results"][0]);
@@ -81,12 +84,14 @@ def run_log_in():
         label = labelArray[1].replace('"', '').strip();
         passwordArray = resultPassword.split(':');
         correctPassword = passwordArray[1].replace('"', '').replace('}', '').strip();
-        
+
+        print password, correctPassword;
+
         if(password==correctPassword):
             print "correct"
             return '<p id="returnResult">1</p><p id="returnLabel">'+ label +'</p>'
         else:
-            print "error"  
+            print "error"
             return '<p id="returnResult">0</p>'
     except (ConnectionError, HTTPError):
         print "Encountered connection error; stopping execution"
@@ -94,11 +99,11 @@ def run_log_in():
 
     return True
 
-# API Endpoints   
+# API Endpoints
 @route('/query')
 def run_asterix_query():
     return (build_response("query", dict(request.query)))
-    
+
 @route('/query/status')
 def run_asterix_query_status():
     return (build_response("query/status", dict(request.query)))
@@ -116,6 +121,6 @@ def run_asterix_ddl():
 def run_asterix_update():
     return (build_response("update", dict(request.query)))
 
-    
+
 # res = bootstrap.bootstrap()
 run(host='localhost', port=8081, debug=True)
