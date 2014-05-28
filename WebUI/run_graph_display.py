@@ -62,7 +62,7 @@ def run_log_in():
     password = request.forms.get('password');
     #print password;
     #print user_id+','+password
-    query_statement = 'use dataverse Account; for $n in dataset AccountInfo where $n.user_id='+str(user_id)+' return $n';
+    query_statement = 'use dataverse Tasks; for $n in dataset AccountInfo where $n.user_id='+str(user_id)+' return $n';
     query = {
         'query': query_statement
     };

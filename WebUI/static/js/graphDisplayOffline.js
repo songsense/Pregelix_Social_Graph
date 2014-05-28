@@ -270,7 +270,7 @@ var maxNumOutsideVIP = 5;
 
 var maxDegree = 4;
 
-var maxNodeNum = 49;
+var maxNodeNum = 20;
 
 var maxLevel = 3;
 
@@ -481,7 +481,8 @@ function drawGraph(dom, res){
 }*/
 
 function addNodeInGraph(inputNode, inputLabel, inputColor){
-	sys.addNode(inputNode, {label:inputLabel, color:inputColor});
+	//sys.addNode(inputNode, {label:inputLabel, color:inputColor});
+	sys.addNode(inputNode, {label:inputNode, color:inputColor});
 	allNodes.push(inputNode);
 	nodeSet[inputNode] = true;
 	
@@ -495,6 +496,7 @@ function addBiDirectEdgeInGraph(sourceNode, targetNode, inputColor){
 }
 
 function drawGraphBFS(dom, res){
+	alert("drawGraph");
 	deleteAllNodesAndEdges();
 	var nodeNeighbors = {};
 	var nodeWeights = {};
@@ -548,7 +550,10 @@ function drawGraphBFS(dom, res){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
 						edgeSet[currNode+"||"+neighbor]=true;
 						edgeSet[neighbor+"||"+currNode]=true;
+						//alert(nodeNum);
 						++nodeNum;
+						if(nodeNum>maxNodeNum)
+							break;
 					}
 					else
 						break;
@@ -661,27 +666,45 @@ function drawTaskOne(sourceNode, targetNode){
             	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
             }
 	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
-            for(var j=1; j<path.length-1; ++j){
-                if(j!=1){
+            for(var j=2; j<path.length-1; ++j){
+    //             if(j!=1){
                 	
-                    sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
-		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
+    //                 sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		  //   		coloredNodes.push(sys.getNode(path[j].int32.toString()));
 		    			
-		    		if(!(path[j+1].int32.toString() in nodeSet)){
+		  //   		if(!(path[j+1].int32.toString() in nodeSet)){
+		  //   			//add two nodes and add two edges
+		  //   			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
+		  //   			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+		  //   			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
+		  //   			break;
+		  //   		}
+				// }
+				// var sourceNodeObj = sys.getNode(path[j].int32.toString());
+    // 			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
+    //         	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+    //         	sys.pruneEdge(edgeArray[0]);
+    //         	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
+				// edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+				// coloredEdges.push(edgeArray[0]);
+				if(!(path[j].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-		    			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
-		    			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+		    			sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
+		    			outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
 		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
 		    			break;
-		    		}
-				}
-				var sourceNodeObj = sys.getNode(path[j].int32.toString());
-    			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
-            	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-            	sys.pruneEdge(edgeArray[0]);
-            	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
-				edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-				coloredEdges.push(edgeArray[0]);
+		    	}
+		    	else{
+		    		sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
+		    		var sourceNodeObj = sys.getNode(path[j-1].int32.toString());
+    				var targetNodeObj = sys.getNode(path[j].int32.toString());
+            		var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+            		sys.pruneEdge(edgeArray[0]);
+            		sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000"});
+					edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+					coloredEdges.push(edgeArray[0]);
+		    	}
            
             }
         }
