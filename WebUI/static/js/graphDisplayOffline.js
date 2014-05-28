@@ -673,7 +673,8 @@ function drawTaskOne(sourceNode, targetNode){
 		    			
 		    		if(!(path[j+1].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-		    			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
+		    			distance2Dest = path.length - j;
+		    			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
 		    			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
 		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
 		    			break;
