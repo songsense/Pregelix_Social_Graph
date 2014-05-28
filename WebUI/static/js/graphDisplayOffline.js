@@ -125,6 +125,10 @@ var Renderer = function(canvas){
 		ctx.beginPath()
 		if(edge.data.dashFlag == true)
 			ctx.setLineDash([5]);
+		if (edge.data.text != undefined) {
+			gfx.text(edge.data.text + " hops", (pt1.x+pt2.x)/2, (pt1.y+pt2.y)/2, {color:edge.data.color, align:"center", font:"Arial", size: 12})
+			//ctx.fillText(edge.data.text, (pt1.x+pt2.x)/2, (pt1.y+pt2.y)/2);
+		}
 		ctx.moveTo(tail.x, tail.y)
 		ctx.lineTo(head.x, head.y)
 		//ctx.dashedLine(head.x, head.y,tail.x, tail.y,[30,10]);
@@ -270,7 +274,7 @@ var maxNumOutsideVIP = 5;
 
 var maxDegree = 4;
 
-var maxNodeNum = 49;
+var maxNodeNum = 20;
 
 var maxLevel = 3;
 
@@ -358,7 +362,7 @@ function clearOutsideNodesSet() {
 /*
 *	add the outside nodes beside to a inside node
 */
-function addOutsideNode(outsideNode, insideNode) {
+function addOutsideNode(outsideNode, insideNode, distance2Dest) {
 	var connection = new AsterixDBConnection().dataverse("Graph");
 	var expression = new FLWOGRExpression()
 	.ForClause("$node", new AExpression("dataset OriginalGraph"))
@@ -373,7 +377,7 @@ function addOutsideNode(outsideNode, insideNode) {
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
 			outsideNodesSet[outsideNode] = true;
 
-			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor, dashFlag: true});			
+			sys.addEdge(insideNode, outsideNode, {text:distance2Dest.toString(), directed:false, color:backgroundColor, dashFlag: true});			
 			outsideEdgesSet[insideNode+"||"+outsideNode] = true;
 		}
 	}
@@ -481,7 +485,8 @@ function drawGraph(dom, res){
 }*/
 
 function addNodeInGraph(inputNode, inputLabel, inputColor){
-	sys.addNode(inputNode, {label:inputLabel, color:inputColor});
+	//sys.addNode(inputNode, {label:inputLabel, color:inputColor});
+	sys.addNode(inputNode, {label:inputNode, color:inputColor});
 	allNodes.push(inputNode);
 	nodeSet[inputNode] = true;
 	
@@ -495,6 +500,7 @@ function addBiDirectEdgeInGraph(sourceNode, targetNode, inputColor){
 }
 
 function drawGraphBFS(dom, res){
+	alert("drawGraph");
 	deleteAllNodesAndEdges();
 	var nodeNeighbors = {};
 	var nodeWeights = {};
@@ -548,7 +554,10 @@ function drawGraphBFS(dom, res){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
 						edgeSet[currNode+"||"+neighbor]=true;
 						edgeSet[neighbor+"||"+currNode]=true;
+						//alert(nodeNum);
 						++nodeNum;
+						if(nodeNum>maxNodeNum)
+							break;
 					}
 					else
 						break;
@@ -661,27 +670,46 @@ function drawTaskOne(sourceNode, targetNode){
             	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
             }
 	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
-            for(var j=1; j<path.length-1; ++j){
-                if(j!=1){
+            for(var j=2; j<path.length-1; ++j){
+    //             if(j!=1){
                 	
-                    sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
-		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
+    //                 sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		  //   		coloredNodes.push(sys.getNode(path[j].int32.toString()));
 		    			
-		    		if(!(path[j+1].int32.toString() in nodeSet)){
+		  //   		if(!(path[j+1].int32.toString() in nodeSet)){
+		  //   			//add two nodes and add two edges
+		  //   			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
+		  //   			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+		  //   			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
+		  //   			break;
+		  //   		}
+				// }
+				// var sourceNodeObj = sys.getNode(path[j].int32.toString());
+    // 			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
+    //         	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+    //         	sys.pruneEdge(edgeArray[0]);
+    //         	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
+				// edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+				// coloredEdges.push(edgeArray[0]);
+				if(!(path[j].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-		    			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
-		    			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+						distance2Dest = path.length - j + 1;
+		    			sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
+		    			outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
 		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
 		    			break;
-		    		}
-				}
-				var sourceNodeObj = sys.getNode(path[j].int32.toString());
-    			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
-            	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-            	sys.pruneEdge(edgeArray[0]);
-            	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
-				edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-				coloredEdges.push(edgeArray[0]);
+		    	}
+		    	else{
+		    		sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
+		    		var sourceNodeObj = sys.getNode(path[j-1].int32.toString());
+    				var targetNodeObj = sys.getNode(path[j].int32.toString());
+            		var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+            		sys.pruneEdge(edgeArray[0]);
+            		sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000"});
+					edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+					coloredEdges.push(edgeArray[0]);
+		    	}
            
             }
         }
@@ -733,7 +761,7 @@ function doDrawTaskTwo(resNode) {
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
 		} else {
-			alert("not in nodeset:"+nodeStr);			
+			//alert("not in nodeset:"+nodeStr);			
 			findIntermediateNodeNDraw(nodeStr);
 		}
 	}	
@@ -824,14 +852,16 @@ function findIntermediateNodeNDraw(outsideNode) {
 			var resJson = eval('(' + res[i] + ')');
 			var path = resJson.orderedlist;
 			var lastInNodeSet = logInUserId;
+			var step = 0;
 			for (var i = 2; i < path.length; ++i) {
 				var nodeStr = path[i].int32.toString();				
 				if (!(nodeStr in nodeSet)) {
+					distance2Dest = path.length-i;
 					break;
 				}				
 				lastInNodeSet = nodeStr;
 			}
-			addOutsideNode(outsideNode, lastInNodeSet);
+			addOutsideNode(outsideNode, lastInNodeSet, distance2Dest);
 		}
 	}
 
