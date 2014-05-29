@@ -1,14 +1,10 @@
 package edu.uci.ics.biggraph.algo;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
+import edu.uci.ics.biggraph.client.Client;
+import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
+import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.io.WeightedPathWritable;
-import org.apache.hadoop.io.FloatWritable;
-
-
+import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.Edge;
 import edu.uci.ics.pregelix.api.graph.MessageCombiner;
@@ -16,13 +12,12 @@ import edu.uci.ics.pregelix.api.graph.MsgList;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
-
-
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
-import edu.uci.ics.biggraph.client.Client;
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
-import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
+import org.apache.hadoop.io.FloatWritable;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.logging.Logger;
 
 
 public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> {
@@ -145,9 +140,9 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
                 minPath = msg.getPathArrayList();
             }
         }
-        if (LOG.getLevel() == Level.FINE) {
-            LOG.fine("Vertex " + getVertexId() + " got minDist = " + minDist + " vertex value = " + getVertexValue());
-        }
+//        if (LOG.getLevel() == Level.FINE) {
+//            LOG.fine("Vertex " + getVertexId() + " got minDist = " + minDist + " vertex value = " + getVertexValue());
+//        }
 
         if (minDist < getVertexValue().getWeight()) {
         	tmpVertexValue = new WeightedPathWritable();
@@ -155,14 +150,14 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
             // uncomment here to redisplay the exception
             // this prevents storing the path info into the vertex value
             tmpVertexValue.setPath(minPath, getVertexId().get());
-            System.out.println("Size of vertex value to be set: " + tmpVertexValue.size());
+//            System.out.println("Size of vertex value to be set: " + tmpVertexValue.size());
             setVertexValue(tmpVertexValue);
 
             for (Edge<VLongWritable, FloatWritable> edge : getEdges()) {
-                if (LOG.getLevel() == Level.FINE) {
-                    LOG.fine("Vertex " + getVertexId() + " sent to " + edge.getDestVertexId() + " = "
-                            + (minDist + edge.getEdgeValue().get()));
-                }
+//                if (LOG.getLevel() == Level.FINE) {
+//                    LOG.fine("Vertex " + getVertexId() + " sent to " + edge.getDestVertexId() + " = "
+//                            + (minDist + edge.getEdgeValue().get()));
+//                }
                 outputValue = new WeightedPathWritable();
                 outputValue.setWeight(minDist + (double) edge.getEdgeValue().get());
                 // uncomment here
@@ -187,6 +182,7 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
 //        job.setMessageCombinerClass(WeightedShortestPathVertex.SimpleMinCombiner.class);
         job.setMessageCombinerClass(DefaultMessageCombiner.class);
         job.setNoramlizedKeyComputerClass(VLongNormalizedKeyComputer.class);
+        job.setDynamicVertexValueSize(true);
         job.getConfiguration().setLong(SOURCE_ID, 0);
         Client.run(args, job);
     }

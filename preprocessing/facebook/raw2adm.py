@@ -9,7 +9,8 @@ import sys
 import namegen
 
 # Maximum entry in this big social graph
-MAX_ENTRY = 2198462
+#MAX_ENTRY = 2198462
+MAX_ENTRY = 500000
 FIRST_NAME_SET = "first-names.txt"
 LAST_NAME_SET = "surnames.txt"
 
@@ -44,6 +45,10 @@ def convert(filename):
     for i in graph_file:
         i = i.strip('\n')
         line_cnt += 1
+
+        if line_cnt > MAX_ENTRY:
+            break;
+
         strs = split_line(i)
         strs_len = len(strs)
         if strs_len == 0:
@@ -58,7 +63,7 @@ def convert(filename):
         # third item: target node
         # count the number of friends within the range of the graph
         fcnt = 0;
-        friends = "\"target_node\":["
+        friends = "\"target_nodes\":["
         # If no friends, just discard this node
         if strs_len == 1 or strs[1] == '' or int(strs[1]) > MAX_ENTRY:
             print "Warning: @line ", line_cnt, ", no friends"
@@ -86,8 +91,8 @@ def convert(filename):
         weight += "1.0]"
 
         # combine items
-        adm_entry = "{{" + source_node + "," + label + "," + \
-                    friends + "," + weight + "}}"
+        adm_entry = "{" + source_node + "," + label + "," + \
+                    friends + "," + weight + "}"
         #print adm_entry
         outfile.write(adm_entry + '\n')
 

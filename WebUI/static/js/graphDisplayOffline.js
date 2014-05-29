@@ -274,7 +274,7 @@ var maxNumOutsideVIP = 5;
 
 var maxDegree = 4;
 
-var maxNodeNum = 20;
+var maxNodeNum = 15;
 
 var maxLevel = 3;
 
@@ -363,10 +363,10 @@ function clearOutsideNodesSet() {
 *	add the outside nodes beside to a inside node
 */
 function addOutsideNode(outsideNode, insideNode, distance2Dest) {
-	var connection = new AsterixDBConnection().dataverse("Graph");
+	var connection = new AsterixDBConnection().dataverse("Tasks");
 	var expression = new FLWOGRExpression()
-	.ForClause("$node", new AExpression("dataset OriginalGraph"))
-	.WhereClause(new AExpression("$node.source_node=" + outsideNode))
+	.ForClause("$node", new AExpression("dataset AccountInfo"))
+	.WhereClause(new AExpression("$node.user_id=" + outsideNode))
 	.ReturnClause("$node.label");
 
 	var successGetLabel = function(tempres) {
@@ -500,12 +500,12 @@ function addBiDirectEdgeInGraph(sourceNode, targetNode, inputColor){
 }
 
 function drawGraphBFS(dom, res){
-	alert("drawGraph");
+	// alert("drawGraph");
 	deleteAllNodesAndEdges();
 	var nodeNeighbors = {};
 	var nodeWeights = {};
 	var nodeLabel = {};
-	//alert(res.length);
+	// alert(res.length);
 	for(i in res){
 		var resJson = eval('('+res[i]+')');
 		//alert(res);
@@ -523,7 +523,7 @@ function drawGraphBFS(dom, res){
 	visited[logInUserId] = true;
 	var nodeNum = 0;
 	var edgeSet = {};
-	for(var k=0; (k<maxLevel || nodeNum<maxNodeNum); ++k){
+	for(var k=0; nodeNum<maxNodeNum; ++k){
 		var neighborDisplayArray = [];
 		for(var j=0; j<levelArray[k].length; ++j){
 			var currNode = levelArray[k][j];
@@ -534,10 +534,9 @@ function drawGraphBFS(dom, res){
 			}
 			neighborsWeights.sort(function(a, b){if(a.weight>b.weight) return -1; if(a.weight<b.weight) return 1; return 0});
 			var nodeCount = 0;
-			for(var n=0; n<nodeNeighbors[currNode].length; ++n){
+			for(var n=0; n<Math.min(nodeNeighbors[currNode].length, maxDegree); ++n){
 				var neighbor = neighborsWeights[n].node;
 				//alert(neighborsWeights[n].weight);
-				++nodeCount;
 				if(visited[neighbor]==true){
 					if(!(edgeSet[currNode+"||"+neighbor]==true)){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
@@ -546,7 +545,6 @@ function drawGraphBFS(dom, res){
 					}
 				}
 				else{
-					if(nodeCount<maxDegree){
 						addNodeInGraph(neighbor, nodeLabel[neighbor], defaultNodeColor);
 						visited[neighbor]=true;
 						neighborDisplayArray.push(neighbor);
@@ -558,9 +556,6 @@ function drawGraphBFS(dom, res){
 						++nodeNum;
 						if(nodeNum>maxNodeNum)
 							break;
-					}
-					else
-						break;
 				}
 			}
 		}
@@ -693,7 +688,7 @@ function drawTaskOne(sourceNode, targetNode){
 				// coloredEdges.push(edgeArray[0]);
 				if(!(path[j].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-						distance2Dest = path.length - j + 1;
+						distance2Dest = path.length - j;
 		    			sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
 		    			outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
 		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());

@@ -27,14 +27,20 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         String nodeID = vertex.getVertexId().toString();
         String nodeVal = val.toString();
 
-        getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
+//        getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
+
+        System.err.println("numResults = " + numResults);
 
         String[] friends = nodeVal.split(" ");
         LinkedList<Integer> list = new LinkedList<Integer>();
+        int num = 0;
 
         for (String f : friends) {
             if (f != null && !f.isEmpty()) {
                 list.add(Integer.parseInt(f));
+                if (++num >= numResults) {
+                    break;
+                }
             }
         }
 
@@ -43,4 +49,6 @@ TextVertexWriter<VLongWritable, VLongArrayListWritable, IntWritable>{
         p.storeEntry();
     }
 
+    public static final String NUM_RESULTS = "SocialSuggestionVertex.results";
+    private static int numResults = Vertex.getContext().getConfiguration().getInt(NUM_RESULTS, 10);
 }

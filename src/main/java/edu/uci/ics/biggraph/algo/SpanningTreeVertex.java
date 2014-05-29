@@ -189,15 +189,15 @@ public class SpanningTreeVertex extends Vertex<VLongWritable, IntWritable, Float
     }
 
     private void printMessage(long idToDelete, Edge<VLongWritable, FloatWritable> edge) {
-        if (getVertexId().get() != 12 && getVertexId().get() != 16) {
-            return;
-        }
-        System.out.print("==== ");
-        System.out.print("vertex: " + getVertexId().toString());
-        System.out.print(" removes edge to vertex: " + idToDelete);
-        System.out.print(" edge value is: " + edge.getEdgeValue());
-        System.out.print(" edge dest id is: " + edge.getDestVertexId().toString());
-        System.out.println(" ====");
+//        if (getVertexId().get() != 12 && getVertexId().get() != 16) {
+//            return;
+//        }
+//        System.out.print("==== ");
+//        System.out.print("vertex: " + getVertexId().toString());
+//        System.out.print(" removes edge to vertex: " + idToDelete);
+//        System.out.print(" edge value is: " + edge.getEdgeValue());
+//        System.out.print(" edge dest id is: " + edge.getDestVertexId().toString());
+//        System.out.println(" ====");
     }
 
     public static void main(String[] args) throws Exception {

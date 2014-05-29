@@ -88,7 +88,7 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
         }
         if (getSuperstep() == 1) {
             tmpVertexValue.set(1.0 / numVertices);
-            PrintStatus(tmpVertexValue);
+            printStatus(tmpVertexValue);
             setVertexValue(tmpVertexValue);
         }
         if (getSuperstep() >= 2 && getSuperstep() <= maxIteration) {
@@ -114,12 +114,14 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
         return getVertexValue().toString();
     }
 
-    private void PrintStatus(DoubleWritable tmpVertexValue) {
+    private void printStatus(DoubleWritable tmpVertexValue) {
+        /*
         System.out.print("===== ");
         System.out.print(" Vertex: " + getVertexId().toString());
         System.out.print(" with tmpVertexValue: " + tmpVertexValue.toString());
         System.out.print(" total vertexes number: " + getNumVertices());
         System.out.println(" =====");
+        */
     }
 
     public static void main(String[] args) throws Exception {

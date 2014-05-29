@@ -96,8 +96,8 @@ public class TaskFiveTypeAccessor extends DataTypeAccessor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("use dataverse Graph;");
-        sb.append("delete $t from dataset DisplayGraph where $t.id = " +
-                id + ";");
+        sb.append("delete $t from dataset DisplayGraph where $t.id = \"" +
+                id + "\";");
 
         String cmd = sb.toString();
         cmd = URLGenerator.cmdParser(cmd);

@@ -12,21 +12,8 @@ public class WeightedPathWritable extends DoubleArrayListWritable {
         super();
         DoubleWritable dw = new DoubleWritable(Double.MAX_VALUE);
         this.add(new DoubleWritable(dw.get()));
-    	// here we assume the length of the array list is only 100
-        // @see setPathAlone()
-        for (int i = 0; i < 100; ++i) {
-        	this.add(new DoubleWritable(Double.MAX_VALUE));
-        }
 	}
 
-    @SuppressWarnings("unchecked")
-	public WeightedPathWritable(WeightedPathWritable weightedPathWritable) {
-        super();
-        for (int i = 0; i < weightedPathWritable.size(); ++i) {
-            DoubleWritable doubleWritable = (DoubleWritable) weightedPathWritable.get(i);
-            this.add(new DoubleWritable(doubleWritable.get()));
-        }
-    }
 
     @SuppressWarnings("unchecked")
 	@Override
@@ -82,20 +69,16 @@ public class WeightedPathWritable extends DoubleArrayListWritable {
 	public void setPath(ArrayList<Double> path, long id) {
         this.setPathAlone(path);
         double newID = (double) id;
-        this.set(path.size() + 1, (new DoubleWritable(newID)));
+        this.add(new DoubleWritable(newID));
     }
 
     @SuppressWarnings("unchecked")
 	public void setPathAlone(ArrayList<Double> path) {
         double weight = getWeight();
-        this.set(0, new DoubleWritable(weight));
+        this.clear();
+        this.add(new DoubleWritable(weight));
         for (int i = 0; i < path.size(); ++i) {
-        	this.set(i + 1, new DoubleWritable(path.get(i)));
-        }
-        for (int i = path.size() + 1; i < 101; ++i) {
-        	// here we assume the length of the array list is only 100
-        	// @see constructor for details
-        	this.set(i, new DoubleWritable(Double.MAX_VALUE));
+            this.add(new DoubleWritable(path.get(i)));
         }
     }
 
