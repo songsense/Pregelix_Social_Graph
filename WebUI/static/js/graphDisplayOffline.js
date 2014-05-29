@@ -363,10 +363,10 @@ function clearOutsideNodesSet() {
 *	add the outside nodes beside to a inside node
 */
 function addOutsideNode(outsideNode, insideNode, distance2Dest) {
-	var connection = new AsterixDBConnection().dataverse("Graph");
+	var connection = new AsterixDBConnection().dataverse("Tasks");
 	var expression = new FLWOGRExpression()
-	.ForClause("$node", new AExpression("dataset OriginalGraph"))
-	.WhereClause(new AExpression("$node.source_node=" + outsideNode))
+	.ForClause("$node", new AExpression("dataset AccountInfo"))
+	.WhereClause(new AExpression("$node.user_id=" + outsideNode))
 	.ReturnClause("$node.label");
 
 	var successGetLabel = function(tempres) {
