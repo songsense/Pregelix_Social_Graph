@@ -505,7 +505,7 @@ function drawGraphBFS(dom, res){
 	var nodeNeighbors = {};
 	var nodeWeights = {};
 	var nodeLabel = {};
-	//alert(res.length);
+	// alert(res.length);
 	for(i in res){
 		var resJson = eval('('+res[i]+')');
 		//alert(res);

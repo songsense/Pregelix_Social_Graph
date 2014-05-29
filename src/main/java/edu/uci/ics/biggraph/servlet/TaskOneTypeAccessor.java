@@ -36,7 +36,7 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
     public void setVertex(String id, int login_user_id, int target_user_id,
                           int length, LinkedList<Integer> path) {
         System.out.println("[Task1:setVertex] id: " + id + ", user id: " + login_user_id +
-                    "target: " + target_user_id + ", path length: " + length);
+                    " target: " + target_user_id + ", path length: " + length);
         this.id = id;
         this.login_user_id = login_user_id;
         this.target_user_id = target_user_id;
@@ -99,8 +99,8 @@ public class TaskOneTypeAccessor extends DataTypeAccessor {
         StringBuilder sb = new StringBuilder();
 
         sb.append("use dataverse Tasks;");
-        sb.append("delete $t from dataset TaskOne where $t.id = " +
-                id + ";");
+        sb.append("delete $t from dataset TaskOne where $t.id = \"" +
+                id + "\";");
 
         String cmd = sb.toString();
         cmd = URLGenerator.cmdParser(cmd);
