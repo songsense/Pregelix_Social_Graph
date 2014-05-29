@@ -280,7 +280,8 @@ var maxLevel = 3;findIntermediateNodeNDraw
 
 var maxPathLength = 7;
 
-
+// max len of the label
+var maxLenLabel = 7;
 
 
 function clearGraphVariables(){
@@ -340,6 +341,26 @@ function logOut(){
 }
 
 /*
+*		Label Abbreviation
+*/
+function labelAbbr(label) {
+	if (label.length <= maxLenLabel) {
+		return label;
+	}
+	var name = label.split(" ");
+	var firstName = name[0];
+	var lastName = name[1];
+
+	label = firstName + " " + lastName[0] + ".";
+	if (label.length <= maxLenLabel) {
+		return label;
+	}
+
+	label = firstName[0]+lastName[0];
+	return label;
+}
+
+/*
 *	clear the outside nodes
 */
 function clearOutsideNodesSet() {
@@ -376,6 +397,7 @@ function addOutsideNode(outsideNode, insideNode, distance2Dest) {
 		for (i in res) {
 			var resJson = eval('(' + res[i] + ')');
 			var label = resJson.toString();
+			label = labelAbbr(label);
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
 			outsideNodesSet[outsideNode] = true;
 
