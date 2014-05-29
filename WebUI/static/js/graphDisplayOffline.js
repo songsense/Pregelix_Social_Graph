@@ -276,7 +276,9 @@ var maxDegree = 4;
 
 var maxNodeNum = 15;
 
-var maxLevel = 3;
+var maxLevel = 3;findIntermediateNodeNDraw
+
+var maxPathLength = 7;
 
 
 
@@ -615,6 +617,27 @@ function loadGraph(){
 		
 }
 
+function addOutSideNodeForTaskOne(nodeID, nodeColor){
+	var connAccount = new AsterixDBConnection().dataverse("Tasks");
+    var whereClauseStr = '$node.user_id='+nodeID;
+    //alert(whereClauseStr);
+    var exp = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset AccountInfo"))
+	.WhereClause().and(new AExpression(whereClauseStr))
+	.ReturnClause("$node");
+	var succAccount = function(tempres){
+		var res = tempres["results"];
+		for(i in res){
+			var resJson = eval('('+res[i]+')');
+			targetLabel = resJson.label;
+
+			sys.addNode(nodeID, {label:targetLabel, color: nodeColor});            			
+			outsideNodesSet[nodeID] = true;
+			//allNodes.push(path[path.length-1].int32.toString());
+		}
+	}
+	connAccount.query(exp.val(),succAccount);       
+}
 /*
 draw Task1
 */
@@ -639,60 +662,32 @@ function drawTaskOne(sourceNode, targetNode){
             	 // alert(path[j].int32.toString());
             sys.getNode(path[0].int32.toString()).data.color="#FF0000";
             if(!(path[path.length-1].int32.toString() in nodeSet)){
-
-			    var connAccount = new AsterixDBConnection().dataverse("Tasks");
-			    var whereClauseStr = '$node.user_id='+path[path.length-1].int32.toString();
-			    //alert(whereClauseStr);
-			    var exp = new FLWOGRExpression()
-				.ForClause("$node", new AExpression("dataset AccountInfo"))
-				.WhereClause().and(new AExpression(whereClauseStr))
-				.ReturnClause("$node");
-            	var succAccount = function(tempres){
-            		var res = tempres["results"];
-            		for(i in res){
-            			var resJson = eval('('+res[i]+')');
-            			targetLabel = resJson.label;
-
-            			sys.addNode(path[path.length-1].int32.toString(), {label:targetLabel, color:"#FF0000"});            			
-            			outsideNodesSet[path[path.length-1].int32.toString()] = true;
-            			//allNodes.push(path[path.length-1].int32.toString());
-            		}
-            	}
-            	connAccount.query(exp.val(),succAccount);            	
+			    addOutSideNodeForTaskOne(path[path.length-1].int32.toString(), "#FF0000");       	
             }
             else{
             	sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
             	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
             }
 	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
+	    	var prevNode = -1;
             for(var j=2; j<path.length-1; ++j){
-    //             if(j!=1){
-                	
-    //                 sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
-		  //   		coloredNodes.push(sys.getNode(path[j].int32.toString()));
-		    			
-		  //   		if(!(path[j+1].int32.toString() in nodeSet)){
-		  //   			//add two nodes and add two edges
-		  //   			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
-		  //   			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
-		  //   			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
-		  //   			break;
-		  //   		}
-				// }
-				// var sourceNodeObj = sys.getNode(path[j].int32.toString());
-    // 			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
-    //         	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-    //         	sys.pruneEdge(edgeArray[0]);
-    //         	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
-				// edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-				// coloredEdges.push(edgeArray[0]);
+
 				if(!(path[j].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-						distance2Dest = path.length - j;
-		    			sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
-		    			outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
-		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
-		    			break;
+		    			if(j>=maxPathLength){
+							distance2Dest = path.length - j;
+		    				sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
+		    				outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+		    				//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
+		    				prevNode = -1;
+		    				break;
+		    			}
+		    			else{
+            				addOutSideNodeForTaskOne(path[j].int32.toString(), "#CA7A2C");
+            				sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000", dashFlag: false})
+		    				outsideEdgesSet[path[j-1].int32.toString()+"||"+path[j].int32.toString()] = true;
+		    				prevNode = j;
+		    			}
 		    	}
 		    	else{
 		    		sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
@@ -704,9 +699,16 @@ function drawTaskOne(sourceNode, targetNode){
             		sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000"});
 					edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
 					coloredEdges.push(edgeArray[0]);
+					prevNode = j;
 		    	}
            
             }
+            if(prevNode != -1){
+            	sys.addEdge(path[prevNode].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#FF0000", dashFlag: false})
+		    	outsideEdgesSet[path[prevNode].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+            }
+
+
         }
 	}
 	connTask1.query(expTask1.val(), succTask1);
