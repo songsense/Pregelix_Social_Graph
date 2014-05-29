@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # usage: usage: python db_admcoconverter.py dataverse, dataset
 import sys
 import requests
