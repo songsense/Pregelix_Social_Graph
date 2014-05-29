@@ -270,13 +270,16 @@ var outsideEdgesSet = {};
 var maxNumVIP = 5;
 var maxNumOutsideVIP = 5;
 
+// max num of community member
+var maxCommunityMembers = 10;
+
 //var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
 
 var maxDegree = 4;
 
 var maxNodeNum = 15;
 
-var maxLevel = 3;findIntermediateNodeNDraw
+var maxLevel = 3;
 
 var maxPathLength = 7;
 
@@ -767,7 +770,12 @@ function doDrawTaskTwo(resNode) {
 	sys.addNode("tempNode1", {label:"tempNode1", color:"#FFFFFF"});
 	sys.addNode("tempNode2", {label:"tempNode2", color:"#FFFFFF"});	
 	var nodesInCommunity = [];
+	var cnt = 0;
 	for (m in resNode) {
+		if (cnt > maxCommunityMembers) {
+			break;
+		}
+		++cnt;
 		var resJson = eval('(' + resNode[m] + ')');
 		var nodeStr = resJson.user_id.int32.toString();
 		if (nodeStr in nodeSet) {
@@ -792,7 +800,7 @@ function doDrawTaskTwo(resNode) {
 	}	
 	sys.pruneNode(sys.getNode("tempNode1"));
 	sys.pruneNode(sys.getNode("tempNode2"));
-	
+		
 	for (var i = 0; i < nodesInCommunity.length; ++i) {
 		for (var j = 0; j < nodesInCommunity.length; ++j) {
         	var sourceNodeObj = sys.getNode(nodesInCommunity[i]);
