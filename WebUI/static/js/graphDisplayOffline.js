@@ -283,6 +283,8 @@ var maxPathLength = 7;
 // max len of the label
 var maxLenLabel = 7;
 
+var logInNodeColor = "#990099";
+
 
 function clearGraphVariables(){
 	coloredNodes = [];
@@ -510,7 +512,7 @@ function drawGraph(dom, res){
 
 function addNodeInGraph(inputNode, inputLabel, inputColor){
 	//sys.addNode(inputNode, {label:inputLabel, color:inputColor});
-	sys.addNode(inputNode, {label:inputNode, color:inputColor});
+	sys.addNode(inputNode, {label:inputLabel, color:inputColor});
 	allNodes.push(inputNode);
 	nodeSet[inputNode] = true;
 	
@@ -537,12 +539,12 @@ function drawGraphBFS(dom, res){
 		var targetNodeArray = resJson.target_nodes.orderedlist;
 		nodeNeighbors[sourceNode] = targetNodeArray;
 		nodeWeights[sourceNode] = resJson.importance.orderedlist[0];
-		nodeLabel[sourceNode] = resJson.label.orderedlist[0];
+		nodeLabel[sourceNode] = labelAbbr(resJson.label.orderedlist[0]);
 	}
 	var levelArray = [];
 	var level = [logInUserId];
 	levelArray.push(level);
-	addNodeInGraph(logInUserId, nodeLabel[logInUserId], defaultNodeColor);
+	addNodeInGraph(logInUserId, nodeLabel[logInUserId], logInNodeColor);
 	var visited = {};
 	visited[logInUserId] = true;
 	var nodeNum = 0;
@@ -653,7 +655,7 @@ function addOutSideNodeForTaskOne(nodeID, nodeColor){
 			var resJson = eval('('+res[i]+')');
 			targetLabel = resJson.label;
 
-			sys.addNode(nodeID, {label:targetLabel, color: nodeColor});            			
+			sys.addNode(nodeID, {label:labelAbbr(targetLabel), color: nodeColor});            			
 			outsideNodesSet[nodeID] = true;
 			//allNodes.push(path[path.length-1].int32.toString());
 		}
@@ -682,7 +684,7 @@ function drawTaskOne(sourceNode, targetNode){
             var targetLabel = "";
             // for(var j=0; j<path.length; ++j)
             	 // alert(path[j].int32.toString());
-            sys.getNode(path[0].int32.toString()).data.color="#FF0000";
+            sys.getNode(path[0].int32.toString()).data.color=logInNodeColor;
             if(!(path[path.length-1].int32.toString() in nodeSet)){
 			    addOutSideNodeForTaskOne(path[path.length-1].int32.toString(), "#FF0000");       	
             }
@@ -771,7 +773,11 @@ function doDrawTaskTwo(resNode) {
 		if (nodeStr in nodeSet) {
 			// color node
 			var nodeObj = sys.getNode(nodeStr);
-			nodeObj.data.color = colorArray[1];
+			if (nodeStr == logInUserId)
+				nodeObj.data.color = logInNodeColor;
+			else
+				nodeObj.data.color = colorArray[1];
+
 			coloredNodes.push(nodeObj);
 
 			nodesInCommunity.push(nodeStr);
@@ -905,7 +911,7 @@ function doDrawTaskThree(resNode) {
 			$('#tips').html('<p style="font-size: 30px; text-align:center">No suggested friends!</p>');
 			continue;
 		} else {
-            sys.getNode(nodeID).data.color=colorArray[0];
+            sys.getNode(nodeID).data.color=logInNodeColor;
 			coloredNodes.push(sys.getNode(nodeID));
             var minFriendNum = (friendNum>inputFriendNum?inputFriendNum:friendNum);
             for(var k=0; k<minFriendNum; ++k){
@@ -990,7 +996,7 @@ function queryDrawTaskFour() {
 			}
 		}
 		var nodeObj = sys.getNode(logInUserId);
-		nodeObj.data.color = colorArray[0];
+		nodeObj.data.color = logInNodeColor;
 		coloredNodes.push(nodeObj);	
 	}
 
