@@ -174,51 +174,91 @@ var Renderer = function(canvas){
             // set up a handler object that will initially listen for mousedowns then
             // for moves and mouseups while dragging
             var handler = {
-		clicked:function(e){
-		    var pos = $(canvas).offset();
-		    _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-		    dragged = particleSystem.nearest(_mouseP);
+				clicked:function(e){
+				    var pos = $(canvas).offset();
+				    _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+				    dragged = particleSystem.nearest(_mouseP);
 
-		    if (dragged && dragged.node !== null){
-			// while we're dragging, don't let physics move the node
-			dragged.node.fixed = true
-		    }
+				    if (dragged && dragged.node !== null){
+					// while we're dragging, don't let physics move the node
+					dragged.node.fixed = true
+				    }
 
-		    $(canvas).bind('mousemove', handler.dragged)
-		    $(window).bind('mouseup', handler.dropped)
+				    $(canvas).bind('mousemove', handler.dragged)
+				    $(window).bind('mouseup', handler.dropped)
 
-		    return false
-		},
-		dragged:function(e){
-		    var pos = $(canvas).offset();
-		    var s = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+				    return false
+				},
+				dragged:function(e){
+				    var pos = $(canvas).offset();
+				    var s = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
 
-		    if (dragged && dragged.node !== null){
-			var p = particleSystem.fromScreen(s)
-			dragged.node.p = p
-		    }
+				    if (dragged && dragged.node !== null){
+					var p = particleSystem.fromScreen(s)
+					dragged.node.p = p
+				    }
 
-		    return false
-		},
+				    return false
+				},
 
-		dropped:function(e){
-		    if (dragged===null || dragged.node===undefined) return
-		    if (dragged.node !== null) dragged.node.fixed = false
-		    dragged.node.tempMass = 1000
-		    dragged = null
-		    $(canvas).unbind('mousemove', handler.dragged)
-		    $(window).unbind('mouseup', handler.dropped)
-		    _mouseP = null
-		    return false
-		}
-            }
-            
-            // start listening
-            $(canvas).mousedown(handler.clicked);
+				dropped:function(e){
+				    if (dragged===null || dragged.node===undefined) return
+				    if (dragged.node !== null) dragged.node.fixed = false
+				    dragged.node.tempMass = 1000
+				    dragged = null
+				    $(canvas).unbind('mousemove', handler.dragged)
+				    $(window).unbind('mouseup', handler.dropped)
+				    _mouseP = null
+				    return false
+				},
+		      	enter:function(e){
+		            var pos = $(canvas).offset();
+		            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+		            nearest = sys.nearest(_mouseP);
 
-	},
-	
-    }
+		            if (!nearest.node || nearest.distance > 120) 
+		            // if (!nearest.node)
+		            	return false;
+		            var label = nearest.node.data.label;
+		            if (isNaN(parseInt(label))) {
+		            	// label string
+		            	nearest.node.data.copyLabel = nearest.node.data.label;
+			            nearest.node.data.label = nearest.node.name;			       
+		            } else {
+		            	// id string
+		            	nearest.node.data.label = nearest.node.data.copyLabel;
+		            }
+		            /*
+		            if (isNaN(parseInt(label))) {
+		            	nearest.node.data.copyLabel = nearest.node.data.label;
+			            nearest.node.data.label = nearest.node.name;
+		            } else {
+		            	return false;
+		            } 
+		            */
+		            
+				},
+				leave:function(e){
+		            var pos = $(canvas).offset();
+		            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+		            nearest = sys.nearest(_mouseP);
+
+		            if (!nearest.node || nearest.distance > 120) 
+		            // if (!nearest.node)
+		            	return false;
+		            if (nearest.node.data.copyLabel == undefined ||
+		            	!nearest.node.data.copyLabel ||
+		            	isNaN(parseInt(nearest.node.data.label)))
+		            	return false;
+		            nearest.node.data.label = nearest.node.data.copyLabel;
+				}
+			}          
+	        // start listening
+	        $(canvas).mousedown(handler.clicked);
+	        $(canvas).mousedown(handler.enter);
+	    },
+	}
+
     return that
 }
 
@@ -275,9 +315,9 @@ var maxCommunityMembers = 10;
 
 //var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
 
-var maxDegree = 4;
+var maxDegree = 10;
 
-var maxNodeNum = 15;
+var maxNodeNum = 20;
 
 var maxLevel = 3;
 
@@ -357,6 +397,11 @@ function labelAbbr(label) {
 	var lastName = name[1];
 
 	label = firstName + " " + lastName[0] + ".";
+	if (label.length <= maxLenLabel) {
+		return label;
+	}
+
+	label = firstName[0] + ". " + lastName;
 	if (label.length <= maxLenLabel) {
 		return label;
 	}
@@ -583,8 +628,10 @@ function drawGraphBFS(dom, res){
 						edgeSet[neighbor+"||"+currNode]=true;
 						//alert(nodeNum);
 						++nodeNum;
-						if(nodeNum>maxNodeNum)
-							break;
+						if(nodeNum>maxNodeNum){
+							//alert("break");
+							return;
+						}
 				}
 			}
 		}

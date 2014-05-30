@@ -16,17 +16,17 @@ def loadData():
     query_statement = '''
                         use dataverse Tasks;
 
-                        load dataset DisplayGraph using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/TenThousand/DisplayGraph.adm"),("format"="adm"));
+                        load dataset DisplayGraph using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/randomGraph/DisplayGraph.adm"),("format"="adm"));
 
-                        load dataset TaskOne using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/TenThousand/TaskOne.adm"),("format"="adm"));
+                        load dataset TaskOne using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/randomGraph/TaskOne.adm"),("format"="adm"));
 
-                        load dataset TaskTwo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/TenThousand/TaskTwo.adm"),("format"="adm"));
+                        load dataset TaskTwo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/randomGraph/TaskTwo.adm"),("format"="adm"));
 
-                        load dataset TaskThree using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/TenThousand/TaskThree.adm"),("format"="adm"));
+                        load dataset TaskThree using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/randomGraph/TaskThree.adm"),("format"="adm"));
 
-                        load dataset TaskFour using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/TenThousand/TaskFour.adm"),("format"="adm"));
+                        load dataset TaskFour using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/randomGraph/TaskFour.adm"),("format"="adm"));
 
-                        load dataset AccountInfo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/TenThousand/Account.adm"),("format"="adm"));
+                        load dataset AccountInfo using localfs(("path"="localhost:///home/zhimin/study/CS295/Pregelix_Social_Graph_Analysis_Visulization/Pregelix_Social_Graph/WebUI/graphFiles/randomGraph/Account.adm"),("format"="adm"));
                     '''
 
     load = {
