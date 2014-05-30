@@ -1,12 +1,9 @@
 package edu.uci.ics.biggraph.inputformat;
 
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.biggraph.io.WeightedPathWritable;
-import edu.uci.ics.pregelix.api.graph.Vertex;
-import edu.uci.ics.pregelix.api.io.VertexReader;
-import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
-import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
-import edu.uci.ics.pregelix.api.util.BspUtils;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -14,9 +11,13 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import edu.uci.ics.biggraph.io.WeightedPathWritable;
+import edu.uci.ics.pregelix.api.graph.Vertex;
+import edu.uci.ics.pregelix.api.io.VertexReader;
+import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
+import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat.TextVertexReader;
+import edu.uci.ics.pregelix.api.util.BspUtils;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 public class WeightedShortestPathsInputFormat extends
 TextVertexInputFormat<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable>{

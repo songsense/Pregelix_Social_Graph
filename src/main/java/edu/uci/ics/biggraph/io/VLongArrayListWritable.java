@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import edu.uci.ics.pregelix.api.io.WritableSizable;
 import edu.uci.ics.pregelix.api.util.ArrayListWritable;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 /**
  * Created by soushimei on 4/13/14.

@@ -1,10 +1,11 @@
 package edu.uci.ics.biggraph.algo;
 
+import java.util.Iterator;
+
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.inputformat.PageRankVertexInputFormat;
 import edu.uci.ics.biggraph.io.DoubleWritable;
 import edu.uci.ics.biggraph.io.FloatWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.outputformat.PageRankOutputFormat;
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.MessageCombiner;
@@ -12,8 +13,7 @@ import edu.uci.ics.pregelix.api.graph.MsgList;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
-
-import java.util.Iterator;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 /**
  * Created by soushimei on 5/16/14.
@@ -25,6 +25,7 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
     private DoubleWritable tmpVertexValue = new DoubleWritable();
     private int maxIteration = -1;
     private final long numVertices = getContext().getConfiguration().getLong(NUM_VERTICES, 20);
+
     /**
      * Test whether combiner is called by summing up the messages.
      */
@@ -64,7 +65,21 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
             msgList.add(agg);
             return msgList;
         }
+
+        @Override
+        public void stepPartial2(VLongWritable vertexIndex, DoubleWritable partialAggregate)
+                throws HyracksDataException {
+            sum += partialAggregate.get();
+
+        }
+
+        @Override
+        public DoubleWritable finishPartial2() {
+            agg.set(sum);
+            return agg;
+        }
     }
+
     /**
      * The key method that users need to implement to process
      * incoming messages in each superstep.
@@ -78,8 +93,9 @@ public class PageRankVertex extends Vertex<VLongWritable, DoubleWritable, FloatW
      * 3. In each partition, the vertex Java object is reused
      * for all the vertice to be processed in the same partition. (The model
      * is the same as the key-value objects in hadoop map tasks.)
-     *
-     * @param msgIterator an iterator of incoming messages
+     * 
+     * @param msgIterator
+     *            an iterator of incoming messages
      */
     @Override
     public void compute(Iterator<DoubleWritable> msgIterator) throws Exception {

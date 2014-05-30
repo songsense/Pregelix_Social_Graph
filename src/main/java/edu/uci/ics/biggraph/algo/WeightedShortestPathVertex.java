@@ -1,8 +1,13 @@
 package edu.uci.ics.biggraph.algo;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.logging.Logger;
+
+import org.apache.hadoop.io.FloatWritable;
+
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.inputformat.WeightedShortestPathsInputFormat;
-import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.io.WeightedPathWritable;
 import edu.uci.ics.biggraph.outputformat.WeightedOutputFormat;
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
@@ -13,11 +18,7 @@ import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
-import org.apache.hadoop.io.FloatWritable;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.logging.Logger;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 
 public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPathWritable, FloatWritable, WeightedPathWritable> {
@@ -91,6 +92,26 @@ public class WeightedShortestPathVertex extends Vertex<VLongWritable, WeightedPa
             int size = accumulatedSize;
             size += (partialAggregate.sizeInBytes());
             return size;
+        }
+        
+        @Override
+        public void stepPartial2(VLongWritable vertexIndex, WeightedPathWritable partialAggregate)
+                throws HyracksDataException {
+            double value = partialAggregate.getWeight();
+            if (min > value) {
+                min = value;
+                path = partialAggregate.getPathArrayList();
+            }
+            accumulatedSize += partialAggregate.sizeInBytes();
+        }
+
+        /* (non-Javadoc)
+         * @see edu.uci.ics.pregelix.api.graph.MessageCombiner#finishPartial2()
+         */
+        @Override
+        public WeightedPathWritable finishPartial2() {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
 
