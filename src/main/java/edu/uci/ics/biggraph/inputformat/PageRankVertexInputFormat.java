@@ -4,23 +4,23 @@ package edu.uci.ics.biggraph.inputformat;
  * Created by soushimei on 5/16/14.
  */
 
-import edu.uci.ics.biggraph.io.DoubleWritable;
-import edu.uci.ics.biggraph.io.FloatWritable;
-import edu.uci.ics.biggraph.io.IntWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.pregelix.api.graph.Vertex;
-import edu.uci.ics.pregelix.api.io.VertexReader;
-import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
-import edu.uci.ics.pregelix.api.util.BspUtils;
-import org.apache.hadoop.io.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.VLongWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import edu.uci.ics.biggraph.io.DoubleWritable;
+import edu.uci.ics.biggraph.io.FloatWritable;
+import edu.uci.ics.pregelix.api.graph.Vertex;
+import edu.uci.ics.pregelix.api.io.VertexReader;
+import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
+import edu.uci.ics.pregelix.api.util.BspUtils;
 
 
 public class PageRankVertexInputFormat extends

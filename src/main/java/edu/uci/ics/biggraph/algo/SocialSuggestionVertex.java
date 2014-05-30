@@ -1,10 +1,15 @@
 package edu.uci.ics.biggraph.algo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.logging.Logger;
+
 import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.inputformat.SocialSuggestionInputFormat;
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongArrayListWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.outputformat.SocialSuggestionOutputFormat;
 import edu.uci.ics.hyracks.api.exceptions.HyracksDataException;
 import edu.uci.ics.pregelix.api.graph.Edge;
@@ -14,12 +19,7 @@ import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.logging.Logger;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayListWritable, IntWritable, VLongArrayListWritable> {
     /**
@@ -64,6 +64,25 @@ public class SocialSuggestionVertex extends Vertex<VLongWritable, VLongArrayList
 
         @Override
         public MsgList<VLongArrayListWritable> finishFinal() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        /* (non-Javadoc)
+         * @see edu.uci.ics.pregelix.api.graph.MessageCombiner#stepPartial2(org.apache.hadoop.io.WritableComparable, org.apache.hadoop.io.Writable)
+         */
+        @Override
+        public void stepPartial2(VLongWritable vertexIndex, VLongArrayListWritable partialAggregate)
+                throws HyracksDataException {
+            // TODO Auto-generated method stub
+            
+        }
+
+        /* (non-Javadoc)
+         * @see edu.uci.ics.pregelix.api.graph.MessageCombiner#finishPartial2()
+         */
+        @Override
+        public VLongArrayListWritable finishPartial2() {
             // TODO Auto-generated method stub
             return null;
         }

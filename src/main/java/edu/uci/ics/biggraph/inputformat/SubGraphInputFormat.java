@@ -1,15 +1,16 @@
 package edu.uci.ics.biggraph.inputformat;
 
-import edu.uci.ics.biggraph.io.HelloCntParentIdWritable;
-import edu.uci.ics.biggraph.io.IntWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
-import edu.uci.ics.pregelix.api.io.VertexReader;
-import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
+import java.io.IOException;
+
 import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
-import java.io.IOException;
+import edu.uci.ics.biggraph.io.HelloCntParentIdWritable;
+import edu.uci.ics.biggraph.io.IntWritable;
+import edu.uci.ics.pregelix.api.io.VertexReader;
+import edu.uci.ics.pregelix.api.io.text.TextVertexInputFormat;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 /**
  * Created by liqiangw on 5/18/14.

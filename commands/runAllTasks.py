@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # usage:
 # change the following path variables
 # (too long to consider them as input of the script)

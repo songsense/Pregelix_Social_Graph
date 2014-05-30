@@ -1,12 +1,12 @@
 package edu.uci.ics.biggraph.inputformat;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Map;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonReader;
 
 /**
  * ADMParser - Convert ADM graph file like:

@@ -7,13 +7,13 @@ import edu.uci.ics.biggraph.client.Client;
 import edu.uci.ics.biggraph.inputformat.CommunityClusterInputFormat;
 import edu.uci.ics.biggraph.io.FloatWritable;
 import edu.uci.ics.biggraph.io.VLongIntWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.biggraph.outputformat.CommunityClusterOutputFormat;
 import edu.uci.ics.pregelix.api.graph.Edge;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.job.PregelixJob;
 import edu.uci.ics.pregelix.api.util.DefaultMessageCombiner;
 import edu.uci.ics.pregelix.example.data.VLongNormalizedKeyComputer;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 public class CommunityClusterVertex extends Vertex<VLongWritable, VLongIntWritable, FloatWritable, VLongWritable>{
 	HashMap<Long, Integer> vertexFreq = new HashMap<Long, Integer>();

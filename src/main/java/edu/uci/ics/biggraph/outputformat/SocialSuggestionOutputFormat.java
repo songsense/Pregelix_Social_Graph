@@ -8,9 +8,9 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
 import edu.uci.ics.biggraph.io.IntWritable;
 import edu.uci.ics.biggraph.io.VLongArrayListWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.pregelix.api.io.VertexWriter;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 public class SocialSuggestionOutputFormat extends
 TextVertexOutputFormat<VLongWritable, VLongArrayListWritable, IntWritable> {
