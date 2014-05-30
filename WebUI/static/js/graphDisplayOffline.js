@@ -125,6 +125,10 @@ var Renderer = function(canvas){
 		ctx.beginPath()
 		if(edge.data.dashFlag == true)
 			ctx.setLineDash([5]);
+		if (edge.data.text != undefined) {
+			gfx.text(edge.data.text + " hops", (pt1.x+pt2.x)/2, (pt1.y+pt2.y)/2, {color:edge.data.color, align:"center", font:"Arial", size: 12})
+			//ctx.fillText(edge.data.text, (pt1.x+pt2.x)/2, (pt1.y+pt2.y)/2);
+		}
 		ctx.moveTo(tail.x, tail.y)
 		ctx.lineTo(head.x, head.y)
 		//ctx.dashedLine(head.x, head.y,tail.x, tail.y,[30,10]);
@@ -266,15 +270,23 @@ var outsideEdgesSet = {};
 var maxNumVIP = 5;
 var maxNumOutsideVIP = 5;
 
+// max num of community member
+var maxCommunityMembers = 10;
+
 //var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
 
 var maxDegree = 4;
 
-var maxNodeNum = 49;
+var maxNodeNum = 15;
 
 var maxLevel = 3;
 
+var maxPathLength = 7;
 
+// max len of the label
+var maxLenLabel = 7;
+
+var logInNodeColor = "#990099";
 
 
 function clearGraphVariables(){
@@ -334,6 +346,26 @@ function logOut(){
 }
 
 /*
+*		Label Abbreviation
+*/
+function labelAbbr(label) {
+	if (label.length <= maxLenLabel) {
+		return label;
+	}
+	var name = label.split(" ");
+	var firstName = name[0];
+	var lastName = name[1];
+
+	label = firstName + " " + lastName[0] + ".";
+	if (label.length <= maxLenLabel) {
+		return label;
+	}
+
+	label = firstName[0]+lastName[0];
+	return label;
+}
+
+/*
 *	clear the outside nodes
 */
 function clearOutsideNodesSet() {
@@ -358,11 +390,11 @@ function clearOutsideNodesSet() {
 /*
 *	add the outside nodes beside to a inside node
 */
-function addOutsideNode(outsideNode, insideNode) {
-	var connection = new AsterixDBConnection().dataverse("Graph");
+function addOutsideNode(outsideNode, insideNode, distance2Dest) {
+	var connection = new AsterixDBConnection().dataverse("Tasks");
 	var expression = new FLWOGRExpression()
-	.ForClause("$node", new AExpression("dataset OriginalGraph"))
-	.WhereClause(new AExpression("$node.source_node=" + outsideNode))
+	.ForClause("$node", new AExpression("dataset AccountInfo"))
+	.WhereClause(new AExpression("$node.user_id=" + outsideNode))
 	.ReturnClause("$node.label");
 
 	var successGetLabel = function(tempres) {
@@ -370,10 +402,11 @@ function addOutsideNode(outsideNode, insideNode) {
 		for (i in res) {
 			var resJson = eval('(' + res[i] + ')');
 			var label = resJson.toString();
+			label = labelAbbr(label);
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
 			outsideNodesSet[outsideNode] = true;
 
-			sys.addEdge(insideNode, outsideNode, {directed:false, color:backgroundColor, dashFlag: true});			
+			sys.addEdge(insideNode, outsideNode, {text:distance2Dest.toString(), directed:false, color:backgroundColor, dashFlag: true});			
 			outsideEdgesSet[insideNode+"||"+outsideNode] = true;
 		}
 	}
@@ -481,6 +514,7 @@ function drawGraph(dom, res){
 }*/
 
 function addNodeInGraph(inputNode, inputLabel, inputColor){
+	//sys.addNode(inputNode, {label:inputLabel, color:inputColor});
 	sys.addNode(inputNode, {label:inputLabel, color:inputColor});
 	allNodes.push(inputNode);
 	nodeSet[inputNode] = true;
@@ -495,11 +529,12 @@ function addBiDirectEdgeInGraph(sourceNode, targetNode, inputColor){
 }
 
 function drawGraphBFS(dom, res){
+	// alert("drawGraph");
 	deleteAllNodesAndEdges();
 	var nodeNeighbors = {};
 	var nodeWeights = {};
 	var nodeLabel = {};
-	//alert(res.length);
+	// alert(res.length);
 	for(i in res){
 		var resJson = eval('('+res[i]+')');
 		//alert(res);
@@ -507,17 +542,17 @@ function drawGraphBFS(dom, res){
 		var targetNodeArray = resJson.target_nodes.orderedlist;
 		nodeNeighbors[sourceNode] = targetNodeArray;
 		nodeWeights[sourceNode] = resJson.importance.orderedlist[0];
-		nodeLabel[sourceNode] = resJson.label.orderedlist[0];
+		nodeLabel[sourceNode] = labelAbbr(resJson.label.orderedlist[0]);
 	}
 	var levelArray = [];
 	var level = [logInUserId];
 	levelArray.push(level);
-	addNodeInGraph(logInUserId, nodeLabel[logInUserId], defaultNodeColor);
+	addNodeInGraph(logInUserId, nodeLabel[logInUserId], logInNodeColor);
 	var visited = {};
 	visited[logInUserId] = true;
 	var nodeNum = 0;
 	var edgeSet = {};
-	for(var k=0; (k<maxLevel || nodeNum<maxNodeNum); ++k){
+	for(var k=0; nodeNum<maxNodeNum; ++k){
 		var neighborDisplayArray = [];
 		for(var j=0; j<levelArray[k].length; ++j){
 			var currNode = levelArray[k][j];
@@ -528,10 +563,9 @@ function drawGraphBFS(dom, res){
 			}
 			neighborsWeights.sort(function(a, b){if(a.weight>b.weight) return -1; if(a.weight<b.weight) return 1; return 0});
 			var nodeCount = 0;
-			for(var n=0; n<nodeNeighbors[currNode].length; ++n){
+			for(var n=0; n<Math.min(nodeNeighbors[currNode].length, maxDegree); ++n){
 				var neighbor = neighborsWeights[n].node;
 				//alert(neighborsWeights[n].weight);
-				++nodeCount;
 				if(visited[neighbor]==true){
 					if(!(edgeSet[currNode+"||"+neighbor]==true)){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
@@ -540,7 +574,6 @@ function drawGraphBFS(dom, res){
 					}
 				}
 				else{
-					if(nodeCount<maxDegree){
 						addNodeInGraph(neighbor, nodeLabel[neighbor], defaultNodeColor);
 						visited[neighbor]=true;
 						neighborDisplayArray.push(neighbor);
@@ -548,10 +581,10 @@ function drawGraphBFS(dom, res){
 						addBiDirectEdgeInGraph(currNode, neighbor, defaultEdgeColor);
 						edgeSet[currNode+"||"+neighbor]=true;
 						edgeSet[neighbor+"||"+currNode]=true;
+						//alert(nodeNum);
 						++nodeNum;
-					}
-					else
-						break;
+						if(nodeNum>maxNodeNum)
+							break;
 				}
 			}
 		}
@@ -611,6 +644,27 @@ function loadGraph(){
 		
 }
 
+function addOutSideNodeForTaskOne(nodeID, nodeColor){
+	var connAccount = new AsterixDBConnection().dataverse("Tasks");
+    var whereClauseStr = '$node.user_id='+nodeID;
+    //alert(whereClauseStr);
+    var exp = new FLWOGRExpression()
+	.ForClause("$node", new AExpression("dataset AccountInfo"))
+	.WhereClause().and(new AExpression(whereClauseStr))
+	.ReturnClause("$node");
+	var succAccount = function(tempres){
+		var res = tempres["results"];
+		for(i in res){
+			var resJson = eval('('+res[i]+')');
+			targetLabel = resJson.label;
+
+			sys.addNode(nodeID, {label:labelAbbr(targetLabel), color: nodeColor});            			
+			outsideNodesSet[nodeID] = true;
+			//allNodes.push(path[path.length-1].int32.toString());
+		}
+	}
+	connAccount.query(exp.val(),succAccount);       
+}
 /*
 draw Task1
 */
@@ -633,57 +687,55 @@ function drawTaskOne(sourceNode, targetNode){
             var targetLabel = "";
             // for(var j=0; j<path.length; ++j)
             	 // alert(path[j].int32.toString());
-            sys.getNode(path[0].int32.toString()).data.color="#FF0000";
+            sys.getNode(path[0].int32.toString()).data.color=logInNodeColor;
             if(!(path[path.length-1].int32.toString() in nodeSet)){
-
-			    var connAccount = new AsterixDBConnection().dataverse("Tasks");
-			    var whereClauseStr = '$node.user_id='+path[path.length-1].int32.toString();
-			    //alert(whereClauseStr);
-			    var exp = new FLWOGRExpression()
-				.ForClause("$node", new AExpression("dataset AccountInfo"))
-				.WhereClause().and(new AExpression(whereClauseStr))
-				.ReturnClause("$node");
-            	var succAccount = function(tempres){
-            		var res = tempres["results"];
-            		for(i in res){
-            			var resJson = eval('('+res[i]+')');
-            			targetLabel = resJson.label;
-
-            			sys.addNode(path[path.length-1].int32.toString(), {label:targetLabel, color:"#FF0000"});            			
-            			outsideNodesSet[path[path.length-1].int32.toString()] = true;
-            			//allNodes.push(path[path.length-1].int32.toString());
-            		}
-            	}
-            	connAccount.query(exp.val(),succAccount);            	
+			    addOutSideNodeForTaskOne(path[path.length-1].int32.toString(), "#FF0000");       	
             }
             else{
             	sys.getNode(path[path.length-1].int32.toString()).data.color="#FF0000";
             	coloredNodes.push(sys.getNode(path[path.length-1].int32.toString()));
             }
 	    	coloredNodes.push(sys.getNode(path[0].int32.toString()));
-            for(var j=1; j<path.length-1; ++j){
-                if(j!=1){
-                	
-                    sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
-		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
-		    			
-		    		if(!(path[j+1].int32.toString() in nodeSet)){
+	    	var prevNode = -1;
+            for(var j=2; j<path.length-1; ++j){
+
+				if(!(path[j].int32.toString() in nodeSet)){
 		    			//add two nodes and add two edges
-		    			sys.addEdge(path[j].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#000000", dashFlag: true})
-		    			outsideEdgesSet[path[j].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
-		    			//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
-		    			break;
-		    		}
-				}
-				var sourceNodeObj = sys.getNode(path[j].int32.toString());
-    			var targetNodeObj = sys.getNode(path[j+1].int32.toString());
-            	var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-            	sys.pruneEdge(edgeArray[0]);
-            	sys.addEdge(path[j].int32.toString(), path[j+1].int32.toString(), {directed:false, color:"#FF0000"});
-				edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
-				coloredEdges.push(edgeArray[0]);
+		    			if(j>=maxPathLength){
+							distance2Dest = path.length - j;
+		    				sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
+		    				outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+		    				//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
+		    				prevNode = -1;
+		    				break;
+		    			}
+		    			else{
+            				addOutSideNodeForTaskOne(path[j].int32.toString(), "#CA7A2C");
+            				sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000", dashFlag: false})
+		    				outsideEdgesSet[path[j-1].int32.toString()+"||"+path[j].int32.toString()] = true;
+		    				prevNode = j;
+		    			}
+		    	}
+		    	else{
+		    		sys.getNode(path[j].int32.toString()).data.color="#CA7A2C";
+		    		coloredNodes.push(sys.getNode(path[j].int32.toString()));
+		    		var sourceNodeObj = sys.getNode(path[j-1].int32.toString());
+    				var targetNodeObj = sys.getNode(path[j].int32.toString());
+            		var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+            		sys.pruneEdge(edgeArray[0]);
+            		sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000"});
+					edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
+					coloredEdges.push(edgeArray[0]);
+					prevNode = j;
+		    	}
            
             }
+            if(prevNode != -1){
+            	sys.addEdge(path[prevNode].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#FF0000", dashFlag: false})
+		    	outsideEdgesSet[path[prevNode].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+            }
+
+
         }
 	}
 	connTask1.query(expTask1.val(), succTask1);
@@ -718,13 +770,22 @@ function doDrawTaskTwo(resNode) {
 	sys.addNode("tempNode1", {label:"tempNode1", color:"#FFFFFF"});
 	sys.addNode("tempNode2", {label:"tempNode2", color:"#FFFFFF"});	
 	var nodesInCommunity = [];
+	var cnt = 0;
 	for (m in resNode) {
+		if (cnt > maxCommunityMembers) {
+			break;
+		}
+		++cnt;
 		var resJson = eval('(' + resNode[m] + ')');
 		var nodeStr = resJson.user_id.int32.toString();
 		if (nodeStr in nodeSet) {
 			// color node
 			var nodeObj = sys.getNode(nodeStr);
-			nodeObj.data.color = colorArray[1];
+			if (nodeStr == logInUserId)
+				nodeObj.data.color = logInNodeColor;
+			else
+				nodeObj.data.color = colorArray[1];
+
 			coloredNodes.push(nodeObj);
 
 			nodesInCommunity.push(nodeStr);
@@ -733,13 +794,13 @@ function doDrawTaskTwo(resNode) {
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
 		} else {
-			alert("not in nodeset:"+nodeStr);			
+			//alert("not in nodeset:"+nodeStr);			
 			findIntermediateNodeNDraw(nodeStr);
 		}
 	}	
 	sys.pruneNode(sys.getNode("tempNode1"));
 	sys.pruneNode(sys.getNode("tempNode2"));
-	
+		
 	for (var i = 0; i < nodesInCommunity.length; ++i) {
 		for (var j = 0; j < nodesInCommunity.length; ++j) {
         	var sourceNodeObj = sys.getNode(nodesInCommunity[i]);
@@ -824,14 +885,16 @@ function findIntermediateNodeNDraw(outsideNode) {
 			var resJson = eval('(' + res[i] + ')');
 			var path = resJson.orderedlist;
 			var lastInNodeSet = logInUserId;
+			var step = 0;
 			for (var i = 2; i < path.length; ++i) {
 				var nodeStr = path[i].int32.toString();				
 				if (!(nodeStr in nodeSet)) {
+					distance2Dest = path.length-i;
 					break;
 				}				
 				lastInNodeSet = nodeStr;
 			}
-			addOutsideNode(outsideNode, lastInNodeSet);
+			addOutsideNode(outsideNode, lastInNodeSet, distance2Dest);
 		}
 	}
 
@@ -856,7 +919,7 @@ function doDrawTaskThree(resNode) {
 			$('#tips').html('<p style="font-size: 30px; text-align:center">No suggested friends!</p>');
 			continue;
 		} else {
-            sys.getNode(nodeID).data.color=colorArray[0];
+            sys.getNode(nodeID).data.color=logInNodeColor;
 			coloredNodes.push(sys.getNode(nodeID));
             var minFriendNum = (friendNum>inputFriendNum?inputFriendNum:friendNum);
             for(var k=0; k<minFriendNum; ++k){
@@ -941,7 +1004,7 @@ function queryDrawTaskFour() {
 			}
 		}
 		var nodeObj = sys.getNode(logInUserId);
-		nodeObj.data.color = colorArray[0];
+		nodeObj.data.color = logInNodeColor;
 		coloredNodes.push(nodeObj);	
 	}
 

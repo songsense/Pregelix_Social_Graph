@@ -9,7 +9,8 @@ import sys
 import namegen
 
 # Maximum entry in this big social graph
-MAX_ENTRY = 2198462
+#MAX_ENTRY = 2198462
+MAX_ENTRY = 500000
 FIRST_NAME_SET = "first-names.txt"
 LAST_NAME_SET = "surnames.txt"
 
@@ -44,6 +45,10 @@ def convert(filename):
     for i in graph_file:
         i = i.strip('\n')
         line_cnt += 1
+
+        if line_cnt > MAX_ENTRY:
+            break;
+
         strs = split_line(i)
         strs_len = len(strs)
         if strs_len == 0:

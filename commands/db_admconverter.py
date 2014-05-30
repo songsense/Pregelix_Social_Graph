@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # usage: usage: python db_admcoconverter.py dataverse, dataset
 import sys
 import requests
@@ -24,12 +25,12 @@ if __name__ == '__main__':
 	response = 01
 	try:
 		response = requests.get(query_url, params=query, headers=http_header)
-		print response.status_code		
+		print response.status_code
 	except (ConnectionError, HTTPError):
 		print "Encountered connection error; stopping execution with code: " + str(response)
 		sys.exit(1)
 	data = response.json()
-	print data
+	# print data
 	results = data['results']
 
 	f = open(dataset + ".adm", "w")
@@ -40,7 +41,7 @@ if __name__ == '__main__':
 		line = line.replace("{","")
 		line = line.replace("}","")
 		line = "{" + line + "}"
-		print line
+	#	print line
 		f.write(line)
 		f.write("\n")
 	f.close()
