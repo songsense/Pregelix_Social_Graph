@@ -211,10 +211,29 @@ var Renderer = function(canvas){
 		    _mouseP = null
 		    return false
 		}
-            }
-            
-            // start listening
-            $(canvas).mousedown(handler.clicked);
+      	enter:function(e){
+            var pos = $(canvas).offset();
+            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            nearest = sys.nearest(_mouseP);
+
+            if (!nearest.node) return false;
+
+            nearest.node.data.copyLabel = nearest.node.data.label;
+            nearest.node.data.label = nearest.node.name;
+		}
+		leave:function(e){
+            var pos = $(canvas).offset();
+            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+            nearest = sys.nearest(_mouseP);
+
+            if (!nearest.node) return false;
+             
+            nearest.node.data.label = nearest.node.data.copyLabel;
+		}            
+        // start listening
+        $(canvas).mousedown(handler.clicked);
+        // $(canvas).mouseenter(handler.enter);
+        // $(canvas).mouseleave(handler.leave);
 
 	},
 	
