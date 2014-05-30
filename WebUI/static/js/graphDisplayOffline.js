@@ -275,9 +275,9 @@ var maxCommunityMembers = 10;
 
 //var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
 
-var maxDegree = 4;
+var maxDegree = 10;
 
-var maxNodeNum = 15;
+var maxNodeNum = 20;
 
 var maxLevel = 3;
 
@@ -583,8 +583,10 @@ function drawGraphBFS(dom, res){
 						edgeSet[neighbor+"||"+currNode]=true;
 						//alert(nodeNum);
 						++nodeNum;
-						if(nodeNum>maxNodeNum)
-							break;
+						if(nodeNum>maxNodeNum){
+							alert("break");
+							return;
+						}
 				}
 			}
 		}
