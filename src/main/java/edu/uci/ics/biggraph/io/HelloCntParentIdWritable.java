@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import edu.uci.ics.pregelix.api.io.WritableSizable;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 public class HelloCntParentIdWritable implements WritableSizable {
 	private VLongWritable HelloCounter = new VLongWritable();

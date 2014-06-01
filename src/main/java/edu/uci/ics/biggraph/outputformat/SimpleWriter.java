@@ -7,9 +7,9 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 
 import edu.uci.ics.biggraph.io.DoubleWritable;
 import edu.uci.ics.biggraph.io.FloatWritable;
-import edu.uci.ics.biggraph.io.VLongWritable;
 import edu.uci.ics.pregelix.api.graph.Vertex;
 import edu.uci.ics.pregelix.api.io.text.TextVertexOutputFormat.TextVertexWriter;
+import edu.uci.ics.pregelix.example.io.VLongWritable;
 
 /**
  * Simple VertexWriter that supports output format

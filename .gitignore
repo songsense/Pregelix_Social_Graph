@@ -23,3 +23,8 @@ hs_err_pid*
 
 # Graph data
 data/*
+<<<<<<< HEAD
+*.adm
+=======
+/target
+>>>>>>> c7920190a9b925cf334c0aa919cae7a5de366502

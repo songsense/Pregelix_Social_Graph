@@ -280,7 +280,7 @@ var maxNumVIP = 5;
 var maxNumOutsideVIP = 5;
 
 // max num of community member
-var maxCommunityMembers = 10;
+var maxCommunityMembers = 15;
 
 //var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
 
@@ -366,6 +366,11 @@ function labelAbbr(label) {
 	var lastName = name[1];
 
 	label = firstName + " " + lastName[0] + ".";
+	if (label.length <= maxLenLabel) {
+		return label;
+	}
+
+	label = firstName[0] + ". " + lastName;
 	if (label.length <= maxLenLabel) {
 		return label;
 	}

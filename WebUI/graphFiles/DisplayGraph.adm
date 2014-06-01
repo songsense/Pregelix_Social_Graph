@@ -1,7 +1,0 @@
-{ "id": "1_1", "login_user_id":   1, "source_node":   1, "label": "Siming", "target_nodes":   [  2,   3 ] }
-{ "id": "1_11", "login_user_id":   1, "source_node":   11, "label": "Zhimin", "target_nodes":   [  5] }
-{ "id": "1_2", "login_user_id":   1, "source_node":   2, "label": "Danny", "target_nodes":   [  1,   4 ] }
-{ "id": "1_3", "login_user_id":   1, "source_node":   3, "label": "Jessica", "target_nodes":   [  1,   4 ] }
-{ "id": "1_4", "login_user_id":   1, "source_node":   4, "label": "Alex", "target_nodes":   [  2,   3,   5 ] }
-{ "id": "1_5", "login_user_id":   1, "source_node":   5, "label": "Steven", "target_nodes":   [  4,   6,   11 ] }
-{ "id": "1_6", "login_user_id":   1, "source_node":   6, "label": "Jerry", "target_nodes":   [  5] }
