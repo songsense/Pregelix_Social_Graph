@@ -134,35 +134,10 @@ var Renderer = function(canvas){
 		//ctx.dashedLine(head.x, head.y,tail.x, tail.y,[30,10]);
 		ctx.stroke()
 		ctx.restore()
-		if(edge.data.directed==true){
-		    //zhimin add: add arrow in each edge
-		    /*--start--*/
-		    ctx.save()
-		    // move to the head position of the edge we just drew
-		    var wt = 1;
-		    var arrowLength = 6 + wt;
-		    var arrowWidth = 2 + wt;
-		    ctx.fillStyle =  "#cccccc";
-		    ctx.translate(head.x, head.y);
-		    ctx.rotate(Math.atan2(head.y - tail.y, head.x - tail.x));
-		    
-		    // delete some of the edge that's already there (so the point isn't hidden)
-		    ctx.clearRect(-arrowLength/2,-wt/2, arrowLength/2,wt)
-
-		    // draw the chevron
-		    ctx.beginPath();
-		    ctx.moveTo(-arrowLength, arrowWidth);
-		    ctx.lineTo(0, 0);
-		    ctx.lineTo(-arrowLength, -arrowWidth);
-		    ctx.lineTo(-arrowLength * 0.8, -0);
-		    ctx.closePath();
-		    ctx.fill();
-		    ctx.restore()
-		    /*--end--*/
-		}
 		
 		
-            })
+		
+        	})
 
             
 	},
@@ -216,42 +191,36 @@ var Renderer = function(canvas){
 		            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
 		            nearest = sys.nearest(_mouseP);
 
-		            if (!nearest.node || nearest.distance > 120) 
+		            if (!nearest.node || nearest.distance > 50) 
 		            // if (!nearest.node)
 		            	return false;
 		            var label = nearest.node.data.label;
 		            if (isNaN(parseInt(label))) {
 		            	// label string
 		            	nearest.node.data.copyLabel = nearest.node.data.label;
-			            nearest.node.data.label = nearest.node.name;			       
+			            nearest.node.data.label = nearest.node.name;
+			            nearest.node.data.font_color = "#FFFF00";			       
 		            } else {
 		            	// id string
 		            	nearest.node.data.label = nearest.node.data.copyLabel;
+		            	nearest.node.data.font_color = "#FFFFFF";
 		            }
-		            /*
-		            if (isNaN(parseInt(label))) {
-		            	nearest.node.data.copyLabel = nearest.node.data.label;
-			            nearest.node.data.label = nearest.node.name;
-		            } else {
-		            	return false;
-		            } 
-		            */
 		            
 				},
-				leave:function(e){
-		            var pos = $(canvas).offset();
-		            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
-		            nearest = sys.nearest(_mouseP);
+				// leave:function(e){
+		  //           var pos = $(canvas).offset();
+		  //           _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
+		  //           nearest = sys.nearest(_mouseP);
 
-		            if (!nearest.node || nearest.distance > 120) 
-		            // if (!nearest.node)
-		            	return false;
-		            if (nearest.node.data.copyLabel == undefined ||
-		            	!nearest.node.data.copyLabel ||
-		            	isNaN(parseInt(nearest.node.data.label)))
-		            	return false;
-		            nearest.node.data.label = nearest.node.data.copyLabel;
-				}
+		  //           if (!nearest.node || nearest.distance > 120) 
+		  //           // if (!nearest.node)
+		  //           	return false;
+		  //           if (nearest.node.data.copyLabel == undefined ||
+		  //           	!nearest.node.data.copyLabel ||
+		  //           	isNaN(parseInt(nearest.node.data.label)))
+		  //           	return false;
+		  //           nearest.node.data.label = nearest.node.data.copyLabel;
+				// }
 			}          
 	        // start listening
 	        $(canvas).mousedown(handler.clicked);
@@ -446,7 +415,7 @@ function addOutsideNode(outsideNode, insideNode, distance2Dest) {
 			sys.addNode(outsideNode, {label:label, color:backgroundColor,mass:1, alpha:0});						
 			outsideNodesSet[outsideNode] = true;
 
-			sys.addEdge(insideNode, outsideNode, {text:distance2Dest.toString(), directed:false, color:backgroundColor, dashFlag: true});			
+			sys.addEdge(insideNode, outsideNode, {text:distance2Dest.toString(), color:backgroundColor, dashFlag: true});			
 			outsideEdgesSet[insideNode+"||"+outsideNode] = true;
 		}
 	}
@@ -497,7 +466,7 @@ function clearNodeEdgeColor(){
 		var sourceNode = coloredEdges[i].source;
 		var targetNode = coloredEdges[i].target;
 		sys.pruneEdge(coloredEdges[i]);
-		sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
+		sys.addEdge(sourceNode, targetNode, {color:defaultEdgeColor});
     }
     coloredEdges = [];
 
@@ -510,7 +479,7 @@ function clearNodeEdgeColor(){
     for (var i=0; i<10; ++i){
 	    sys.addNode("-1", {label:"-1", color:"#FFFFFF"});
 	    sys.addNode("-2", {label:"-2", color:"#FFFFFF"});
-	    sys.addEdge("-1", "-2", {directed:false, color:"#FFFFFF"})
+	    sys.addEdge("-1", "-2", {color:"#FFFFFF"})
 	    var edgeArray = sys.getEdges("-1","-2");
 	    sys.pruneEdge(edgeArray[0]);   
 	    var tempNode = sys.getNode("-1");
@@ -523,36 +492,6 @@ function clearNodeEdgeColor(){
 
 
 
-/*
-draw the graph
-*/
-/*
-function drawGraph(dom, res){
-    
-    deleteAllNodesAndEdges();
-    for(i in res){
-		//alert(res[i]);
-		var resJson = eval('('+res[i]+')');
-		var sourceNode = resJson.source_node.int32.toString();
-		var targetNodeArray = resJson.target_nodes.orderedlist;
-
-
-		//alert("sourceNode:"+sourceNode);
-		var label=resJson.label;
-		labelNodeIDTable[label]=sourceNode;
-		//alert(label);
-		sys.addNode(sourceNode, {mass:3,label:label, color:defaultNodeColor});
-		allNodes.push(sourceNode);
-		nodeSet[sourceNode] = true;
-
-		for(var i=0; i<targetNodeArray.length; ++i){
-		    var targetNode = targetNodeArray[i].int32.toString();
-		    sys.addEdge(sourceNode, targetNode, {directed:false, color:defaultEdgeColor});
-		    allEdges.push(sourceNode+"||"+targetNode);		    
-		}
-    }
-}*/
-
 function addNodeInGraph(inputNode, inputLabel, inputColor){
 	//sys.addNode(inputNode, {label:inputLabel, color:inputColor});
 	sys.addNode(inputNode, {label:inputLabel, color:inputColor});
@@ -562,9 +501,9 @@ function addNodeInGraph(inputNode, inputLabel, inputColor){
 }
 
 function addBiDirectEdgeInGraph(sourceNode, targetNode, inputColor){
-	sys.addEdge(sourceNode, targetNode, {directed:false, color:inputColor});
+	sys.addEdge(sourceNode, targetNode, {color:inputColor});
 	allEdges.push(sourceNode+"||"+targetNode);
-	sys.addEdge(targetNode, sourceNode, {directed:false, color:inputColor});
+	sys.addEdge(targetNode, sourceNode, {color:inputColor});
 	allEdges.push(targetNode+"||"+sourceNode);
 }
 
@@ -745,7 +684,7 @@ function drawTaskOne(sourceNode, targetNode){
 		    			//add two nodes and add two edges
 		    			if(j>=maxPathLength){
 							distance2Dest = path.length - j;
-		    				sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),directed:false, color:"#000000", dashFlag: true})
+		    				sys.addEdge(path[j-1].int32.toString(), path[path.length-1].int32.toString(), {text:distance2Dest.toString(),color:"#000000", dashFlag: true})
 		    				outsideEdgesSet[path[j-1].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
 		    				//allEdges.push(path[j].int32.toString()+"||"+path[path.length-1].int32.toString());
 		    				prevNode = -1;
@@ -753,7 +692,7 @@ function drawTaskOne(sourceNode, targetNode){
 		    			}
 		    			else{
             				addOutSideNodeForTaskOne(path[j].int32.toString(), "#CA7A2C");
-            				sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000", dashFlag: false})
+            				sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {color:"#FF0000", dashFlag: false})
 		    				outsideEdgesSet[path[j-1].int32.toString()+"||"+path[j].int32.toString()] = true;
 		    				prevNode = j;
 		    			}
@@ -765,7 +704,7 @@ function drawTaskOne(sourceNode, targetNode){
     				var targetNodeObj = sys.getNode(path[j].int32.toString());
             		var edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
             		sys.pruneEdge(edgeArray[0]);
-            		sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), {directed:false, color:"#FF0000"});
+            		sys.addEdge(path[j-1].int32.toString(), path[j].int32.toString(), { color:"#FF0000"});
 					edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
 					coloredEdges.push(edgeArray[0]);
 					prevNode = j;
@@ -773,7 +712,7 @@ function drawTaskOne(sourceNode, targetNode){
            
             }
             if(prevNode != -1){
-            	sys.addEdge(path[prevNode].int32.toString(), path[path.length-1].int32.toString(), {directed:false, color:"#FF0000", dashFlag: false})
+            	sys.addEdge(path[prevNode].int32.toString(), path[path.length-1].int32.toString(), { color:"#FF0000", dashFlag: false})
 		    	outsideEdgesSet[path[prevNode].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
             }
 
@@ -832,7 +771,7 @@ function doDrawTaskTwo(resNode) {
 
 			nodesInCommunity.push(nodeStr);
 
-			sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"});
+			sys.addEdge("tempNode1", "tempNode2", {color:"#FFFFFF"});
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
 		} else {
@@ -851,7 +790,7 @@ function doDrawTaskTwo(resNode) {
 			if (edgeArray.length == 0)
 				continue;
 			sys.pruneEdge(edgeArray[0]);
-			sys.addEdge(nodesInCommunity[i], nodesInCommunity[j], {directed:false, color:colorArray[1]})
+			sys.addEdge(nodesInCommunity[i], nodesInCommunity[j], { color:colorArray[1]})
 			edgeArray = sys.getEdges(sourceNodeObj, targetNodeObj);
 			coloredEdges.push(edgeArray[0]);
 		}
@@ -973,7 +912,7 @@ function doDrawTaskThree(resNode) {
 	    			findIntermediateNodeNDraw(suggestedFriend);		    			
 	    		}
             }
-            sys.addEdge("tempNode1", "tempNode2", {directed:false, color:"#FFFFFF"})
+            sys.addEdge("tempNode1", "tempNode2", { color:"#FFFFFF"})
             var edgeArray = sys.getEdges("tempNode1","tempNode2");
             sys.pruneEdge(edgeArray[0]);
 		}
@@ -1072,15 +1011,6 @@ $(document).ready(function(){
 
     initializeVariables();
 
-    //$("#filePath").change(uploadFile);
-
-    //$("#iframeID1").load(loadGraphFirstTime);
-
-    
-
-    //$("#runTask2").click(runTask2);
-
-    //$('#runTask3').click(runTask3);
 
     $("#logOut").hide();
 
