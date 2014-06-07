@@ -53,6 +53,15 @@ def build_response(endpoint, data):
     # data = {'update' : updateQuery}
     # build_response(endpint, data);
 
+
+@route('/intro')
+def run_introduction():
+    return template('introduction_page');
+
+@route('/contact')
+def run_contact_us():
+    return template('contact_us_page');
+
 # Log In
 @route('/logIn', method = 'POST')
 def run_log_in():
