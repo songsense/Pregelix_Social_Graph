@@ -233,7 +233,7 @@ var Renderer = function(canvas){
 
 //var pathGraph = "/Users/liqiangw/Documents/workspace/Pregelix_Social_Graph/WebUI/graphFile/adm/";
 
-var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/";
+// var pathGraph = "/home/zhimin/study/CS295/display/src/main/resources/graph-display-arborjs/graphFiles/";
 
 var sys;
 
@@ -331,7 +331,7 @@ function checkAndLoadGraph(){
 	var status = $('#iframeID1').contents().find('#returnResult').html();
 	//alert(status);
 	if(parseInt(status)!=1){
-		//alert('User ID or Password is not correct!');
+		alert('User ID or Password is not correct!');
 		logInStatus = false;
 	}
 	else{
@@ -461,9 +461,7 @@ function deleteAllNodesAndEdges(){
 change the color of nodes and edges to default color
 */
 function clearNodeEdgeColor(){
-	// to Zhimin:
-	// in case I forgot to tell you 
-	// to clear outside nodes as well clear node edge color
+
 	clearOutsideNodesSet();
     
     
@@ -595,10 +593,8 @@ function loadGraph(){
 
 	var expression1 = new FLWOGRExpression()
 	.ForClause("$weight", new AExpression("dataset TaskFour"))
-	// .ForClause("$account", new AExpression("dataset AccountInfo"))
 	.WhereClause(new AExpression(joinGraphTaskFourClauseStr))
 	.ReturnClause(
-		// "label" : "$account.label",
 		"$weight.importance"
 	);
 
@@ -623,8 +619,6 @@ function loadGraph(){
 	
 	var success = function(res){
 		drawGraphBFS('#graph', res["results"]);
-		//alert(allNodes.length);
-		//alert(allEdges.length);
 	}
 	A.query(expression.val(),  success);
 		
@@ -716,9 +710,20 @@ function drawTaskOne(sourceNode, targetNode){
 		    	}
            
             }
+            //draw the last edge
             if(prevNode != -1){
-            	sys.addEdge(path[prevNode].int32.toString(), path[path.length-1].int32.toString(), { color:"#FF0000", dashFlag: false})
-		    	outsideEdgesSet[path[prevNode].int32.toString()+"||"+path[path.length-1].int32.toString()] = true;
+            	var edgeArray = sys.getEdges(path[path.length-2].int32.toString(), path[path.length-1].int32.toString());
+            	if(edgeArray.length > 0) {
+            		sys.pruneEdge(edgeArray[0]);
+            		sys.addEdge(path[path.length-2].int32.toString(), path[path.length-1].int32.toString(), { color:"#FF0000", dashFlag: false})
+            		edgeArray = sys.getEdges(path[path.length-2].int32.toString(), path[path.length-1].int32.toString());
+            		coloredEdges.push(edgeArray[0]);
+            	}
+            	else{
+            		sys.addEdge(path[path.length-2].int32.toString(), path[path.length-1].int32.toString(), { color:"#FF0000", dashFlag: false})
+		    		outsideEdgesSet[path[j-1].int32.toString()+"||"+path[j].int32.toString()] = true;
+            	}
+            	
             }
 
 
@@ -1031,9 +1036,6 @@ $(document).ready(function(){
     $('#iframeID1').load(checkAndLoadGraph);
 
     $("#runTask1").click(runTask1);
-
-
-    $("#runTask4").click(runTask4);
 
     $("#runTask2").click(runTask2);
 

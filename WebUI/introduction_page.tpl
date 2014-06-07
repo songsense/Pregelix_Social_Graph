@@ -155,16 +155,36 @@
         <li><a href="#tabs-5" class="controlBlockTitle" style="color: #17265a">VIP Recommendation</a></li>
       </ul>
       <div id="tabs-1">
-        <p> This is a general introduction for this project</p>
+        <p> In this work, we implete pregelix based graph analysis toolkit mining properties of social networks. Four tasks are completed in our work:</p>
+        <ul>
+          <li><p>Connection Tracing</p></li>
+          <li><p>Community Display</p></li>
+          <li><p>Friend Recommendation<p></li>
+          <li><p>VIP Recommendation<p></li>
+        </ul>
+        <p>The architecture of our work is as follow.</p>
+        <img src='static/img/architecture.png' />
+        <p>In the backend, we first extract a subgraph and display it for each user by using Pregelix. And then, we use pregelix to analyze their social networks, and compute these four tasks. Results are stored in AsterixDB available to be retrieved from the front end. </p>
+        <p>In the front end, user should log in first. After login, one's subgraph will be retrieved and displayed. When user chooses to run one of the tasks, corresponding data is retrived from the database and displayed in a form of graph. </p>
       </div>
       <div id="tabs-2">
-        <p> This is a introduction for connection tracing</p>
+        <p> In this task, we display the path from current user to one of his specific friend. The user need to specify the ID of his friend which can be obtained by clicking the node.</p>
+        <p> If the specified friend is one of the nodes in the original graph, the result is as follow. </p>
+        <img src='static/img/taskOneImg.png' />
+        <p> In above graph, the purple node and red node represent user node and his friend, respectively The brown nodes represent the internal nodes in the path. The path is marked by red line.</p>
+        <p> Otherwise, the result is as follow. </p>
+        <img src='static/img/taskOneNotInGraphImg.png' />
+        <p> In this case, we only display 7 nodes in the path. The rest nodes and edges are represent using dash line on which the number of rest hops is marked. </p>
       </div>
       <div id="tabs-3">
-        <p> This is a introduction for community display</P>
+        <p> In this task, we display all nodes which are in the same community of current user. A community is a set of nodes with similar topology. One example is as follow.</P>
+        <img src='static/img/taskTwoImg.png'/>
+        <p> The purple node represents current user. The pink and gray nodes represent the nodes in the same community. The pink ones are displayed in the original graph. While the gray ones are not displayed in it. </p>
       </div>
       <div id="tabs-4">
-        <p> This is a introduction for friend recommendation</p>
+        <p> In this task, we display recommended friends for current user. The user needs to specify the number of recommended friends. One example is as follow.</p>
+        <img />
+
       </div>
       <div id="tabs-5">
         <p> This is a introduction for vip recommendation</P>
