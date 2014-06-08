@@ -126,7 +126,7 @@
   <div id="main" style="float:left">
     <div id="header" style="float:left">
       <div id="headerLine">
-        <a href="/" style="text-decoration:none"><p id="headerContent">Social Graph Analysis and Visualization</p></a>
+        <a href="/" target="_blank" style="text-decoration:none"><p id="headerContent">Social Graph Analysis and Visualization</p></a>
       </div>
     </div>
   
@@ -179,15 +179,17 @@
       <div id="tabs-3">
         <p> In this task, we display all nodes which are in the same community of current user. A community is a set of nodes with similar topology. One example is as follow.</P>
         <img src='static/img/taskTwoImg.png'/>
-        <p> The purple node represents current user. The pink and gray nodes represent the nodes in the same community. The pink ones are displayed in the original graph. While the gray ones are not displayed in it. </p>
+        <p> The purple node represents current user. The pink and gray nodes represent the nodes in the same community. The pink ones are the friends displayed in the original graph. While the gray ones are the friends not displayed in it. </p>
       </div>
       <div id="tabs-4">
         <p> In this task, we display recommended friends for current user. The user needs to specify the number of recommended friends. One example is as follow.</p>
-        <img />
-
+        <img src='static/img/taskThreeImg.png'/>
+        <p> The purple node represents current user. The pink nodes and gray nodes represent the recommended friends. The pink ones are the friends displayed in the original graph. While the gray ones are the friends not displayed in it. </p>
       </div>
       <div id="tabs-5">
-        <p> This is a introduction for vip recommendation</P>
+        <p> In this task, we display popular users who are close to the current user. One example is as follow. </P>
+          <img src='static/img/taskFourImg.png'/>
+        <p> In the above example, the purple node represents the current user. The pink nodes represent the recommended popular users who are displayed in the graph. While the gray ones represent the recommended popular users are not displayed. </p>
       </div>
     </div>
   </div>
