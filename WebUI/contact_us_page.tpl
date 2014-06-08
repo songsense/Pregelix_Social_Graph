@@ -146,7 +146,7 @@
   <div id="main" style="float:left">
     <div id="header" style="float:left">
       <div id="headerLine">
-        <a href="/" style="text-decoration:none"><p id="headerContent">Social Graph Analysis and Visualization</p></a>
+        <a href="/" target="_blank" style="text-decoration:none"><p id="headerContent">Social Graph Analysis and Visualization</p></a>
       </div>
     </div>
   

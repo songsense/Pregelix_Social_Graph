@@ -276,11 +276,11 @@ var backgroundColor = "#B19693";
 var outsideNodesSetSet = {};
 var outsideEdgesSet = {};
 
-var maxNumVIP = 5;
+var maxNumVIP = 100;
 var maxNumOutsideVIP = 5;
 
 // max num of community member
-var maxCommunityMembers = 15;
+var maxCommunityMembers = 5;
 
 //var maxDegreeArray = [4, 4, 4, 3, 3, 2, 2];
 
@@ -763,10 +763,6 @@ function doDrawTaskTwo(resNode) {
 	var nodesInCommunity = [];
 	var cnt = 0;
 	for (m in resNode) {
-		if (cnt > maxCommunityMembers) {
-			break;
-		}
-		++cnt;
 		var resJson = eval('(' + resNode[m] + ')');
 		var nodeStr = resJson.user_id.int32.toString();
 		if (nodeStr in nodeSet) {
@@ -784,9 +780,10 @@ function doDrawTaskTwo(resNode) {
 			sys.addEdge("tempNode1", "tempNode2", {color:"#FFFFFF"});
 			var edgeArray = sys.getEdges("tempNode1", "tempNode2");
 			sys.pruneEdge(edgeArray[0]);
-		} else {
+		} else if (cnt <= maxCommunityMembers){
 			//alert("not in nodeset:"+nodeStr);			
 			findIntermediateNodeNDraw(nodeStr);
+			++cnt;
 		}
 	}	
 	sys.pruneNode(sys.getNode("tempNode1"));
