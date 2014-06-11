@@ -138,6 +138,11 @@ def task4(pregelixPath, graphPath, projectJarPath):
 	runTask4(pageRankTaskName, pregelixPath,
 		projectJarPath, pageRankClassName, graphPath, pageRankOutputPath, getIp, portNo, iterations, graphSize)
 
+	# for running locally without the database
+	print "Tasks four all done!"
+	return
+	# end for running locally without the database
+
 	global pageRankDict, stDict, finalResults
 
 	print "analyze the results of CDS..."
