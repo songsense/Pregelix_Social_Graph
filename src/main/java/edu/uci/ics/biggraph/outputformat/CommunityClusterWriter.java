@@ -26,9 +26,10 @@ public class CommunityClusterWriter extends
             InterruptedException {
         getRecordWriter().write(new Text(vertex.getVertexId().toString()),
                 new Text(vertex.getVertexValue().toString()));
-
+        /*  no database access
         TaskTwoTypeAccessor t = TaskTwoTypeAccessor.getInstance();
         t.setVertex((int) vertex.getVertexId().get(), (int) vertex.getVertexValue().getVertexId());
         t.storeEntry();
+        */
     }
 }

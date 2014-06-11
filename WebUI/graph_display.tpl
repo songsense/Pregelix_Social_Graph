@@ -259,8 +259,8 @@
           </br>
           <button class="button" id="runTask3" type="submit">Run</button>
         </div>
-        <h3 class="controlBlockTitle">VIP Recommendation</h3>
-        <div><p class="controlBlockContent">Show VIPs near you!</p>
+        <h3 class="controlBlockTitle">Popular People Recommendation</h3>
+        <div><p class="controlBlockContent">Show popular people near you!</p>
           <button class="button" id="runTask4" type="submit">Run</button>
         </div>
       </div>

@@ -187,6 +187,9 @@ var Renderer = function(canvas){
 				    return false
 				},
 		      	enter:function(e){
+		      		if (e.which != 2) {
+		      			return;
+		      		}
 		            var pos = $(canvas).offset();
 		            _mouseP = arbor.Point(e.pageX-pos.left, e.pageY-pos.top)
 		            nearest = sys.nearest(_mouseP);
