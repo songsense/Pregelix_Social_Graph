@@ -1,12 +1,12 @@
-PREGELIX_LIB_HOME="/Users/yingyib/workspace/hyracks/pregelix/pregelix-dist/target/pregelix-dist-0.2.12-SNAPSHOT-binary-assembly/"
+#PREGELIX_LIB_HOME="/Users/yingyib/workspace/hyracks/pregelix/pregelix-dist/target/pregelix-dist-0.2.12-SNAPSHOT-binary-assembly/"
 PROJ_TARGET="`pwd`/target/"
 PROJ_CLASSES="`pwd`/target/classes/"
 #INPUT_PATH="`pwd`/data/task3/"
-#INPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/adm"
-INPUT_PATH="/Users/yingyib/Downloads/test"
+INPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/adm"
+#INPUT_PATH="/Users/yingyib/Downloads/test"
 #OUTPUT_PATH="/tmp/wsp_result/"
-#OUTPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/output"
-OUTPUT_PATH="/tmp/out"
+OUTPUT_PATH="/Volumes/TOSHIBA/BigGraphData/Facebook/output"
+#OUTPUT_PATH="/tmp/out"
 
 #echo *********Starting the cluster**************
 cd ${PREGELIX_LIB_HOME}
