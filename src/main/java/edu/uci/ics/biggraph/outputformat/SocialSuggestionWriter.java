@@ -25,6 +25,8 @@ public class SocialSuggestionWriter extends TextVertexWriter<VLongWritable, VLon
     @Override
     public void writeVertex(Vertex<VLongWritable, VLongArrayListWritable, IntWritable, ?> vertex) throws IOException,
             InterruptedException {
+        getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
+        /*      no more database access
         if (numResults < 0) {
             numResults = vertex.getContext().getConfiguration().getInt(NUM_RESULTS, 10);
         }
@@ -32,8 +34,6 @@ public class SocialSuggestionWriter extends TextVertexWriter<VLongWritable, VLon
         VLongArrayListWritable val = vertex.getVertexValue();
         String nodeID = vertex.getVertexId().toString();
         String nodeVal = val.toString();
-
-        //        getRecordWriter().write(new Text(nodeID), new Text(nodeVal));
 
         System.err.println("numResults = " + numResults);
 
@@ -53,5 +53,6 @@ public class SocialSuggestionWriter extends TextVertexWriter<VLongWritable, VLon
         TaskThreeTypeAccessor p = TaskThreeTypeAccessor.getInstance();
         p.setVertex(Integer.parseInt(nodeID), list);
         p.storeEntry();
+        */
     }
 }

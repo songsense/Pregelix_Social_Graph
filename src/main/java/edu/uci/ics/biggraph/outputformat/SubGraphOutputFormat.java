@@ -42,6 +42,10 @@ class SubGraphWriter extends TextVertexOutputFormat.TextVertexWriter<VLongWritab
     @Override
     public void writeVertex(Vertex<VLongWritable, IntWritable, FloatWritable, ?> vertex) throws IOException,
             InterruptedException {
+        if (vertex.getVertexValue().get() != Integer.MAX_VALUE) {
+            getRecordWriter().write(new Text(vertex.getVertexId().toString()), new Text(buildValueLine(vertex)));
+        }
+        /*      no more database access
         if (SOURCE_ID < 0) {
             SOURCE_ID = (int) vertex.getContext().getConfiguration()
                     .getLong(SubGraphVertex.SOURCE_ID, SubGraphVertex.SOURCE_ID_DEFAULT);
@@ -65,6 +69,7 @@ class SubGraphWriter extends TextVertexOutputFormat.TextVertexWriter<VLongWritab
         } else {
             getRecordWriter().write(new Text(vertex.getVertexId().toString()), new Text("Not included!"));
         }
+        */
     }
 
     private String buildValueLine(Vertex<VLongWritable, IntWritable, FloatWritable, ?> vertex) {
