@@ -126,6 +126,9 @@
 
     }
 
+    a:link    {color:blue;}
+    a:visited {color:blue;}
+
     #leftIndex{
       margin-left: 15px;
     }
@@ -179,7 +182,7 @@
   <div id="main" style="float:left">
     <div id="header" style="float:left">
       <div id="headerLine">
-        <p id="headerContent">Social Graph Analysis and Visualization</p>
+        <a href="/" target="_blank" style="text-decoration:none"><p id="headerContent">Social Graph Analysis and Visualization</p></a>
       </div>
       <div id="logInOut" >
           
@@ -214,16 +217,16 @@
 
     <ul id="indexMenu">
       <li class="indexItems" id="leftIndex">
-        <a href="#" style="text-decoration:none">Introduction</a>
+        <a href="/intro" style="text-decoration:none" target="_blank">Introduction</a>
       </li>
       <li class="indexItem">
-        <a href="#" style="text-decoration:none">Pregelix</a>
+        <a href="http://pregelix.ics.uci.edu/" style="text-decoration:none" target="_blank">Pregelix</a>
       </li>
       <li class="indexItem">
-        <a href="#" style="text-decoration:none">AsterixDB</a>
+        <a href="http://asterixdb.ics.uci.edu/" style="text-decoration:none" target="_blank">AsterixDB</a>
       </li>
       <li class="indexItem">
-        <a href="#" style="text-decoration:none">Contact</a>
+        <a href="contact" style="text-decoration:none" target="_blank">Contact</a>
       </li>
     </ul>
     <div id="graphDisplayBlock" style="float:left">
@@ -245,48 +248,19 @@
         </div>
         <h3 class="controlBlockTitle">Community Display</h3>
         <div>
-          <p class="controlBlockContent">Show Your Community!</p>
-          <!--
-          <span style="margin-left:5px">Name:</span>
-          <input id="task2_node" class="task1Text" name="task2_node" type="text"/>
-          </br>
-          <span style="margin-left:5px">Number Of Iteration:</span>
-          <input id="task2_num_iteration" class="task1Text" name="task2_num_iteration" type="text"/>
-          </br>
-        -->          
+          <p class="controlBlockContent">Show Your Community!</p>         
           <button class="button" id="runTask2" type="submit">Run</button>
           
         </div>
         <h3 class="controlBlockTitle">Friend Recommendation</h3>
         <div><p class="controlBlockContent">Show Your Potential Friends!</p>
-          <span style="margin-left:5px">Name:</span>
-          <!--
-          <input id="task3_node" class="task1Text" name="task3_node" type="text"/>
-          </br>
-        -->
           <span style="margin-left:5px">Number Of Friends:</span>
           <input id="task3_num_friends" class="task1Text" name="task3_num_friends" type="text"/>
-          <!--
-          </br>
-          <span style="margin-left:5px">Number Of Iteration:</span>          
-          <input id="task3_num_iteration" class="task1Text" name="task3_num_iteration" type="text"/>          
-          -->
           </br>
           <button class="button" id="runTask3" type="submit">Run</button>
         </div>
-        <h3 class="controlBlockTitle">VIP Recommendation</h3>
-        <div><p class="controlBlockContent">Show VIPs near you!</p>
-          <!--
-          <span style="margin-left:5px">Name:</span>
-          <input id="task4_node" class="task1Text" name="task4_node" type="text"/>
-          </br>
-          <span style="margin-left:5px">Number Of Friends:</span>
-          <input id="task4_num_friends" class="task1Text" name="task4_num_friends" type="text"/>
-          </br>
-          <span style="margin-left:5px">Number Of Iteration:</span>
-          <input id="task4_num_iteration" class="task1Text" name="task4_num_iteration" type="text"/>
-          </br>
-        -->
+        <h3 class="controlBlockTitle">Popular People Recommendation</h3>
+        <div><p class="controlBlockContent">Show popular people near you!</p>
           <button class="button" id="runTask4" type="submit">Run</button>
         </div>
       </div>
